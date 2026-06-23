@@ -28,6 +28,8 @@ tags: [自托管, AI, NAS, 多模型, OpenWebUI]
 
 折腾到最后，我干脆自己搭了一个。这篇就讲讲：我怎么从"踩了个大坑"，到"一天搭出一套全家能用的多模型 AI 入口"。
 
+![Open WebUI 里 Claude / GPT / Gemini 三个模型并排回答同一个问题](images/openwebui.png)
+
 ---
 
 ## 一、我先走了一条死路
