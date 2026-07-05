@@ -1,7 +1,7 @@
 ---
-title: "One Clean Temperature API for an AMD Synology NAS — CPU, Board, Every Disk, Cross-Checked"
+title: "Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS"
 date: 2026-06-26
-summary: Getting temps off an AMD Synology is a maze — Glances can't see the board, the bundled smartctl is broken, AMD reports as Tctl not Core 0. So I pick the right source per value, merge them into one tiny JSON, and cross-check every reading against an independent source.
+summary: On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.
 wechat_url:
 tags: [self-hosting, NAS, homelab, monitoring, docker]
 lang: en
@@ -10,84 +10,130 @@ translations: [zh]
 
 <!-- English is the default version. 中文原文见 index.zh.md（站内点「中文」按钮切换）。 -->
 
-# One Clean Temperature API for an AMD Synology NAS — CPU, Board, Every Disk, Cross-Checked
+# Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS
 
-## Intro
+![Verified temperature telemetry for an AMD Synology NAS](cover.png)
 
-I wanted one small, boring thing: to see my NAS's temperatures — CPU, board, every disk — on a little dial on my desk. On an AMD-based Synology, that turned into a surprisingly deep maze. No single tool would give me all the numbers, and the ones that gave me *some* numbers couldn't agree on them.
+> **Short version:** Monitoring does not end when you read a number. A temperature that has not been checked against a second source is just a number that looks official.
 
-So I built the smallest thing that gets all the temperatures, off the right source for each value, merges them into one tiny JSON endpoint — and then doesn't trust itself, cross-checking every reading against an independent source on every run.
+## TL;DR
 
-This is the story of why it's hard, and what "verified, not vibes" monitoring actually looks like.
+| Problem | My approach |
+| --- | --- |
+| Glances misses board temperature | Read system temp from DSM's own `synowebapi` |
+| AMD CPU is not `Core 0` | Read `k10temp` as `Tctl`, fallback `Tdie` |
+| Synology's bundled `smartctl` is limited | Force `-d sat` and parse SMART attributes |
+| A pipeline can be self-consistent and wrong | Cross-check each value on every run |
+| Downstream devices need a stable contract | Write one flat JSON atomically |
 
 ---
 
-## 1. Why temperatures are hard on an AMD Synology
+## 1. Why this small thing became hard
 
-Every "read your NAS temps" tutorial assumes an Intel box and one cooperative tool. On an AMD DSM machine, three things break that assumption at once:
+**Point:** An AMD Synology is not the default target of most temperature tutorials.
 
-- **The bundled `smartctl` is old and crippled.** It has no `--json`, its `--scan` is broken, and you only get the ATA SMART attribute table if you force the device type with `-d sat`. Miss that and your disks look temperature-less.
-- **AMD doesn't report "Core 0".** Under the `k10temp` driver the CPU shows up as `Tctl` / `Tdie`, not the `Core 0` / `Package id 0` every Intel guide tells you to grep for.
-- **Glances sees the CPU but not the board.** Running Glances in Docker gets you CPU sensors, but on these machines it simply doesn't surface a motherboard/system temperature, and its disk path is flaky inside the Synology container.
+I wanted a small desk display for my NAS temperatures: CPU, system, and every disk. It sounded like an afternoon project. Then the platform broke several common assumptions:
 
-Each tool is missing a different piece. That's the whole reason this project exists: no one source is complete, so you have to assemble one.
+| Assumption | Reality on this machine |
+| --- | --- |
+| `smartctl --json` works | The bundled version is old; no JSON, broken scan |
+| CPU shows up as `Core 0` | AMD `k10temp` reports `Tctl` / `Tdie` |
+| Glances sees all sensors | It sees CPU, but not board temp reliably |
+| One tool can do everything | Each tool is missing a different piece |
 
-## 2. The approach: the right source per value, merged into one JSON
+This is not a “find the right command” problem. It is a “compose incomplete sources into one trustworthy contract” problem.
 
-Instead of forcing one tool to do everything, each value comes from whatever reports it most reliably:
+## 2. Pick the right source per value
+
+**Point:** Do not force one tool to report everything.
 
 | Value | Source | How |
 | --- | --- | --- |
-| CPU | Glances REST API | `…/api/4/sensors`, label `Tctl` (fallback `Tdie`) |
-| System / board | Synology's own `synowebapi` | `SYNO.Core.System` → `sys_temp` (the value DSM itself shows) |
-| Disks | `smartctl` | `-A -d sat /dev/sataN`, attribute `194` (or `190`) |
+| CPU | Glances REST API | `.../api/4/sensors`, label `Tctl`, fallback `Tdie` |
+| System / board | DSM Web API | `SYNO.Core.System` -> `sys_temp` |
+| Disks | `smartctl` | `-A -d sat /dev/sataN`, attribute `194` or `190` |
 
-A small Python collector queries all three, normalizes them to integer Celsius, and writes a single flat JSON. If a source is unavailable, its field is `null` rather than a fabricated number. No database, no agent — just shell + Python 3 and two tiny containers.
+The collector does three things:
 
-## 3. Don't trust your own pipeline — grade it every run
+1. Query those sources.
+2. Normalize to integer Celsius.
+3. Write one flat JSON document.
 
-Here's the part I'm proudest of. Most homelab monitoring is *self-consistent*: it reports whatever its one tool said, and you hope it's right. This one **checks itself against three independent sources on every run**, via a `verify.py`:
+If a source is unavailable, the field becomes `null`. I would rather show missing data than invent a plausible number.
 
-- **CPU** — endpoint (Glances) vs. reading `/sys/class/hwmon/hwmon0/temp1_input` directly from sysfs (`k10temp`, bypassing Glances entirely).
-- **System** — endpoint vs. `synowebapi`'s `sys_temp` (the official DSM value).
-- **Disks** — endpoint (smartctl) vs. DSM's Storage Manager (`SYNO.Storage.CGI.Storage`).
+## 3. Do not trust your own pipeline
 
-It allows a `3°C` tolerance to absorb the ~30-second gap between samples, prints a PASS/FAIL table, and exits non-zero if anything disagrees. The point isn't that cross-checking is fancy — it's that a temperature you haven't verified against a second source is just a number that *looks* official.
+**Point:** The most valuable part is verification, not collection.
 
-## 4. The contract: one flat JSON → a physical dial
+Most homelab monitoring is self-consistent: it reads one tool and plots that tool's answer. Self-consistent is not the same as correct.
 
-Everything downstream depends on one stable shape:
+So the project includes `verify.py`, which checks the endpoint against independent sources every run:
+
+| Field | Endpoint source | Independent check |
+| --- | --- | --- |
+| CPU | Glances | Direct sysfs read from `k10temp` |
+| System | JSON output | DSM `synowebapi` `sys_temp` |
+| Disks | `smartctl` | DSM Storage Manager |
+
+It allows a `3°C` tolerance for sampling delay and exits non-zero on mismatch.
+
+> The point is not “I can read it.” The point is “I can prove I did not read it wrong.”
+
+## 4. One small JSON for every downstream client
+
+**Point:** The simpler the downstream client, the more stable the contract needs to be.
 
 ```json
-{ "ts": 1750900000, "unit": "C", "model": "DS1525+",
-  "cpu": 53, "cpu_label": "Tctl", "system": 41,
-  "disks": [ { "name": "sata1", "temp": 38 } ] }
+{
+  "ts": 1750900000,
+  "unit": "C",
+  "model": "DS1525+",
+  "cpu": 53,
+  "cpu_label": "Tctl",
+  "system": 41,
+  "disks": [
+    { "name": "sata1", "temp": 38 }
+  ]
+}
 ```
 
-A daemon refreshes it every 30 seconds and writes it **atomically** — temp file, then `mv` — so a reader never catches a half-written file. An `nginx:alpine` container serves it read-only on `:8787`. From there:
+The daemon refreshes every 30 seconds and writes atomically: temp file first, then `mv`. That keeps ESP32 clients and the browser dashboard from ever reading a half-written file.
 
-- An **ESP32 / M5Dial** desk gadget does an HTTP GET and parses it with ArduinoJson v7, using the `ts` field to decide if the data is stale.
-- A self-contained `web/index.html` renders the same JSON as a live dial in the browser: green below 66°C, amber 66–81°C, red above — refreshing every 5 seconds, with a stale-data dot if `ts` is older than 90s.
+## 5. Pits and fixes
 
-## 5. The war stories
+| Pit | Cause | Fix |
+| --- | --- | --- |
+| Script killed itself | BusyBox lacks `pgrep`; `pkill -f` matched the launcher | Track a PID file and kill by PID |
+| Empty CPU sensors in Docker | Container could not see host sensors | Add `pid: host` for Glances |
+| `scp` failed on DSM | Synology lacks the modern SFTP subsystem used by default | Use `scp -O` |
+| Disk temps were missing | Device type was not explicit | Use `smartctl -A -d sat /dev/sataN` |
 
-A few pits worth their own paragraph, because they cost real time:
+## 6. Trade-offs
 
-- **The script that kills itself.** Synology ships busybox, which has no `pgrep`. `pkill -f temps_daemon.sh` matches the *launcher's own* command line (it contains that path) and kills the very thing managing the daemon. The fix: track a PID file and `kill` by PID, never by pattern.
-- **Empty CPU sensors in Docker.** Glances in a container returns no sensors until you give it the host PID namespace (`pid: host` in compose) — otherwise psutil can't see the host's hardware.
-- **`scp` that won't connect.** Deploying to DSM failed with `subsystem request failed on channel 0` because Synology doesn't enable the SFTP subsystem modern `scp` defaults to. `scp -O` (legacy protocol) fixes it.
+- It is tuned to one AMD Synology model; disk slots, `Tctl`, and `hwmon` paths are assumptions.
+- It reports temperatures only; throughput, fans, UPS, and capacity are future work.
+- The endpoint belongs on the LAN. Do not port-forward it or expose it publicly.
+- The physical M5Dial firmware is still evolving; the JSON contract is the stable part.
 
-## 6. Honest trade-offs
+## 7. Checklist
 
-This is a sharp little tool, not an enterprise stack — be clear about the edges:
+- [ ] List the trusted source for every value.
+- [ ] Do not force one tool to read everything.
+- [ ] Find a second source for each value.
+- [ ] Use `null` for missing data; do not fabricate numbers.
+- [ ] Write JSON atomically.
+- [ ] Use `ts` to detect stale data downstream.
+- [ ] Keep the endpoint internal.
 
-- **It's tuned to one machine.** Disk slots, the AMD `Tctl` label, the `hwmon0` path, and several volume paths are currently hardcoded. Different model, disk count, or an Intel box means editing code (factoring these into config is on the TODO).
-- **Temperatures only, for now.** Throughput, load, fan RPM, volume capacity, UPS — all roadmap, none shipped yet.
-- **The physical M5Dial firmware is still a vision.** Today the "dial" is a browser page plus a mockup; the on-device firmware isn't written.
-- **No auth, internal only.** The endpoint binds on the LAN with no authentication — never port-forward it, never tunnel it to the public internet. Anyone on your network can read these numbers.
+## 8. Final thought
 
-None of that dents the core win: on a platform where temperatures are scattered across three half-working tools, this gives you one endpoint you can actually trust.
+This project is not really about displaying temperatures. It is about this question:
+
+> If a number influences your judgment, can you prove it deserves trust?
+
+On a platform where sensors are scattered across half-working tools, this gives me one endpoint I can explain, verify, and feed into a desk display.
 
 → **[github.com/ZerbLion/nas_monitoring](https://github.com/ZerbLion/nas_monitoring)**
 
-If it saved you an afternoon of fighting `smartctl`, a ⭐ means a lot.
+If it saved you an afternoon of fighting `smartctl`, a star means a lot.
+
