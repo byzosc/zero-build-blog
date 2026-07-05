@@ -33,39 +33,6 @@
     }
   },
   {
-    "dir": "2026-06-26-ai-chathub-chrome-extension",
-    "title": "AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration",
-    "short_title": "AI ChatHub: API + Webtab Engines",
-    "date": "2026-06-26",
-    "summary": "A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a \"webtab\" mode that drives your already-logged-in tabs — because each alone isn't enough.",
-    "tags": [
-      "chrome",
-      "extension",
-      "AI",
-      "javascript",
-      "opensource"
-    ],
-    "cover": "cover.png",
-    "lang": "en",
-    "translations": [
-      "zh"
-    ],
-    "localized": {
-      "zh": {
-        "title": "AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路",
-        "short_title": "AI ChatHub：API 与标签页双引擎",
-        "summary": "用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你\"已登录标签页\"的 webtab 模式——因为每套单独都不够。",
-        "tags": [
-          "浏览器扩展",
-          "AI",
-          "前端",
-          "开源",
-          "折腾"
-        ]
-      }
-    }
-  },
-  {
     "dir": "2026-06-26-amd-synology-temperature-json-api",
     "title": "Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS",
     "short_title": "AMD Synology Temps: Verified JSON",
@@ -99,39 +66,6 @@
     }
   },
   {
-    "dir": "2026-06-26-local-first-trading-dashboard",
-    "title": "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.",
-    "short_title": "Trading Dashboard: Read-Only First",
-    "date": "2026-06-26",
-    "summary": "A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.",
-    "tags": [
-      "webdev",
-      "dataviz",
-      "fastapi",
-      "react",
-      "self-hosting"
-    ],
-    "cover": "cover.png",
-    "lang": "en",
-    "translations": [
-      "zh"
-    ],
-    "localized": {
-      "zh": {
-        "title": "我做交易面板时最先写的不是图表，而是“只读边界”",
-        "short_title": "交易面板第一步：只读边界",
-        "summary": "一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。",
-        "tags": [
-          "前端",
-          "数据可视化",
-          "FastAPI",
-          "React",
-          "自托管"
-        ]
-      }
-    }
-  },
-  {
     "dir": "2026-06-26-zero-build-blog",
     "title": "I Built a Zero-Build Blog: Just Markdown and git push",
     "short_title": "Zero-Build Blog: Markdown + Push",
@@ -144,7 +78,7 @@
       "markdown",
       "self-hosting"
     ],
-    "cover": "",
+    "cover": "cover.png",
     "lang": "en",
     "translations": [
       "zh"
@@ -160,6 +94,39 @@
           "GitHubPages",
           "Markdown",
           "自托管"
+        ]
+      }
+    }
+  },
+  {
+    "dir": "2026-06-26-ai-chathub-chrome-extension",
+    "title": "AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration",
+    "short_title": "AI ChatHub: API + Webtab Engines",
+    "date": "2026-06-23",
+    "summary": "A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a \"webtab\" mode that drives your already-logged-in tabs — because each alone isn't enough.",
+    "tags": [
+      "chrome",
+      "extension",
+      "AI",
+      "javascript",
+      "opensource"
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路",
+        "short_title": "AI ChatHub：API 与标签页双引擎",
+        "summary": "用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你\"已登录标签页\"的 webtab 模式——因为每套单独都不够。",
+        "tags": [
+          "浏览器扩展",
+          "AI",
+          "前端",
+          "开源",
+          "折腾"
         ]
       }
     }
@@ -198,6 +165,39 @@
     }
   },
   {
+    "dir": "2026-06-26-local-first-trading-dashboard",
+    "title": "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.",
+    "short_title": "Trading Dashboard: Read-Only First",
+    "date": "2026-03-26",
+    "summary": "A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.",
+    "tags": [
+      "webdev",
+      "dataviz",
+      "fastapi",
+      "react",
+      "self-hosting"
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "我做交易面板时最先写的不是图表，而是“只读边界”",
+        "short_title": "交易面板第一步：只读边界",
+        "summary": "一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。",
+        "tags": [
+          "前端",
+          "数据可视化",
+          "FastAPI",
+          "React",
+          "自托管"
+        ]
+      }
+    }
+  },
+  {
     "dir": "2017-07-01-silence-is-an-eternal-theme",
     "title": "Silence Is an Eternal Theme",
     "short_title": "",
@@ -207,7 +207,7 @@
       "writing",
       "photography"
     ],
-    "cover": "",
+    "cover": "cover.png",
     "lang": "en",
     "translations": [
       "zh"
@@ -234,7 +234,7 @@
       "writing",
       "photography"
     ],
-    "cover": "",
+    "cover": "cover.png",
     "lang": "en",
     "translations": [
       "zh"

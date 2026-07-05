@@ -1,7 +1,7 @@
 ---
 title: "AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration"
 short_title: "AI ChatHub: API + Webtab Engines"
-date: 2026-06-26
+date: 2026-06-23
 summary: A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a "webtab" mode that drives your already-logged-in tabs — because each alone isn't enough.
 wechat_url:
 tags: [chrome, extension, AI, javascript, opensource]

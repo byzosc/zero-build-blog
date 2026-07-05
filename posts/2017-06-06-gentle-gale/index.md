@@ -10,6 +10,8 @@ translations: [zh]
 
 # Gentle Gale
 
+![A lone walk through a ruined coastal street in Zhuhai](cover.png)
+
 *Soundtrack: ["This Is Not Where We Are Supposed To Be"](https://music.163.com/#/song?id=1309897) — NetEase Cloud Music*
 
 Midday. Wandering through the Fourteen-Inch Resort, the post-rock track "This Is Not Where We Are Supposed To Be" echoing in my ears.

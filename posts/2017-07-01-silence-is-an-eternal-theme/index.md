@@ -10,6 +10,8 @@ translations: [zh]
 
 # Silence Is an Eternal Theme
 
+![A summer farewell on a quiet campus walkway](cover.png)
+
 Months on — looking back to the start — the instant it all felt certain — and just like that, the curtain fell
 
 For months — I longed for the end from the very start — yet when it truly ended — words choked in my throat — tears streaming down
