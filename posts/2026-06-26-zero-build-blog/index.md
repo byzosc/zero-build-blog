@@ -13,6 +13,8 @@ translations: [zh]
 
 # I Built a Zero-Build Blog: Just Markdown and git push
 
+![A zero-build Markdown blog rendered directly by the browser](cover.png)
+
 ## Intro
 
 Every "simple" blog I tried wanted the same thing from me first: install a static-site generator, learn its templating language, run a build, then babysit a deploy pipeline. I just wanted to **write a Markdown file and have it show up online.**

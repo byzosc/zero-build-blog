@@ -1,7 +1,7 @@
 ---
 title: "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary."
 short_title: "Trading Dashboard: Read-Only First"
-date: 2026-06-26
+date: 2026-03-26
 summary: A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.
 wechat_url:
 tags: [webdev, dataviz, fastapi, react, self-hosting]

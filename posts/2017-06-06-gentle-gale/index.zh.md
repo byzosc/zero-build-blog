@@ -8,6 +8,8 @@ tags: [随笔, 摄影]
 
 # 和煦暴风
 
+![独自走过珠海一条破败潮湿的街道](cover.png)
+
 *配乐：[《This Is Not Where We Are Supposed To Be》](https://music.163.com/#/song?id=1309897) —— 网易云音乐*
 
 午间，漫步十四寸度假村，耳边回荡后摇"This Is Not Where We Are Supposed To Be"。
