@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="760" viewBox="0 0 1280 760" role="img" aria-labelledby="title desc">
+  <title id="title">VPS 合规边缘枢纽架构</title>
+  <desc id="desc">一台 VPS 作为公网入口、私有管理入口、部署目标、监控节点和 NAS 桥接点的架构图。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#111827"/>
+      <stop offset="0.55" stop-color="#172033"/>
+      <stop offset="1" stop-color="#102326"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#020617" flood-opacity="0.32"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#67e8f9"/>
+    </marker>
+    <style>
+      .title { fill: #f8fafc; font: 700 34px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .subtitle { fill: #b6c8d8; font: 18px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .box { fill: rgba(15,23,42,0.88); stroke: #2dd4bf; stroke-width: 1.6; rx: 18; filter: url(#shadow); }
+      .box2 { fill: rgba(30,41,59,0.86); stroke: #94a3b8; stroke-width: 1.2; rx: 16; }
+      .center { fill: rgba(13,148,136,0.18); stroke: #5eead4; stroke-width: 2.4; rx: 26; filter: url(#shadow); }
+      .h { fill: #f8fafc; font: 700 22px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .p { fill: #cbd5e1; font: 17px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .small { fill: #94a3b8; font: 15px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .tag { fill: #0f172a; font: 700 14px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .line { stroke: #67e8f9; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .line2 { stroke: #fbbf24; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .muted { stroke: #64748b; stroke-width: 1.6; stroke-dasharray: 8 8; fill: none; }
+    </style>
+  </defs>
+  <rect width="1280" height="760" fill="url(#bg)"/>
+  <circle cx="1030" cy="116" r="170" fill="#0e7490" opacity="0.14"/>
+  <circle cx="220" cy="650" r="220" fill="#f59e0b" opacity="0.08"/>
+  <text x="64" y="76" class="title">把 VPS 当作合规边缘枢纽</text>
+  <text x="64" y="110" class="subtitle">公网入口、私有管理、部署、监控和 NAS 桥接都收拢到一个可审计控制面。</text>
+
+  <rect x="450" y="215" width="380" height="310" class="center"/>
+  <text x="522" y="258" class="h">VPS Edge Hub</text>
+  <rect x="520" y="286" width="240" height="34" rx="17" fill="#5eead4"/>
+  <text x="561" y="309" class="tag">唯一的公网承接点</text>
+  <text x="494" y="358" class="p">• Docker 服务与反代</text>
+  <text x="494" y="390" class="p">• Cloudflare Tunnel 出站连接</text>
+  <text x="494" y="422" class="p">• Tailscale 私有管理入口</text>
+  <text x="494" y="454" class="p">• 健康页、日志、备份目录</text>
+  <text x="494" y="486" class="p">• 可回滚的部署工作流</text>
+
+  <rect x="70" y="188" width="270" height="140" class="box"/>
+  <text x="110" y="231" class="h">开发设备</text>
+  <text x="110" y="268" class="p">Git push / SSH / 审批</text>
+  <text x="110" y="296" class="small">只放公钥，不复制私钥</text>
+
+  <rect x="70" y="448" width="270" height="140" class="box2"/>
+  <text x="110" y="491" class="h">NAS / 家庭内网</text>
+  <text x="110" y="528" class="p">大容量数据、备份、桥接任务</text>
+  <text x="110" y="556" class="small">不直接暴露管理面板</text>
+
+  <rect x="935" y="165" width="280" height="154" class="box"/>
+  <text x="975" y="208" class="h">公网访问</text>
+  <text x="975" y="245" class="p">Cloudflare Access</text>
+  <text x="975" y="273" class="small">先认证，再进隧道</text>
+
+  <rect x="935" y="438" width="280" height="154" class="box2"/>
+  <text x="975" y="481" class="h">监控与验证</text>
+  <text x="975" y="518" class="p">/health · status.json</text>
+  <text x="975" y="546" class="small">重启后检查端点与 timer</text>
+
+  <path d="M340 258 C382 258 395 325 450 330" class="line"/>
+  <path d="M340 518 C392 518 405 460 450 450" class="line2"/>
+  <path d="M830 328 C880 324 890 250 935 242" class="line"/>
+  <path d="M830 452 C880 456 890 518 935 520" class="line2"/>
+  <path d="M205 330 C205 378 205 405 205 448" class="muted"/>
+  <text x="117" y="388" class="small">私网优先，公网最小化</text>
+
+  <rect x="430" y="620" width="420" height="54" rx="27" fill="rgba(251,191,36,0.12)" stroke="#fbbf24"/>
+  <text x="480" y="654" class="p">目标不是躲风控，而是让服务边界清楚、用途真实、故障可恢复。</text>
+</svg>

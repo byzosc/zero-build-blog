@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="560" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
+  <title id="title">VPS 部署流程图</title>
+  <desc id="desc">从 main 对齐到部署验证的 VPS 更新流程。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#172554"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M2,2 L10,6 L2,10 Z" fill="#93c5fd"/>
+    </marker>
+    <style>
+      .title { fill: #f8fafc; font: 700 34px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .sub { fill: #bfd3e8; font: 18px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .card { fill: rgba(15,23,42,0.88); stroke: #60a5fa; stroke-width: 1.4; rx: 18; }
+      .num { fill: #0f172a; font: 800 18px Arial, sans-serif; }
+      .h { fill: #f8fafc; font: 700 20px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .p { fill: #cbd5e1; font: 15px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+      .line { stroke: #93c5fd; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .warn { fill: #fef3c7; font: 16px "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect width="1280" height="560" fill="url(#bg)"/>
+  <text x="64" y="70" class="title">一次不惊动前端的 VPS 后端部署</text>
+  <text x="64" y="105" class="sub">核心不是“复制文件”，而是每一步都有备份、边界和验证。</text>
+
+  <g transform="translate(62 158)">
+    <rect width="142" height="160" class="card"/>
+    <circle cx="32" cy="34" r="18" fill="#93c5fd"/><text x="27" y="40" class="num">1</text>
+    <text x="24" y="78" class="h">对齐 main</text>
+    <text x="24" y="112" class="p">确认 GitHub main</text>
+    <text x="24" y="136" class="p">指向目标提交</text>
+  </g>
+  <path d="M212 238 H272" class="line"/>
+  <g transform="translate(284 158)">
+    <rect width="142" height="160" class="card"/>
+    <circle cx="32" cy="34" r="18" fill="#93c5fd"/><text x="27" y="40" class="num">2</text>
+    <text x="24" y="78" class="h">打包后端</text>
+    <text x="24" y="112" class="p">只打 backend</text>
+    <text x="24" y="136" class="p">前端没改不 build</text>
+  </g>
+  <path d="M434 238 H494" class="line"/>
+  <g transform="translate(506 158)">
+    <rect width="142" height="160" class="card"/>
+    <circle cx="32" cy="34" r="18" fill="#93c5fd"/><text x="27" y="40" class="num">3</text>
+    <text x="24" y="78" class="h">盘点现场</text>
+    <text x="24" y="112" class="p">容器、端口、timer</text>
+    <text x="24" y="136" class="p">先看清再动手</text>
+  </g>
+  <path d="M656 238 H716" class="line"/>
+  <g transform="translate(728 158)">
+    <rect width="142" height="160" class="card"/>
+    <circle cx="32" cy="34" r="18" fill="#fbbf24"/><text x="27" y="40" class="num">4</text>
+    <text x="24" y="78" class="h">备份旧版</text>
+    <text x="24" y="112" class="p">backend/app</text>
+    <text x="24" y="136" class="p">带时间戳保存</text>
+  </g>
+  <path d="M878 238 H938" class="line"/>
+  <g transform="translate(950 158)">
+    <rect width="142" height="160" class="card"/>
+    <circle cx="32" cy="34" r="18" fill="#93c5fd"/><text x="27" y="40" class="num">5</text>
+    <text x="24" y="78" class="h">覆盖代码</text>
+    <text x="24" y="112" class="p">解包到目标目录</text>
+    <text x="24" y="136" class="p">不碰无关栈</text>
+  </g>
+  <path d="M1021 318 C1021 380 196 380 196 408" class="line"/>
+  <g transform="translate(128 392)">
+    <rect width="200" height="110" class="card"/>
+    <text x="26" y="44" class="h">重启目标容器</text>
+    <text x="26" y="78" class="p">只重启需要更新的服务</text>
+  </g>
+  <path d="M338 447 H430" class="line"/>
+  <g transform="translate(442 392)">
+    <rect width="240" height="110" class="card"/>
+    <text x="26" y="44" class="h">验证业务端点</text>
+    <text x="26" y="78" class="p">/health + 新 API + 公网入口</text>
+  </g>
+  <path d="M692 447 H784" class="line"/>
+  <g transform="translate(796 392)">
+    <rect width="250" height="110" class="card"/>
+    <text x="26" y="44" class="h">确认周边没受影响</text>
+    <text x="26" y="78" class="p">NAS 桥 timer、隧道、监控</text>
+  </g>
+  <rect x="350" y="520" width="580" height="28" rx="14" fill="rgba(251,191,36,0.13)" stroke="#fbbf24" stroke-width="1"/>
+  <text x="422" y="540" class="warn">失败就回滚备份，不在生产机上即兴修。</text>
+</svg>

@@ -1,5 +1,18 @@
 [
   {
+    "dir": "2026-07-05-vps-compliant-edge",
+    "title": "A VPS as a Compliant Edge Hub: Access, Deploys, Monitoring, and Account Hygiene",
+    "date": "2026-07-05",
+    "summary": "This is not a guide to evading cloud enforcement. It is a practical way to use a small VPS as a legitimate, auditable, recoverable edge control plane for public access, private SSH, deployment, health checks, NAS bridging, and backups.",
+    "tags": [
+      "vps",
+      "self-hosting",
+      "devops",
+      "cloud",
+      "docker"
+    ]
+  },
+  {
     "dir": "2026-06-26-ai-chathub-chrome-extension",
     "title": "AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration",
     "date": "2026-06-26",
