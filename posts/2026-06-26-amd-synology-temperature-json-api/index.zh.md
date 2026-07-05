@@ -1,5 +1,6 @@
 ---
 title: 别再相信单一温度来源：我给 AMD 群晖做了一份可验证的温度 JSON
+short_title: AMD 群晖温度 JSON：别信单一来源
 date: 2026-06-26
 summary: AMD 群晖上没有一个工具能稳定读全 CPU、主板和每块硬盘温度。我把每个值从最靠谱的来源取出来，合并成一份 JSON，再用独立来源逐项交叉验证，最后喂给桌面小屏。
 wechat_url:
@@ -145,4 +146,3 @@ tags: [自托管, NAS, 群晖, 监控, Docker]
 → **[github.com/ZerbLion/nas_monitoring](https://github.com/ZerbLion/nas_monitoring)**
 
 如果它帮你省下一下午跟 `smartctl` 较劲的功夫，给个 star 我会很开心。
-

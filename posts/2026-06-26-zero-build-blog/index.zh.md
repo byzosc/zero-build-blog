@@ -1,5 +1,6 @@
 ---
 title: 我做了个零构建博客：写 Markdown、git push 就发布
+short_title: 零构建博客：Markdown + Push
 date: 2026-06-26
 summary: 没有 Hugo、没有 Jekyll、没有 node_modules、没有 CI。仓库本身就是网站——写一个 Markdown 文件、push，一个约 400 行的原生 JS 引擎就把它渲染出来。这篇讲它怎么跑，以及我踩的那个限流坑。
 wechat_url:

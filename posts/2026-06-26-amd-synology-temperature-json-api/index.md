@@ -1,5 +1,6 @@
 ---
 title: "Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS"
+short_title: "AMD Synology Temps: Verified JSON"
 date: 2026-06-26
 summary: On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.
 wechat_url:
@@ -136,4 +137,3 @@ On a platform where sensors are scattered across half-working tools, this gives 
 → **[github.com/ZerbLion/nas_monitoring](https://github.com/ZerbLion/nas_monitoring)**
 
 If it saved you an afternoon of fighting `smartctl`, a star means a lot.
-

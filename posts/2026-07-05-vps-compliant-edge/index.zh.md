@@ -1,5 +1,6 @@
 ---
 title: 别把 Claude 账号稳定性赌在运气上：我用 VPS 收拢网络出口和运维边界
+short_title: Claude 稳定性：用 VPS 收拢边界
 date: 2026-07-05
 summary: 这不是“绕过 Claude 风控”的教程，而是一套更稳的使用方式：用 VPS 做稳定出口、私有 SSH、部署 runbook、健康检查和备份，减少账号行为看起来异常的概率，也让故障可解释、可恢复。
 wechat_url:

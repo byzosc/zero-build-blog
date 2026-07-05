@@ -1,5 +1,6 @@
 ---
 title: "Don't Bet Your Claude Account Stability on Luck: I Use a VPS to Stabilize the Edge"
+short_title: "Claude Stability: VPS as the Edge"
 date: 2026-07-05
 summary: This is not a guide to bypassing Claude safeguards. It is a practical way to make Claude-heavy engineering work more stable: a VPS edge for consistent access, private SSH, deployment runbooks, health checks, logs, and backups.
 wechat_url:

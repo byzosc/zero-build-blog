@@ -2,6 +2,7 @@
   {
     "dir": "2026-07-05-vps-compliant-edge",
     "title": "Don't Bet Your Claude Account Stability on Luck: I Use a VPS to Stabilize the Edge",
+    "short_title": "Claude Stability: VPS as the Edge",
     "date": "2026-07-05",
     "summary": "This is not a guide to bypassing Claude safeguards. It is a practical way to make Claude-heavy engineering work more stable: a VPS edge for consistent access, private SSH, deployment runbooks, health checks, logs, and backups.",
     "tags": [
@@ -10,11 +11,31 @@
       "self-hosting",
       "devops",
       "cloud"
-    ]
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "别把 Claude 账号稳定性赌在运气上：我用 VPS 收拢网络出口和运维边界",
+        "short_title": "Claude 稳定性：用 VPS 收拢边界",
+        "summary": "这不是“绕过 Claude 风控”的教程，而是一套更稳的使用方式：用 VPS 做稳定出口、私有 SSH、部署 runbook、健康检查和备份，减少账号行为看起来异常的概率，也让故障可解释、可恢复。",
+        "tags": [
+          "Claude",
+          "VPS",
+          "自托管",
+          "DevOps",
+          "云安全"
+        ]
+      }
+    }
   },
   {
     "dir": "2026-06-26-ai-chathub-chrome-extension",
     "title": "AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration",
+    "short_title": "AI ChatHub: API + Webtab Engines",
     "date": "2026-06-26",
     "summary": "A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a \"webtab\" mode that drives your already-logged-in tabs — because each alone isn't enough.",
     "tags": [
@@ -23,11 +44,31 @@
       "AI",
       "javascript",
       "opensource"
-    ]
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路",
+        "short_title": "AI ChatHub：API 与标签页双引擎",
+        "summary": "用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你\"已登录标签页\"的 webtab 模式——因为每套单独都不够。",
+        "tags": [
+          "浏览器扩展",
+          "AI",
+          "前端",
+          "开源",
+          "折腾"
+        ]
+      }
+    }
   },
   {
     "dir": "2026-06-26-amd-synology-temperature-json-api",
     "title": "Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS",
+    "short_title": "AMD Synology Temps: Verified JSON",
     "date": "2026-06-26",
     "summary": "On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.",
     "tags": [
@@ -36,11 +77,31 @@
       "homelab",
       "monitoring",
       "docker"
-    ]
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "别再相信单一温度来源：我给 AMD 群晖做了一份可验证的温度 JSON",
+        "short_title": "AMD 群晖温度 JSON：别信单一来源",
+        "summary": "AMD 群晖上没有一个工具能稳定读全 CPU、主板和每块硬盘温度。我把每个值从最靠谱的来源取出来，合并成一份 JSON，再用独立来源逐项交叉验证，最后喂给桌面小屏。",
+        "tags": [
+          "自托管",
+          "NAS",
+          "群晖",
+          "监控",
+          "Docker"
+        ]
+      }
+    }
   },
   {
     "dir": "2026-06-26-local-first-trading-dashboard",
     "title": "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.",
+    "short_title": "Trading Dashboard: Read-Only First",
     "date": "2026-06-26",
     "summary": "A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.",
     "tags": [
@@ -49,11 +110,31 @@
       "fastapi",
       "react",
       "self-hosting"
-    ]
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "我做交易面板时最先写的不是图表，而是“只读边界”",
+        "short_title": "交易面板第一步：只读边界",
+        "summary": "一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。",
+        "tags": [
+          "前端",
+          "数据可视化",
+          "FastAPI",
+          "React",
+          "自托管"
+        ]
+      }
+    }
   },
   {
     "dir": "2026-06-26-zero-build-blog",
     "title": "I Built a Zero-Build Blog: Just Markdown and git push",
+    "short_title": "Zero-Build Blog: Markdown + Push",
     "date": "2026-06-26",
     "summary": "No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.",
     "tags": [
@@ -62,11 +143,31 @@
       "github-pages",
       "markdown",
       "self-hosting"
-    ]
+    ],
+    "cover": "",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "我做了个零构建博客：写 Markdown、git push 就发布",
+        "short_title": "零构建博客：Markdown + Push",
+        "summary": "没有 Hugo、没有 Jekyll、没有 node_modules、没有 CI。仓库本身就是网站——写一个 Markdown 文件、push，一个约 400 行的原生 JS 引擎就把它渲染出来。这篇讲它怎么跑，以及我踩的那个限流坑。",
+        "tags": [
+          "博客",
+          "原生JS",
+          "GitHubPages",
+          "Markdown",
+          "自托管"
+        ]
+      }
+    }
   },
   {
     "dir": "2026-06-21-multi-model-ai-gateway",
     "title": "Build Your Own Multi-Model AI Gateway in a Day: Turn Paid Subscriptions into a Family-Wide Hub",
+    "short_title": "Multi-Model AI Gateway in a Day",
     "date": "2026-06-21",
     "summary": "From ChatALL pitfalls to rolling my own — a subscription bridge + Open WebUI + NAS, a family-shared, side-by-side multi-model AI hub built in a day.",
     "tags": [
@@ -75,26 +176,79 @@
       "NAS",
       "multi-model",
       "OpenWebUI"
-    ]
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口",
+        "short_title": "一天搭建多模型 AI 网关",
+        "summary": "从 ChatALL 踩坑到自建——用订阅桥 + Open WebUI + NAS，一天搭出全家共享、多模型并排的 AI 入口。",
+        "tags": [
+          "自托管",
+          "AI",
+          "NAS",
+          "多模型",
+          "OpenWebUI"
+        ]
+      }
+    }
   },
   {
     "dir": "2017-07-01-silence-is-an-eternal-theme",
     "title": "Silence Is an Eternal Theme",
+    "short_title": "",
     "date": "2017-07-01",
     "summary": "A farewell under a 38°C blaze — looking back to where it all felt certain, meetings and partings, and a steadfast creed that we will surely meet again.",
     "tags": [
       "writing",
       "photography"
-    ]
+    ],
+    "cover": "",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "静默是永恒的主题",
+        "short_title": "",
+        "summary": "38℃烈日下的告别——回望认定的那一瞬，聚散离合，以及\"必然会再次相遇\"的坚定信条。",
+        "tags": [
+          "随笔",
+          "摄影"
+        ]
+      }
+    }
   },
   {
     "dir": "2017-06-06-gentle-gale",
     "title": "Gentle Gale",
+    "short_title": "",
     "date": "2017-06-06",
     "summary": "A quiet afternoon at the Fourteen-Inch Resort — post-rock in my ears, draped in a gentle gale, wanting only to walk this road to its end.",
     "tags": [
       "writing",
       "photography"
-    ]
+    ],
+    "cover": "",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "和煦暴风",
+        "short_title": "",
+        "summary": "十四寸度假村的宁静午后——耳边后摇，覆着和煦暴风，只想走完这段路。",
+        "tags": [
+          "随笔",
+          "摄影"
+        ]
+      }
+    }
   }
 ]
