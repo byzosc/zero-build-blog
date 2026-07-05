@@ -21,6 +21,17 @@ document.getElementById('year').textContent = new Date().getFullYear();
 
 // 站点 UI 文案：跟随当前阅读语言（localStorage 'lang'，默认英文）
 function currentLang() { return localStorage.getItem('lang') === 'zh' ? 'zh' : 'en'; }
+const THEME_KEY = 'theme';
+function systemTheme() {
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+function savedTheme() {
+  const theme = localStorage.getItem(THEME_KEY);
+  return theme === 'light' || theme === 'dark' ? theme : '';
+}
+function currentTheme() {
+  return savedTheme() || systemTheme();
+}
 const STR = {
   en: { back: '← Back to posts', loadingList: 'Loading posts…', empty: 'No posts yet.',
         listErr: 'Failed to load list: ', rate: 'If this is GitHub API rate limiting (60/hr for anonymous), just try again shortly.',
@@ -35,6 +46,58 @@ function t(k, lang = currentLang()) { return (STR[lang] && STR[lang][k]) || STR.
 function applyChrome(lang) {
   const f = document.getElementById('tagline'); if (f) f.textContent = t('footer', lang);
   document.documentElement.lang = (lang || currentLang()) === 'zh' ? 'zh-CN' : 'en';
+  updateThemeToggleLabel(currentTheme(), lang || currentLang());
+}
+
+function updateHighlightTheme(theme) {
+  const light = document.getElementById('hljs-light');
+  const dark = document.getElementById('hljs-dark');
+  if (!light || !dark) return;
+  light.media = theme === 'light' ? 'all' : 'not all';
+  dark.media = theme === 'dark' ? 'all' : 'not all';
+}
+
+function updateGiscusTheme(theme) {
+  const frame = document.querySelector('iframe.giscus-frame');
+  if (!frame || !frame.contentWindow) return;
+  frame.contentWindow.postMessage({ giscus: { setConfig: { theme } } }, 'https://giscus.app');
+}
+
+function updateThemeToggleLabel(theme, lang = currentLang()) {
+  const button = document.querySelector('[data-theme-toggle]');
+  if (!button) return;
+  const next = theme === 'dark' ? 'light' : 'dark';
+  button.textContent = lang === 'zh'
+    ? (next === 'dark' ? '暗色' : '亮色')
+    : (next === 'dark' ? 'Dark' : 'Light');
+  button.setAttribute('aria-label', lang === 'zh'
+    ? `切换到${next === 'dark' ? '暗色' : '亮色'}模式`
+    : `Switch to ${next} mode`);
+  button.setAttribute('title', button.getAttribute('aria-label'));
+}
+
+function applyTheme(theme = currentTheme()) {
+  document.documentElement.dataset.theme = theme;
+  updateHighlightTheme(theme);
+  updateThemeToggleLabel(theme);
+  updateGiscusTheme(theme);
+}
+
+function setupThemeToggle() {
+  applyTheme();
+  const button = document.querySelector('[data-theme-toggle]');
+  if (button) {
+    button.addEventListener('click', () => {
+      const next = currentTheme() === 'dark' ? 'light' : 'dark';
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+  }
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (!savedTheme()) applyTheme(systemTheme());
+    });
+  }
 }
 
 function escapeHtml(s) {
@@ -270,7 +333,7 @@ function mountGiscus(term) {
     'data-category': g.category, 'data-category-id': g.categoryId,
     'data-mapping': 'specific', 'data-term': term,
     'data-reactions-enabled': '1', 'data-emit-metadata': '0',
-    'data-theme': 'preferred_color_scheme', 'data-lang': currentLang() === 'zh' ? 'zh-CN' : 'en', 'data-loading': 'lazy',
+    'data-theme': currentTheme(), 'data-lang': currentLang() === 'zh' ? 'zh-CN' : 'en', 'data-loading': 'lazy',
   };
   for (const [k, v] of Object.entries(attrs)) s.setAttribute(k, v);
   s.crossOrigin = 'anonymous'; s.async = true;
@@ -354,5 +417,6 @@ function router() {
 }
 
 window.addEventListener('hashchange', router);
+setupThemeToggle();
 applyChrome();
 router();

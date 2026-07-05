@@ -5,11 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zerb's Blog</title>
   <meta name="description" content="Zerb 的博客 · 自托管 / AI / 折腾。">
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
   <link rel="icon" href="assets/brand/zerb-favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/brand/zerb-favicon-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" href="assets/brand/zerb-favicon-180.png">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
   <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
@@ -20,6 +28,7 @@
     </a>
     <nav class="site-nav">
       <a href="https://github.com/ZerbLion/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Toggle theme">Dark</button>
     </nav>
   </header>
 
