@@ -1,5 +1,6 @@
 ---
 title: "I Built a Zero-Build Blog: Just Markdown and git push"
+short_title: "Zero-Build Blog: Markdown + Push"
 date: 2026-06-26
 summary: No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.
 wechat_url:

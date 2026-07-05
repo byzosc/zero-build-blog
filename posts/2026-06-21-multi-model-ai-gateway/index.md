@@ -1,5 +1,6 @@
 ---
 title: "Build Your Own Multi-Model AI Gateway in a Day: Turn Paid Subscriptions into a Family-Wide Hub"
+short_title: "Multi-Model AI Gateway in a Day"
 date: 2026-06-21
 summary: From ChatALL pitfalls to rolling my own — a subscription bridge + Open WebUI + NAS, a family-shared, side-by-side multi-model AI hub built in a day.
 wechat_url:

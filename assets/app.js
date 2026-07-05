@@ -31,7 +31,7 @@ const STR = {
         loadingPost: '加载文章…', postErr: '文章加载失败：', older: '← 更早', newer: '更新 →',
         footer: '纯 Markdown · 免构建 · push 即发布。' },
 };
-function t(k) { return STR.en[k]; } // 站点 chrome 一律英文（英文为主站点）；中文按钮只切文章正文
+function t(k, lang = currentLang()) { return (STR[lang] && STR[lang][k]) || STR.en[k] || k; }
 function applyChrome(lang) {
   const f = document.getElementById('tagline'); if (f) f.textContent = t('footer', lang);
   document.documentElement.lang = (lang || currentLang()) === 'zh' ? 'zh-CN' : 'en';
@@ -96,12 +96,31 @@ async function listPosts() {
       const { date, slug } = parseDir(name);
       let meta = {};
       try { meta = parseFrontmatter(await fetchText(`${CONFIG.postsDir}/${name}/index.md`)).meta; } catch (e) {}
+      const translations = Array.isArray(meta.translations) ? meta.translations
+                         : (meta.translations ? [meta.translations] : []);
+      const localized = {};
+      await Promise.all(translations.map(async code => {
+        try {
+          const lmeta = parseFrontmatter(await fetchText(`${CONFIG.postsDir}/${name}/index.${code}.md`)).meta;
+          localized[code] = {
+            title: lmeta.title || '',
+            short_title: lmeta.short_title || '',
+            summary: lmeta.summary || '',
+            tags: Array.isArray(lmeta.tags) ? lmeta.tags : (lmeta.tags ? [lmeta.tags] : []),
+          };
+        } catch (e) {}
+      }));
       return {
         dir: name,
         title: meta.title || slug,
+        short_title: meta.short_title || '',
         date: meta.date || date,
         summary: meta.summary || '',
         tags: Array.isArray(meta.tags) ? meta.tags : [],
+        cover: meta.cover || '',
+        lang: meta.lang || 'en',
+        translations,
+        localized,
       };
     }));
     posts.sort((a, b) => String(b.date).localeCompare(String(a.date)));
@@ -122,25 +141,105 @@ async function getPosts() {
   return _postsCache;
 }
 
+function normalizeLang(code) {
+  return code === 'zh-CN' ? 'zh' : code;
+}
+
+function postLangs(post) {
+  const langs = new Set([normalizeLang(post.lang || 'en')]);
+  (post.translations || []).forEach(code => langs.add(normalizeLang(code)));
+  Object.keys(post.localized || {}).forEach(code => langs.add(normalizeLang(code)));
+  return Array.from(langs);
+}
+
+function listLangs(posts) {
+  const found = new Set();
+  posts.forEach(post => postLangs(post).forEach(code => found.add(code)));
+  const ordered = ['en', 'zh'].filter(code => found.has(code));
+  return ordered.concat(Array.from(found).filter(code => !ordered.includes(code)));
+}
+
+function langSwitchHtml(langs, active, className = '') {
+  if (langs.length < 2) return '';
+  return `<div class="lang-switch ${className}">` + langs.map(code =>
+    `<button data-lang="${code}" class="${code === active ? 'active' : ''}">${LANG_LABEL[code] || code}</button>`
+  ).join('') + '</div>';
+}
+
+function listCopy(lang) {
+  return lang === 'zh'
+    ? { kicker: 'Zerb 的笔记', title: '最新文章' }
+    : { kicker: "Zerb's Notebook", title: 'Recent writing' };
+}
+
+function localizedMeta(post, lang) {
+  const localized = post.localized || {};
+  const normalized = normalizeLang(lang);
+  return localized[lang] || localized[normalized] ||
+    Object.entries(localized).find(([code]) => normalizeLang(code) === normalized)?.[1] || null;
+}
+
+function postListView(post, lang) {
+  const localized = localizedMeta(post, lang);
+  const tags = localized && localized.tags && localized.tags.length ? localized.tags : (post.tags || []);
+  return {
+    title: (localized && (localized.short_title || localized.title)) || post.short_title || post.title,
+    summary: (localized && localized.summary) || post.summary || '',
+    tags,
+  };
+}
+
+function postCoverSrc(post) {
+  const cover = post.cover || '';
+  if (!cover) return '';
+  if (/^(https?:|\/\/|\/|data:)/.test(cover)) return cover;
+  return `${CONFIG.postsDir}/${post.dir}/${cover}`;
+}
+
 async function renderList() {
-  applyChrome();
-  app.innerHTML = `<p class="state">${t('loadingList')}</p>`;
+  const lang = currentLang();
+  applyChrome(lang);
+  app.innerHTML = `<p class="state">${t('loadingList', lang)}</p>`;
   try {
     const posts = await getPosts();
     document.title = "Zerb's Blog";
-    if (!posts.length) { app.innerHTML = `<p class="empty">${t('empty')}</p>`; return; }
-    app.innerHTML = '<ul class="post-list">' + posts.map(p => `
-      <li class="post-card">
-        <a href="#/post/${encodeURIComponent(p.dir)}">
-          <h2>${escapeHtml(p.title)}</h2>
-          <div class="post-meta">${escapeHtml(p.date)}${p.tags.length ? ' · ' + p.tags.map(escapeHtml).join(' / ') : ''}</div>
-          ${p.summary ? `<p class="post-summary">${escapeHtml(p.summary)}</p>` : ''}
+    if (!posts.length) { app.innerHTML = `<p class="empty">${t('empty', lang)}</p>`; return; }
+    const langs = listLangs(posts);
+    const copy = listCopy(lang);
+    app.innerHTML = `<section class="list-hero">
+        <div>
+          <p class="list-kicker">${escapeHtml(copy.kicker)}</p>
+          <h1>${escapeHtml(copy.title)}</h1>
+        </div>
+        ${langSwitchHtml(langs, lang, 'list-lang-switch')}
+      </section>
+      <ul class="post-list">` + posts.map(p => {
+        const view = postListView(p, lang);
+        const cover = postCoverSrc(p);
+        const tagLabel = view.tags.length ? view.tags[0] : 'note';
+        return `
+      <li class="post-card${cover ? ' has-cover' : ''}">
+        <a class="post-card-link" href="#/post/${encodeURIComponent(p.dir)}">
+          ${cover
+            ? `<img class="post-card-visual post-card-cover" src="${escapeHtml(cover)}" alt="" loading="lazy">`
+            : `<div class="post-card-visual post-card-fallback" aria-hidden="true"><span>Z</span><small>${escapeHtml(tagLabel)}</small></div>`}
+          <div class="post-card-body">
+            <h2>${escapeHtml(view.title)}</h2>
+            <div class="post-meta">${escapeHtml(p.date)}${view.tags.length ? ' · ' + view.tags.map(escapeHtml).join(' / ') : ''}</div>
+            ${view.summary ? `<p class="post-summary">${escapeHtml(view.summary)}</p>` : ''}
+          </div>
         </a>
-      </li>`).join('') + '</ul>';
+      </li>`;
+      }).join('') + '</ul>';
+    app.querySelectorAll('.list-lang-switch button').forEach(btn =>
+      btn.addEventListener('click', () => {
+        localStorage.setItem('lang', btn.getAttribute('data-lang'));
+        renderList();
+      }));
     window.scrollTo(0, 0);
   } catch (e) {
-    app.innerHTML = `<p class="error">${t('listErr')}${escapeHtml(e.message)}</p>
-      <p class="state"><small>${t('rate')}</small></p>`;
+    app.innerHTML = `<p class="error">${t('listErr', lang)}${escapeHtml(e.message)}</p>
+      <p class="state"><small>${t('rate', lang)}</small></p>`;
   }
 }
 
@@ -196,11 +295,8 @@ async function renderPost(dir) {
     let cur = localStorage.getItem('lang');
     if (!langs.some(l => l.code === cur)) cur = langs[0].code;
 
-    const switcher = langs.length > 1
-      ? '<div class="lang-switch">' + langs.map(l =>
-          `<button data-lang="${l.code}">${LANG_LABEL[l.code] || l.code}</button>`).join('') + '</div>'
-      : '';
-    app.innerHTML = `<article class="post"><a class="back" href="#/">${t('back')}</a>${switcher}<div class="post-body"></div></article>`;
+    const switcher = langSwitchHtml(langs.map(l => l.code), cur);
+    app.innerHTML = `<article class="post"><a class="back" href="#/">${t('back', cur)}</a>${switcher}<div class="post-body"></div></article>`;
     const bodyEl = app.querySelector('.post-body');
 
     // 切换语言只换正文，不动上一篇/下一篇和评论
@@ -235,7 +331,7 @@ async function renderPost(dir) {
       const newer = i >= 0 ? posts[i - 1] : null; // 更新
       if (older || newer) {
         const cell = (p, side, label) => p
-          ? `<a class="${side}" href="#/post/${encodeURIComponent(p.dir)}"><span class="post-nav-label">${label}</span><span class="post-nav-title">${escapeHtml(p.title)}</span></a>`
+          ? `<a class="${side}" href="#/post/${encodeURIComponent(p.dir)}"><span class="post-nav-label">${label}</span><span class="post-nav-title">${escapeHtml(postListView(p, currentLang()).title)}</span></a>`
           : `<span class="${side}"></span>`;
         const nav = document.createElement('nav');
         nav.className = 'post-nav';

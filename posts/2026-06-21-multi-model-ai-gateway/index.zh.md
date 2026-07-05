@@ -1,5 +1,6 @@
 ---
 title: 一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口
+short_title: 一天搭建多模型 AI 网关
 date: 2026-06-21
 summary: 从 ChatALL 踩坑到自建——用订阅桥 + Open WebUI + NAS，一天搭出全家共享、多模型并排的 AI 入口。
 wechat_url:

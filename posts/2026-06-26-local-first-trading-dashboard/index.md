@@ -1,5 +1,6 @@
 ---
 title: "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary."
+short_title: "Trading Dashboard: Read-Only First"
 date: 2026-06-26
 summary: A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.
 wechat_url:
@@ -163,4 +164,3 @@ It was about building a tool that is honest about data, restrained with permissi
 Those three properties matter in any dashboard.
 
 → **[github.com/ZerbLion/trading-pannel](https://github.com/ZerbLion/trading-pannel)**
-

@@ -9,7 +9,7 @@
 //
 // 由 .github/workflows/build-posts.yml 在每次 push 时自动跑并提交，作者照常只管 push。
 
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { access, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const ROOT = process.cwd();
@@ -40,6 +40,19 @@ function parseDir(name) {
   return m ? { date: m[1], slug: m[2] } : { date: '', slug: name };
 }
 
+function normalizeList(value) {
+  return Array.isArray(value) ? value : value ? [value] : [];
+}
+
+async function exists(file) {
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 let entries;
 try {
   entries = await readdir(path.join(ROOT, POSTS), { withFileTypes: true });
@@ -58,12 +71,34 @@ for (const e of entries) {
   }
   const fm = parseFrontmatter(md);
   const { date, slug } = parseDir(e.name);
+  const translations = normalizeList(fm.translations);
+  const localized = {};
+  for (const code of translations) {
+    try {
+      const lmd = await readFile(path.join(ROOT, POSTS, e.name, `index.${code}.md`), 'utf8');
+      const lfm = parseFrontmatter(lmd);
+      localized[code] = {
+        title: lfm.title || '',
+        short_title: lfm.short_title || '',
+        summary: lfm.summary || '',
+        tags: normalizeList(lfm.tags),
+      };
+    } catch {
+      // A declared translation can be added later; keep the index usable meanwhile.
+    }
+  }
+  const cover = fm.cover || ((await exists(path.join(ROOT, POSTS, e.name, 'cover.png'))) ? 'cover.png' : '');
   posts.push({
     dir: e.name,
     title: fm.title || slug,
+    short_title: fm.short_title || '',
     date: fm.date || date,
     summary: fm.summary || '',
-    tags: Array.isArray(fm.tags) ? fm.tags : fm.tags ? [fm.tags] : [],
+    tags: normalizeList(fm.tags),
+    cover,
+    lang: fm.lang || 'en',
+    translations,
+    localized,
   });
 }
 
