@@ -1,7 +1,7 @@
 ---
-title: "Building a Local-First, Read-Only Trading Dashboard with FastAPI + React"
+title: "The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary."
 date: 2026-06-26
-summary: A self-hosted dashboard that aggregates read-only brokerage positions, delayed market data, macro feeds and a personal rule base, computes expectancy locally, and assembles an LLM prompt — strictly read-only, it never places an order. A post about the engineering, not the trading.
+summary: A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.
 wechat_url:
 tags: [webdev, dataviz, fastapi, react, self-hosting]
 lang: en
@@ -10,80 +10,157 @@ translations: [zh]
 
 <!-- English is the default version. 中文原文见 index.zh.md（站内点「中文」按钮切换）。 -->
 
-# Building a Local-First, Read-Only Trading Dashboard with FastAPI + React
+# The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.
 
-> **Up front, so there's no confusion:** this is a post about *software engineering*, not investing. The project is a read-only analytics panel. It does not place orders, does not emit buy/sell signals, and promises nothing about returns. Every number it shows is historical statistics or a deterministic formula. Nothing here is financial advice.
+![A local-first, read-only trading analytics dashboard](cover.png)
 
-## Intro
+> **Up front:** this is a software engineering post, not investment advice. The project is read-only analytics. It does not place orders, does not emit buy/sell signals, and promises nothing about returns.
 
-I wanted a single screen that pulled together everything I look at before making a decision — positions, delayed quotes, a few technical indicators, some macro context, a news digest, and my own written "rules" — and then helped me *think*, not act. The hard constraints I set myself were unusual for a trading tool: **local-first, and read-only by default.** The app should be able to sit there all day touching nothing, and connect to my broker only when I explicitly press a button — and even then, only to *read*.
+## TL;DR
 
-This post is about how that constraint shaped the architecture, and the engineering details I found interesting along the way.
+| Problem | My approach |
+| --- | --- |
+| Trading tools can overreach | No broker connection by default; read-only when connected |
+| Bad data can look convincing | Distorted quotes are labeled “do not use” |
+| Real-time data can cost money | UI confirmation plus server-side throttle |
+| LLMs can hallucinate | They receive facts and rules, not execution authority |
+| Slow gateways freeze pages | Single-flight executor, hard timeout, cached snapshot |
 
 ---
 
-## 1. Read-only by design, not by promise
+## 1. Why I wrote the boundary first
 
-The safety property I cared about most is enforced in several independent places, so it can't be "forgotten":
+**Point:** In trading software, “cannot do dangerous things” matters more than “looks advanced.”
 
-- **It doesn't connect to the broker by default.** The home view, the polling loop, the one-click plan — all run off a read-only saved snapshot plus free market data. Connecting to Interactive Brokers happens only on an explicit refresh request.
-- **When it does connect, it connects read-only.** Every broker session is opened with `readonly=True`, and there is *no order-placement call anywhere in the codebase* — it only ever reads positions and account summary.
-- **It degrades instead of lying.** If the gateway is offline, it doesn't fall back to fake data; it re-marks the last real snapshot with external quotes and labels the valuation mode (`live`, `snapshot_external_mark`, or `snapshot_stale`) so you always know how fresh the numbers are.
+I wanted one screen that pulled together what I check before making a decision:
 
-Read-only isn't a sentence in the README — it's the shape of the code.
+- Positions.
+- Delayed quotes.
+- Technical context.
+- Macro background.
+- News summaries.
+- My own written rules.
+- An LLM-ready context bundle.
 
-## 2. Data honesty: better "don't use this" than a pretty fake
+But the hard constraint came first: **local-first, read-only by default.**
 
-The most opinionated part of the project is that it would rather show you nothing than a number that looks right and isn't:
+The dashboard may help me organize information, frame risk, and spot conflicts with my own rules. It must not place orders. That boundary has to be architecture, not marketing copy.
 
-- If a quote's bid/ask spread exceeds a sane threshold (or bid > ask), the value is flagged unreliable and the UI literally says "distorted, don't use."
-- If an option's implied volatility lands outside a plausible band, it's treated as bad — and the Greeks computed from it are discarded rather than displayed with false confidence.
-- Paid data has a hard gate: fetching a real-time snapshot (which costs a small per-call fee) requires an explicit confirm in the UI, plus a server-side throttle so a double-click can't double-charge you.
-- When option Greeks aren't available, the code says *why* — "not subscribed to the real-time options feed" — and falls back to delayed data with a locally computed estimate, instead of silently showing blanks.
+## 2. Wrong frame / better frame
 
-A dashboard you can't trust at a glance is worse than no dashboard. So it spends real effort proving its own numbers.
+| Wrong frame | Better frame |
+| --- | --- |
+| The chart is the product | The boundary and data quality are the product |
+| Let the LLM recommend trades | Let the LLM read facts and rules only |
+| Read-only is a promise | Read-only is enforced by code paths |
+| Missing data should be mocked | Missing data should be labeled missing |
+| More real-time is always better | Use paid real-time data only when explicitly needed |
 
-## 3. The stack (and what's deliberately missing)
+## 3. Read-only by design
 
-- **Frontend:** Vite 7 + React 19 + TypeScript, with an intentionally tiny dependency list — `react`, `react-dom`, an icon set, and a Markdown renderer. **No charting library.** The "visualization" is structured panels, tables, and status bars, not candlestick charts — which fits a tool about *reading context*, not staring at price.
-- **Backend:** FastAPI + uvicorn, with effectively three Python dependencies; nearly everything else (HTTP, CSV, cookies, concurrency) is standard library. It was recently refactored from one big file into a dozen focused modules.
-- **Data layers, by cost:** free by default (delayed quotes, technicals, fundamentals, options-chain IV, plus macro feeds and an economic calendar); a small per-call fee for a real-time snapshot; a monthly subscription for live options Greeks (off by default, auto-falls-back).
+**Point:** The safety property is enforced in several independent places.
 
-## 4. Real-time without WebSockets
+| Layer | Constraint |
+| --- | --- |
+| Default state | Home view and polling use local snapshots plus delayed/free data |
+| Broker connection | Only explicit user refresh connects |
+| Session config | Broker session opens with `readonly=True` |
+| Code path | No order-placement call exists in the codebase |
+| Degraded mode | Offline gateway re-marks old snapshots; it does not fake data |
 
-There's no socket plumbing here — just disciplined polling plus multi-level caching. The frontend probes broker connectivity and the portfolio every few seconds and refreshes macro on a slower cadence; the backend gives every source its own TTL (quotes seconds, options minutes, fundamentals and daily bars hours, the calendar a day). The decision endpoint fans out seven or eight cross-border fetches through a thread pool, so total latency is roughly the slowest single source rather than their sum, with a global semaphore capping concurrency so a free quote API doesn't start returning 429s.
+Read-only is not a sentence in the README. It is the shape of the code.
 
-## 5. Deterministic math, not prediction
+## 4. Data honesty
 
-The "expectancy" panel is pure arithmetic on history, and labeled as such everywhere:
+**Point:** A dashboard you cannot trust at a glance is worse than no dashboard.
 
-- Break-even win rate is just `risk / (risk + reward)`.
-- The historical hit-rate "backtest" walks two years of daily bars, treats each day as an entry, and asks whether price hit the target or the stop first within a fixed horizon — counting same-day double-touches conservatively as a loss.
-- It can condition on the present: only sampling historical days in the same RSI bucket and trend as today.
+The app adds several reliability gates:
 
-Option Greeks are computed locally with Black-Scholes (delayed IV in, a risk-free rate from the 3-month Treasury). None of this predicts anything — it's a transparent way to *frame* a decision, which is exactly why it's safe to put on screen.
+- Wide bid/ask spread or bid > ask: mark as distorted and tell the user not to use it.
+- Implausible implied volatility: discard Greeks derived from it.
+- Missing option Greeks: explain why, such as no real-time options subscription.
+- Paid real-time snapshot: require UI confirmation and server-side throttling.
+- Re-marked stale snapshot: label the valuation mode (`live`, `snapshot_external_mark`, `snapshot_stale`).
 
-## 6. Six-stage retrieval over a personal rule base
+> I do not want a dashboard that pretends to know the market. I want one that knows when it should not be trusted.
 
-The most fun engineering is the rule search. My trading "rules" live as notes; the app indexes them and retrieves the relevant ones to include in the prompt. It runs as a **provider-agnostic, degrade-gracefully pipeline**: lexical recall (with bigram tokenization for languages without word boundaries) → semantic vectors → multi-query expansion → section expansion → LLM rerank → a full-coverage pass. Any upper stage failing falls back to plain lexical — it never crashes. Embeddings are cached on disk with a signature over the content, so editing a note or switching providers recomputes automatically.
+## 5. Stack: restraint over spectacle
 
-And a nice escape hatch: a single endpoint exports the entire rule set as plain text. Because the rule base is small, you can paste the whole thing into a long-context web LLM and get full-coverage retrieval for free, with no dependency on the server's LLM key at all.
+| Layer | Choice |
+| --- | --- |
+| Frontend | Vite + React + TypeScript |
+| Backend | FastAPI + uvicorn |
+| Visualization | Panels, tables, status bars; no heavy charting library |
+| Data | Free/delayed by default; paid real-time only on demand |
+| LLM | Context assembly only; no execution authority |
 
-## 7. The war stories
+The lack of a charting library is intentional. This tool is for reading context before a decision, not staring at candles.
 
-- **A half-open gateway froze the whole page.** The broker client's account/portfolio calls have *no timeout* on a slow gateway — I measured a ~54-second hang, and the old code held a lock the whole time, blocking everything. The fix: a single-flight executor with a hard timeout that returns the cached snapshot on time and lets the slow thread warm the cache in the background.
-- **A data source quietly died.** One free historical-data provider's pages moved and then sprouted a JS anti-scraping challenge, so I migrated wholesale to another chart API (which itself needs a cookie + token handshake, refreshed every 30 minutes).
-- **"Stale options" was a misdiagnosis.** A "distorted/unavailable" flag turned out to be *market-closed wide spreads*, not stale data — it tightens at the open. Knowing that let me harden the reliability check instead of chasing a non-bug.
-- **Deployment is its own boss fight.** Browser cache making you think a deploy didn't land; `docker exec` needing `-i` to accept stdin; an SSH single-command argument ceiling forcing the built frontend to be base64-split into chunks; git-bash mangling absolute paths until `MSYS_NO_PATHCONV=1`.
+## 6. “Real-time” without WebSockets
 
-## 8. Honest trade-offs
+**Point:** Not every dashboard needs socket plumbing.
 
-- **It's a single-user, personal tool.** CORS is pinned to localhost, there's no multi-tenant auth (it leans on a private network), and there's one account snapshot. Not a product.
-- **Free data is delayed** (~15 minutes); truly real-time needs a paid subscription, and most Greeks are local estimates.
-- **It leans on third-party, unofficial endpoints** that can change without notice — one already did.
-- **There are MVP remnants** (mock routes and fixtures) still in the tree; the code is ahead of parts of the README.
-- And again, the important one: **this is read-only analytics, not an auto-trader, and not advice.**
+The frontend uses disciplined polling:
 
-The interesting work here was never about markets. It was about building a tool that's honest about its data, safe by construction, and useful for thinking — three things worth caring about in any dashboard.
+- Frequent checks for broker connectivity and portfolio state.
+- Slower refresh for macro and calendar data.
+- Per-source TTLs on the backend: quotes in seconds, options in minutes, fundamentals and daily bars in hours, calendar in days.
+- Parallel cross-source fetches via a thread pool.
+- A global semaphore to avoid provoking 429s from free APIs.
+
+It is not flashy. It is stable.
+
+## 7. LLMs read facts. They do not press buttons.
+
+**Point:** Letting an LLM participate in analysis does not mean giving it authority.
+
+My personal rule base lives as notes. The app retrieves relevant rules and assembles them with holdings, quotes, macro context, and news.
+
+The retrieval pipeline degrades gracefully:
+
+```text
+lexical recall -> semantic vectors -> multi-query expansion -> section expansion -> LLM rerank -> full pass
+```
+
+If an upper stage fails, it falls back to lexical search. Embeddings are cached with a content hash, so edited rules invalidate automatically.
+
+There is also a useful escape hatch: export all rules as plain text. The rule base is small enough to paste into a long-context web LLM when needed.
+
+## 8. Pits and fixes
+
+| Pit | Symptom | Fix |
+| --- | --- | --- |
+| Half-open broker gateway froze the page | Account/portfolio call hung ~54s while holding a lock | Single-flight executor, hard timeout, cached snapshot |
+| Free data source died | Page moved and gained JS anti-scraping | Migrate source and handle cookie/token handshake |
+| “Stale options” was misdiagnosed | Market-closed wide spreads looked like bad data | Harden reliability checks |
+| Deploy was its own boss fight | Cache, stdin, SSH command length, path conversion | Split into a runbook |
+
+## 9. Trade-offs
+
+- It is a single-user personal tool, not SaaS.
+- CORS is pinned to localhost and it leans on a private network.
+- Free data is delayed; truly real-time data costs money.
+- Some third-party unofficial endpoints can change.
+- There are MVP remnants in the tree.
+- Again: this is read-only analytics, not an auto-trader and not advice.
+
+## 10. Checklist
+
+- [ ] Define what the tool must never do.
+- [ ] Do not connect to high-authority systems by default.
+- [ ] Require explicit confirmation for costly or risky data.
+- [ ] Label bad data instead of beautifying it.
+- [ ] Let LLMs read context, not execute actions.
+- [ ] Put timeouts and caches around slow external dependencies.
+- [ ] Treat deployment as a runbook.
+
+## 11. Final thought
+
+The interesting work was never about predicting markets.
+
+It was about building a tool that is honest about data, restrained with permissions, and useful for thinking.
+
+Those three properties matter in any dashboard.
 
 → **[github.com/ZerbLion/trading-pannel](https://github.com/ZerbLion/trading-pannel)**
+
