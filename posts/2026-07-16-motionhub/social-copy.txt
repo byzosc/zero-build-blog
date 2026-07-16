@@ -8,12 +8,18 @@ MotionHub 发布文案
 正文：
 我把两个动效项目接到了一起：MotionHub。
 
-MotionSheet 先读懂 Lottie：图层、时间、曲线、层级、交接表。
-MotionPilot 再把一句话变成 AE 里的可编辑图层和关键帧。
+右边写一句：
+“8 瓣发光花环向中心旋转收拢成圆，再反向展开；节奏放慢 2x。”
+
+左边直接得到 AE 里的可编辑图层和关键帧。
+
+没有插件，每一种动效都要从 JSX、AE API、图层索引和错误排查重新开始。MotionPilot 把这些容易出错的部分做成稳定执行层；MotionSheet 则负责读懂 Lottie 的图层、时间、曲线与层级。
 
 这次不是“AI 生成一段视频”。结果仍然留在 After Effects 里，能拆、能改、能继续调速度曲线。
 
-标题说得狠，现状说得诚实：两端已经能工作，但还不是一键闭环。下一步是统一 motion contract，真正接通“读懂动效”与“写回 AE”。
+我准备把自有插件代码转成 MIT 开源。不是开源一朵花，而是开源 AI 操作 AE 的执行底座：每个人补一种能力，之后所有人和所有 AI 都能复用。
+
+标题说得狠，现状说得诚实：两端已经能工作，但还不是一键闭环，也还不能保证任何参考都一次成功。下一步是统一 motion contract，真正接通“读懂动效”与“写回 AE”。
 
 AI 还没替代审美，但已经开始接管重复执行。
 
@@ -27,10 +33,10 @@ AI 还没替代审美，但已经开始接管重复执行。
 标题：手K动效已死？我把 AI 接进了 After Effects
 
 摘要：
-MotionSheet 负责读懂动效，MotionPilot 负责把文字意图写回 AE 的可编辑图层与关键帧。两个项目放在一起，就是 MotionHub。
+右边输入一句动效描述，左边生成可编辑的 AE 图层与关键帧。MotionSheet 负责读，MotionPilot 负责写；两个项目放在一起，就是准备走向 MIT 开源的 MotionHub。
 
 开头：
-AI 还没有替代动效师的审美，但它已经开始接管重复执行。这次我做的不是“再生成一段视频”，而是让 AI 真正进入 After Effects 的可编辑工作流。
+AI 还没有替代动效师的审美，但它已经开始接管重复执行。没有插件，每个参考都可能从一份新 JSX 开始；有了稳定执行层，每新增一种能力，下一次就能直接复用。这次我做的不是“再生成一段视频”，而是让 AI 真正进入 After Effects 的可编辑工作流。
 
 推荐素材：`cover.png` + `motionhub-demo.mp4`
 正文：直接使用 `index.zh.md`。
@@ -41,11 +47,11 @@ X / Twitter 中文
 手K动效已死？至少重复执行正在死。
 
 我把 MotionSheet 和 MotionPilot 接成了 MotionHub：
-读 Lottie 的图层/时间/曲线/层级 → AI 生成受控计划 → 写回 AE 可编辑关键帧。
+右边一句描述 → AI 生成受控计划 → 左边写回 AE 可编辑图层与关键帧。
 
 不是黑盒视频。结果还能在 After Effects 里继续改。
 
-现在是两个可工作的原型，下一步打通 motion contract。
+准备把自有插件代码转为 MIT 开源：不是开源一个效果，而是开源 AI 操作 AE 的公共底座。
 
 https://zerblion.github.io/zero-build-blog/#/post/2026-07-16-motionhub
 
@@ -55,9 +61,11 @@ X / Twitter English
 Is hand-keyframing dead? At least the repetitive part is starting to be.
 
 MotionHub connects MotionSheet and MotionPilot:
-read Lottie structure → plan from intent → write editable layers and keyframes back into After Effects.
+describe motion on the right → AI plans → editable AE layers and keyframes appear on the left.
 
 Not a black-box generated clip. The result stays editable in AE.
+
+The first-party plugin is planned for an MIT release: shared infrastructure for AI to operate After Effects, not a one-off effect.
 
 https://zerblion.github.io/zero-build-blog/#/post/2026-07-16-motionhub
 
@@ -72,9 +80,9 @@ MotionHub = MotionSheet + MotionPilot。
 MotionSheet：读取 Lottie / Bodymovin JSON，拆出图层、时间、曲线、父子关系和动效交接表。
 MotionPilot：在 After Effects 内理解文字意图，写入仍可继续编辑的图层、关键帧、效果和表达式。
 
-视频里的 MotionSheet 是真实页面动效；AE 段来自当前工程 240 帧、60fps 的实际渲染，不再用两张截图做放大推拉。
+视频第一段把“右侧描述、左侧生成”放在同一个画面：左侧来自当前工程 240 帧、60fps 的实际渲染，右侧为明确标注的目标面板交互拼接。MotionSheet 段为真实页面动效。
 
-当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
+我准备把自有插件代码转为 MIT 开源，让每个人贡献的动效能力都能被所有人和所有 AI 复用。当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
 
 MotionSheet：https://zerb.cc.cd/
 GitHub：https://github.com/zerbLion/keyframe_sheet
