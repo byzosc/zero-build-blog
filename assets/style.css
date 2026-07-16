@@ -164,6 +164,10 @@ main { min-height: 60vh; padding-bottom: 48px; }
 .post-body a { color: var(--accent); }
 .post-body a:hover { color: var(--accent-hover); }
 .post-body img { max-width: 100%; height: auto; border-radius: 8px; display: block; margin: 18px auto; }
+.post-body video {
+  width: 100%; height: auto; display: block; margin: 20px auto;
+  border-radius: 8px; background: #000;
+}
 .post-body ul, .post-body ol { padding-left: 1.4em; }
 .post-body li { margin: 6px 0; }
 .post-body blockquote {

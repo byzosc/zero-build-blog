@@ -1,0 +1,71 @@
+MotionHub 发布文案
+================
+
+小红书
+------
+标题：我把动效规范直接接进了 AE
+
+正文：
+最近把两个项目接成了一个方向：MotionHub。
+
+MotionSheet 负责读懂 Lottie / Bodymovin JSON，把图层、时间、曲线和父子关系变成交接表；MotionPilot 负责在 After Effects 里理解文字意图，再生成仍然可以继续编辑的图层、关键帧和效果。
+
+现在两端都已经能工作，但还不是一键闭环。下一步是统一 motion contract，让“分析出来的规范”可以直接进入“AE 执行”。
+
+不是生成一段黑盒视频，而是让设计能解释、开发能复现、AE 能执行。
+
+#动效设计 #AfterEffects #Lottie #AI工具 #设计开发协作 #MotionDesign
+
+推荐素材：social-cover.png + motionhub-demo-vertical.mp4
+
+
+微信公众号
+----------
+标题：MotionHub：让动效规范真正进入 AE
+
+摘要：
+MotionSheet 负责读懂已有动效并生成可交接规范，MotionPilot 负责把文字意图落到 AE 的可编辑图层与关键帧。两个项目放在一起，就是 MotionHub。
+
+推荐素材：cover.png + motionhub-demo.mp4
+正文：直接使用 index.zh.md。
+
+
+X / Twitter 中文
+----------------
+我把两个动效项目放到了一条链路里：MotionHub。
+
+MotionSheet 读取 Lottie，整理图层、时间、曲线和父子关系；MotionPilot 在 AE 内把文字意图执行成可编辑图层与关键帧。
+
+现在还不是一键闭环，下一步是统一 motion contract。
+
+设计能解释，开发能复现，AE 能执行。
+
+https://zerb.cc.cd/
+
+
+X / Twitter English
+-------------------
+I am bringing two motion-design tools into one workflow: MotionHub.
+
+MotionSheet reads Lottie data into layers, timing, curves, and hierarchy. MotionPilot turns intent into editable layers and keyframes inside After Effects.
+
+The next milestone is a shared motion contract between them.
+
+https://zerb.cc.cd/
+
+
+Bilibili / YouTube
+------------------
+标题：MotionHub 演示：从 Lottie 动效规范到 AE 可编辑执行
+
+简介：
+MotionHub 由 MotionSheet 和 MotionPilot 组成。
+
+MotionSheet：读取 Lottie / Bodymovin JSON，生成图层、时间、曲线、父子关系和动效交接表。
+MotionPilot：在 After Effects 内理解文字意图，生成仍可继续编辑的图层、关键帧、效果和表达式。
+
+当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
+
+MotionSheet：https://zerb.cc.cd/
+GitHub：https://github.com/zerbLion/keyframe_sheet
+MotionPilot：https://github.com/zerbLion/motion-design

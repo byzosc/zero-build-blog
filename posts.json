@@ -1,5 +1,38 @@
 [
   {
+    "dir": "2026-07-16-motionhub",
+    "title": "MotionHub: MotionSheet Reads Motion, MotionPilot Writes It Back to After Effects",
+    "short_title": "MotionHub: Motion Specs Meet AE",
+    "date": "2026-07-16",
+    "summary": "MotionSheet turns Lottie data into a readable handoff. MotionPilot turns motion intent into editable After Effects operations. Together, they form MotionHub.",
+    "tags": [
+      "motion-design",
+      "after-effects",
+      "lottie",
+      "ai",
+      "tools"
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "MotionHub：让动效规范真正进入 AE",
+        "short_title": "MotionHub：动效规范进入 AE",
+        "summary": "MotionSheet 负责读懂动效并生成可交接规范，MotionPilot 负责把文字意图落到 AE 的可编辑图层与关键帧；两者合起来就是 MotionHub。",
+        "tags": [
+          "动效设计",
+          "After Effects",
+          "Lottie",
+          "AI",
+          "工具"
+        ]
+      }
+    }
+  },
+  {
     "dir": "2026-07-05-vps-compliant-edge",
     "title": "Claude Account Suspended? A VPS Might Be the Answer",
     "short_title": "Claude + VPS",
