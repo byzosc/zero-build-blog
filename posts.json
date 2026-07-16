@@ -4,7 +4,7 @@
     "title": "Is Hand-Keyframing Dead? MotionHub Brings AI Into After Effects",
     "short_title": "Is Hand-Keyframing Dead?",
     "date": "2026-07-16",
-    "summary": "MotionHub connects MotionSheet and MotionPilot so AI can read motion structure, plan from intent, and write editable layers and keyframes back into After Effects.",
+    "summary": "Describe motion on the right and get editable AE layers and keyframes on the left. MotionHub is turning that AI workflow into shared, extensible infrastructure.",
     "tags": [
       "motion-design",
       "after-effects",
@@ -21,7 +21,7 @@
       "zh": {
         "title": "手K动效已死？AI 正在接管 AE：MotionHub 首次公开",
         "short_title": "手K动效已死？AI 正在接管 AE",
-        "summary": "我把 MotionSheet 和 MotionPilot 接成了 MotionHub：AI 先读懂动效规范，再把文字意图写回 After Effects 的可编辑图层与关键帧。",
+        "summary": "右边写一句动效描述，左边得到可继续编辑的 AE 图层与关键帧。MotionHub 正在把这条 AI 动效链路做成可复用、可扩展的公共底座。",
         "tags": [
           "动效设计",
           "After Effects",
