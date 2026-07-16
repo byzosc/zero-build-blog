@@ -1,10 +1,10 @@
 [
   {
     "dir": "2026-07-16-motionhub",
-    "title": "MotionHub: MotionSheet Reads Motion, MotionPilot Writes It Back to After Effects",
-    "short_title": "MotionHub: Motion Specs Meet AE",
+    "title": "Is Hand-Keyframing Dead? MotionHub Brings AI Into After Effects",
+    "short_title": "Is Hand-Keyframing Dead?",
     "date": "2026-07-16",
-    "summary": "MotionSheet turns Lottie data into a readable handoff. MotionPilot turns motion intent into editable After Effects operations. Together, they form MotionHub.",
+    "summary": "MotionHub connects MotionSheet and MotionPilot so AI can read motion structure, plan from intent, and write editable layers and keyframes back into After Effects.",
     "tags": [
       "motion-design",
       "after-effects",
@@ -19,9 +19,9 @@
     ],
     "localized": {
       "zh": {
-        "title": "MotionHub：让动效规范真正进入 AE",
-        "short_title": "MotionHub：动效规范进入 AE",
-        "summary": "MotionSheet 负责读懂动效并生成可交接规范，MotionPilot 负责把文字意图落到 AE 的可编辑图层与关键帧；两者合起来就是 MotionHub。",
+        "title": "手K动效已死？AI 正在接管 AE：MotionHub 首次公开",
+        "short_title": "手K动效已死？AI 正在接管 AE",
+        "summary": "我把 MotionSheet 和 MotionPilot 接成了 MotionHub：AI 先读懂动效规范，再把文字意图写回 After Effects 的可编辑图层与关键帧。",
         "tags": [
           "动效设计",
           "After Effects",

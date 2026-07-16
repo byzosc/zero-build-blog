@@ -1,15 +1,15 @@
 ---
-title: "MotionHub: MotionSheet Reads Motion, MotionPilot Writes It Back to After Effects"
-short_title: "MotionHub: Motion Specs Meet AE"
+title: "Is Hand-Keyframing Dead? MotionHub Brings AI Into After Effects"
+short_title: "Is Hand-Keyframing Dead?"
 date: 2026-07-16
-summary: MotionSheet turns Lottie data into a readable handoff. MotionPilot turns motion intent into editable After Effects operations. Together, they form MotionHub.
+summary: MotionHub connects MotionSheet and MotionPilot so AI can read motion structure, plan from intent, and write editable layers and keyframes back into After Effects.
 wechat_url:
 tags: [motion-design, after-effects, lottie, ai, tools]
 lang: en
 translations: [zh]
 ---
 
-# MotionHub: Motion Specs Meet After Effects
+# Is Hand-Keyframing Dead? AI Is Moving Into After Effects
 
 ![MotionHub combines MotionSheet and MotionPilot](cover.png)
 
@@ -17,9 +17,11 @@ translations: [zh]
   <source src="motionhub-demo.mp4" type="video/mp4">
 </video>
 
-> **In one sentence:** MotionSheet explains existing motion; MotionPilot turns new intent into editable work inside After Effects.
+> **In one sentence:** MotionSheet explains existing motion; MotionPilot turns new intent into editable work inside After Effects. Together, they form MotionHub.
 
-MotionHub is not a third app. It is the name for the workflow that connects two projects I was already building.
+The headline is aggressive; the claim is deliberately narrower. AI has not replaced a motion designer's taste, but it can already take over a growing amount of repetitive execution. MotionHub is the workflow connecting two projects I was already building.
+
+The goal is not another black-box generated clip. Structure, planning, and the result all stay inside a normal design workflow.
 
 | Part | Job | Output |
 | --- | --- | --- |
@@ -36,6 +38,8 @@ MotionSheet runs in the browser and reads JSON locally. It turns animation data 
 ## MotionPilot: write motion
 
 MotionPilot lives inside After Effects. It combines selected-layer context, optional visual context, an LLM-generated plan, and deterministic JSX execution. The result remains editable in AE; it is not a rendered black-box clip.
+
+The demo above no longer fakes the AE section with screenshot zooms. Its AE motion comes from a real 240-frame, 60fps render of the current `Comp 4`, composited back into the actual AE interface to preserve the editing context.
 
 ![MotionPilot running inside After Effects](ae-motionpilot.png)
 
@@ -55,4 +59,4 @@ That is what MotionHub means to me:
 - [MotionSheet on GitHub](https://github.com/zerbLion/keyframe_sheet)
 - [MotionPilot on GitHub](https://github.com/zerbLion/motion-design)
 
-The vertical social demo and platform-ready copy are included with this post's source assets.
+The vertical social demo, real AE source clip, and platform-ready copy are included with this post's source assets.
