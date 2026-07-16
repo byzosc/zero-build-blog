@@ -306,12 +306,21 @@ async function renderList() {
   }
 }
 
-// 把正文里的相对链接/图片改成相对文章目录解析（如 images/arch.png → posts/<dir>/images/arch.png）
+// 把正文里的相对链接和媒体改成相对文章目录解析（如 images/arch.png → posts/<dir>/images/arch.png）
 function fixRelativeUrls(root, base) {
+  const isRelative = value => value && !/^(https?:|\/\/|\/|#|data:|blob:)/.test(value);
   root.querySelectorAll('img[src]').forEach(img => {
     const s = img.getAttribute('src');
-    if (s && !/^(https?:|\/\/|\/|#|data:)/.test(s)) img.setAttribute('src', base + s);
+    if (isRelative(s)) img.setAttribute('src', base + s);
     img.setAttribute('loading', 'lazy');
+  });
+  root.querySelectorAll('video[src], audio[src], source[src]').forEach(media => {
+    const s = media.getAttribute('src');
+    if (isRelative(s)) media.setAttribute('src', base + s);
+  });
+  root.querySelectorAll('video[poster]').forEach(video => {
+    const poster = video.getAttribute('poster');
+    if (isRelative(poster)) video.setAttribute('poster', base + poster);
   });
   root.querySelectorAll('a[href]').forEach(a => {
     const h = a.getAttribute('href') || '';
@@ -366,7 +375,10 @@ async function renderPost(dir) {
     async function load(code) {
       const lang = langs.find(l => l.code === code) || langs[0];
       if (lang.body === null) lang.body = parseFrontmatter(await fetchText(base + lang.file)).body;
-      bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(lang.body));
+      bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(lang.body), {
+        ADD_TAGS: ['video', 'source'],
+        ADD_ATTR: ['controls', 'playsinline', 'preload', 'poster'],
+      });
       fixRelativeUrls(bodyEl, base);
       bodyEl.querySelectorAll('pre code').forEach(el => { try { hljs.highlightElement(el); } catch (e) {} });
       app.querySelectorAll('.lang-switch button').forEach(b =>
