@@ -39,7 +39,7 @@ MotionSheet runs in the browser and reads JSON locally. It turns animation data 
 
 MotionPilot lives inside After Effects. It combines selected-layer context, optional visual context, an LLM-generated plan, and deterministic JSX execution. The result remains editable in AE; it is not a rendered black-box clip.
 
-The demo puts cause and effect in one frame: a motion description is entered on the right, while the corresponding animation appears from an empty canvas on the left. The left-side motion is a real 240-frame, 60fps render of the current `Comp 4`. The panel and execution states are an explicitly labeled demonstration composite of the intended interaction, not a claim that the full one-click loop is finished.
+The demo is a real After Effects screen recording. A motion description is entered in MotionPilot on the right and Generate is clicked; the composition and timeline on the left then receive actual layers and editable keyframes. Only the API wait is visibly time-compressed. Generation and playback remain at their recorded speed, followed by the real MotionSheet interface inspecting and handing off motion data.
 
 ![MotionPilot running inside After Effects](ae-motionpilot.png)
 
@@ -70,7 +70,7 @@ Today, MotionHub cannot promise that every motion reference will work on the fir
 
 ## What works now, and what comes next
 
-Both ends already work as prototypes. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. In the launch video, the left side is a real AE result and the right side is a clearly labeled composite of the intended panel interaction.
+Both ends already work as prototypes. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with a clearly labeled time compression only during the API wait.
 
 The honest boundary: **the two products are not yet a one-click closed loop.** The next milestone is a shared motion contract so MotionSheet output can become MotionPilot input without re-describing timing, easing, hierarchy, or layer intent.
 
