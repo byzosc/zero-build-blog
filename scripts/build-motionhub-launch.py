@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,6 +103,35 @@ def make_horizontal_overlays(work: Path) -> list[Path]:
         draw.text((164, 99), detail, font=font(21), fill=color)
         output = work / name
         image.save(output)
+        outputs.append(output)
+    return outputs
+
+
+def make_ae_focus_overlays(work: Path) -> list[Path]:
+    specs = [
+        ("focus-input.png", (1460, 490), (390, 175), BLUE),
+        ("focus-generate.png", (1500, 740), (310, 130), PINK),
+        ("focus-keyframes.png", (1000, 900), (330, 130), TEAL),
+        ("focus-result.png", (960, 535), (470, 315), PINK),
+    ]
+    outputs: list[Path] = []
+    for name, center, radius, color in specs:
+        cx, cy = center
+        rx, ry = radius
+        box = (cx - rx, cy - ry, cx + rx, cy + ry)
+
+        glow = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        glow_draw = ImageDraw.Draw(glow)
+        glow_draw.ellipse(box, outline=(*color, 68), width=24)
+        glow = glow.filter(ImageFilter.GaussianBlur(40))
+
+        ring = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        ring_draw = ImageDraw.Draw(ring)
+        ring_draw.ellipse(box, outline=(*color, 72), width=2)
+        ring.alpha_composite(glow)
+
+        output = work / name
+        ring.save(output)
         outputs.append(output)
     return outputs
 
@@ -268,25 +297,62 @@ def build_clean_capture(raw: Path, output: Path) -> None:
     )
 
 
-def encode_ae_segment(source: Path, overlays: list[Path], output: Path) -> None:
+def encode_ae_segment(
+    source: Path,
+    overlays: list[Path],
+    focus_overlays: list[Path],
+    output: Path,
+) -> None:
+    zoom = (
+        "if(lt(on,24),1+0.9*(0.5-0.5*cos(PI*on/24)),"
+        "if(lt(on,165),1.9,"
+        "if(lt(on,195),1.9-0.45*(0.5-0.5*cos(PI*(on-165)/30)),"
+        "if(lt(on,246),1.45,"
+        "if(lt(on,276),1.45+0.45*(0.5-0.5*cos(PI*(on-246)/30)),"
+        "if(lt(on,360),1.9,"
+        "if(lt(on,390),1.9-0.9*(0.5-0.5*cos(PI*(on-360)/30)),1)))))))"
+    )
+    move_to_timeline = "0.5-0.5*cos(PI*(on-246)/30)"
+    return_to_full = "0.5-0.5*cos(PI*(on-360)/30)"
+    timeline_x = "1380-iw/(2*zoom)"
+    timeline_y = "ih-ih/zoom"
+    center_x = "(iw-iw/zoom)/2"
+    center_y = "(ih-ih/zoom)/2"
+    x = (
+        "if(lt(on,246),iw-iw/zoom,"
+        f"if(lt(on,276),(iw-iw/zoom)*(1-({move_to_timeline}))+"
+        f"({timeline_x})*({move_to_timeline}),"
+        f"if(lt(on,360),{timeline_x},"
+        f"if(lt(on,390),({timeline_x})*(1-({return_to_full}))+"
+        f"({center_x})*({return_to_full}),{center_x}))))"
+    )
+    input_y = "490-ih/(2*zoom)"
+    y = (
+        f"if(lt(on,246),max(0,min(ih-ih/zoom,{input_y})),"
+        f"if(lt(on,276),max(0,min(ih-ih/zoom,{input_y}))*(1-({move_to_timeline}))+"
+        f"({timeline_y})*({move_to_timeline}),"
+        f"if(lt(on,360),{timeline_y},"
+        f"if(lt(on,390),({timeline_y})*(1-({return_to_full}))+"
+        f"({center_y})*({return_to_full}),{center_y}))))"
+    )
     graph = (
         "[0:v]split=3[s0][s1][s2];"
         "[s0]trim=start=0:end=6,setpts=PTS-STARTPTS[p0];"
         "[s1]trim=start=6:end=19,setpts=(PTS-STARTPTS)/6[p1];"
         "[s2]trim=start=19:end=30.9,setpts=PTS-STARTPTS[p2];"
         "[p0][p1][p2]concat=n=3:v=1:a=0,fps=30[cut];"
-        "[cut]split=2[lc][rc];"
-        "[lc]crop=1300:1080:170:0[left];"
-        "[rc]crop=450:1080:1470:0,scale=620:1080:flags=lanczos[right];"
-        "[left][right]hstack=inputs=2,"
-        "drawbox=x=1297:y=0:w=4:h=1080:color=0x42dcc6@0.68:t=fill[base];"
+        f"[cut]zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s=1920x1080:fps=30[base];"
         "[base][1:v]overlay=0:0:enable='between(t,0,6)'[v1];"
         "[v1][2:v]overlay=0:0:enable='between(t,6,8.2)'[v2];"
-        "[v2][3:v]overlay=0:0:enable='between(t,8.2,20.2)',"
+        "[v2][3:v]overlay=0:0:enable='between(t,8.2,20.2)'[v3];"
+        "[v3][4:v]overlay=0:0:enable='between(t,0,6)'[f1];"
+        "[f1][5:v]overlay=0:0:enable='between(t,6,8.2)'[f2];"
+        "[f2][6:v]overlay=0:0:enable='between(t,8.2,12)'[f3];"
+        "[f3][7:v]overlay=0:0:enable='between(t,12,20.2)',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", source]
-    for overlay in overlays:
+    for overlay in [*overlays, *focus_overlays]:
         args.extend(["-i", overlay])
     args.extend(
         [
@@ -524,7 +590,7 @@ def concat_with_silent_audio(segments: list[Path], output: Path, work: Path) -> 
 
 def make_covers(source: Path, work: Path) -> None:
     frame_path = work / "ae-cover-frame.png"
-    run(FFMPEG, "-y", "-ss", "13", "-i", source, "-frames:v", "1", frame_path)
+    run(FFMPEG, "-y", "-ss", "27.5", "-i", source, "-frames:v", "1", frame_path)
     shutil.copy2(frame_path, POST / "ae-motionpilot.png")
 
     base = Image.open(frame_path).convert("RGB")
@@ -582,6 +648,7 @@ def build(raw: Path | None) -> None:
     with tempfile.TemporaryDirectory(prefix="motionhub-launch-") as tmp:
         work = Path(tmp)
         ae_overlays = make_horizontal_overlays(work)
+        ae_focus_overlays = make_ae_focus_overlays(work)
         sheet_overlays = make_sheet_overlays(work)
         extra_sheet_overlays = make_extra_sheet_overlays(work)
         summary_overlay = make_summary_overlay(work)
@@ -591,7 +658,7 @@ def build(raw: Path | None) -> None:
         sheet_h = work / "sheet-h.mp4"
         extra_sheet_h = work / "sheet-extra-h.mp4"
         summary_h = work / "summary-h.mp4"
-        encode_ae_segment(clean, ae_overlays, ae_h)
+        encode_ae_segment(clean, ae_overlays, ae_focus_overlays, ae_h)
         encode_sheet_segment(sheet_gif, sheet_overlays, sheet_h)
         encode_extra_sheet_segment(
             extra_sheet,
@@ -617,7 +684,7 @@ def build(raw: Path | None) -> None:
             POST / "motionhub-demo-vertical.mp4",
         )
 
-        make_covers(horizontal, work)
+        make_covers(clean, work)
 
     print(f"horizontal={duration(POST / 'motionhub-demo.mp4'):.2f}s")
     print(f"vertical={duration(POST / 'motionhub-demo-vertical.mp4'):.2f}s")
