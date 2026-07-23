@@ -54,7 +54,7 @@
       "zh": {
         "title": "Claude 封号？VPS 或许才是终极答案",
         "short_title": "Claude 封号？VPS 或许是答案",
-        "summary": "与其到处切网络、切设备、切代理，不如直接准备一台配置足够的 VPS：SSH 进去用，或者装轻量 Ubuntu 桌面，再用 Tailscale/RDP 从多设备直连。重点不是绕过风控，而是把 Claude 的使用环境固定、可控、可解释。",
+        "summary": "与其反复折腾网络、设备和代理，我干脆把 Claude 的活都挪到一台配置够用的 VPS 上：能 SSH 就 SSH，要图形界面就装个轻量 Ubuntu 桌面，再用 Tailscale 从几台设备连进去。这么做主要是想让自己用 Claude 的方式别再东一下西一下，不是冲着躲检测去的。",
         "tags": [
           "Claude",
           "VPS",
