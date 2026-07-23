@@ -37,7 +37,7 @@
     "title": "Claude Account Suspended? A VPS Might Be the Answer",
     "short_title": "Claude + VPS",
     "date": "2026-07-05",
-    "summary": "Instead of jumping between devices, networks, and proxy chains, I prefer one sufficiently capable VPS: SSH-only if possible, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal is not evasion; it is a stable, explainable Claude work environment.",
+    "summary": "Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.",
     "tags": [
       "Claude",
       "VPS",
