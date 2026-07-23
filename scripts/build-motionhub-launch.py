@@ -128,6 +128,27 @@ def make_sheet_overlays(work: Path) -> list[Path]:
     return outputs
 
 
+def make_extra_sheet_overlays(work: Path) -> list[Path]:
+    specs = [
+        ("sheet-extra-preview.png", "07", "再换一个 JSON，结构照样能读", "真实预览与时间轴同步，不是为单个案例写死", BLUE),
+        ("sheet-extra-detail.png", "08", "选中图层，动作与参数一起定位", "doc-front / doc-back / bg 的变化分别可追踪", PINK),
+        ("sheet-extra-table.png", "09", "Timeline 与 Table 随时切换", "从视觉检查切到开发交付，不丢上下文", TEAL),
+    ]
+    outputs: list[Path] = []
+    for name, step, title, detail, color in specs:
+        image = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((0, 0, 1920, 102), fill=(5, 7, 12, 236))
+        draw.rounded_rectangle((42, 19, 112, 83), radius=8, fill=(*color, 235))
+        draw.text((58, 29), step, font=font(26, True), fill=BG)
+        draw.text((142, 18), title, font=font(35, True), fill=WHITE)
+        draw.text((910, 29), detail, font=font(22), fill=color)
+        output = work / name
+        image.save(output)
+        outputs.append(output)
+    return outputs
+
+
 def make_summary_overlay(work: Path) -> Path:
     image = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
     draw = ImageDraw.Draw(image)
@@ -308,6 +329,44 @@ def encode_sheet_segment(gif: Path, overlays: list[Path], output: Path) -> None:
             "[out]",
             "-t",
             "14.67",
+            "-an",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "medium",
+            "-crf",
+            "15",
+            "-movflags",
+            "+faststart",
+            output,
+        ]
+    )
+    run(*args)
+
+
+def encode_extra_sheet_segment(
+    source: Path,
+    overlays: list[Path],
+    output: Path,
+) -> None:
+    graph = (
+        "[0:v]fps=30,format=yuv420p[base];"
+        "[base][1:v]overlay=0:0:enable='between(t,0,4)'[v1];"
+        "[v1][2:v]overlay=0:0:enable='between(t,4,8)'[v2];"
+        "[v2][3:v]overlay=0:0:enable='between(t,8,12)',"
+        "fps=30,format=yuv420p[out]"
+    )
+    args: list[object] = [FFMPEG, "-y", "-i", source]
+    for overlay in overlays:
+        args.extend(["-i", overlay])
+    args.extend(
+        [
+            "-filter_complex",
+            graph,
+            "-map",
+            "[out]",
+            "-t",
+            "12",
             "-an",
             "-c:v",
             "libx264",
@@ -516,19 +575,29 @@ def build(raw: Path | None) -> None:
     sheet_gif = POST / "motionsheet-demo.gif"
     if not sheet_gif.exists():
         raise FileNotFoundError(sheet_gif)
+    extra_sheet = POST / "motionsheet-extra-demo.mp4"
+    if not extra_sheet.exists():
+        raise FileNotFoundError(extra_sheet)
 
     with tempfile.TemporaryDirectory(prefix="motionhub-launch-") as tmp:
         work = Path(tmp)
         ae_overlays = make_horizontal_overlays(work)
         sheet_overlays = make_sheet_overlays(work)
+        extra_sheet_overlays = make_extra_sheet_overlays(work)
         summary_overlay = make_summary_overlay(work)
         vertical_ae_overlay = make_vertical_overlay(work)
 
         ae_h = work / "ae-h.mp4"
         sheet_h = work / "sheet-h.mp4"
+        extra_sheet_h = work / "sheet-extra-h.mp4"
         summary_h = work / "summary-h.mp4"
         encode_ae_segment(clean, ae_overlays, ae_h)
         encode_sheet_segment(sheet_gif, sheet_overlays, sheet_h)
+        encode_extra_sheet_segment(
+            extra_sheet,
+            extra_sheet_overlays,
+            extra_sheet_h,
+        )
         encode_summary_segment(
             POST / "ae-motion-result.mp4",
             sheet_gif,
@@ -537,7 +606,7 @@ def build(raw: Path | None) -> None:
         )
         horizontal = POST / "motionhub-demo.mp4"
         concat_with_silent_audio(
-            [ae_h, sheet_h, summary_h],
+            [ae_h, sheet_h, extra_sheet_h, summary_h],
             horizontal,
             work,
         )

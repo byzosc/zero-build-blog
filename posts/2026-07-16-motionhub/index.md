@@ -39,7 +39,7 @@ MotionSheet runs in the browser and reads JSON locally. It turns animation data 
 
 MotionPilot lives inside After Effects. It combines selected-layer context, optional visual context, an LLM-generated plan, and deterministic JSX execution. The result remains editable in AE; it is not a rendered black-box clip.
 
-The demo is a real After Effects screen recording. A motion description is entered in MotionPilot on the right and Generate is clicked; the composition and timeline on the left then receive actual layers and editable keyframes. Only the API wait is visibly time-compressed. Generation and playback remain at their recorded speed, followed by the real MotionSheet interface inspecting and handing off motion data.
+The demo is a real After Effects screen recording. A motion description is entered in MotionPilot on the right and Generate is clicked; the composition and timeline on the left then receive actual layers and editable keyframes. Only the API wait is visibly time-compressed. Generation and playback remain at their recorded speed, followed by the real MotionSheet interface inspecting and handing off motion data. A second JSON example then moves between timeline, layer details, and table view to show that the workflow is not hard-coded to one animation.
 
 ![MotionPilot running inside After Effects](ae-motionpilot.png)
 
@@ -70,7 +70,7 @@ Today, MotionHub cannot promise that every motion reference will work on the fir
 
 ## What works now, and what comes next
 
-Both ends already work as prototypes. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with a clearly labeled time compression only during the API wait.
+Both ends already work as prototypes. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with a clearly labeled time compression only during the API wait and two real MotionSheet JSON walkthroughs.
 
 The honest boundary: **the two products are not yet a one-click closed loop.** The next milestone is a shared motion contract so MotionSheet output can become MotionPilot input without re-describing timing, easing, hierarchy, or layer intent.
 
