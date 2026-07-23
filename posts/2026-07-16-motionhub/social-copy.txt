@@ -80,7 +80,7 @@ MotionHub = MotionSheet + MotionPilot。
 MotionSheet：读取 Lottie / Bodymovin JSON，拆出图层、时间、曲线、父子关系和动效交接表。
 MotionPilot：在 After Effects 内理解文字意图，写入仍可继续编辑的图层、关键帧、效果和表达式。
 
-视频第一段是 MotionPilot 在 AE 内的真实屏幕录制：右侧输入描述并点击 Generate，左侧合成和时间轴出现真实写入的图层与关键帧。只有 API 等待段做了明确标注的压缩跳时；MotionSheet 段同样来自真实页面操作。
+视频第一段是 MotionPilot 在 AE 内的真实屏幕录制：右侧输入描述并点击 Generate，左侧合成和时间轴出现真实写入的图层与关键帧。只有 API 等待段做了明确标注的压缩跳时；MotionSheet 段同样来自真实页面操作，并用第二份 JSON 展示时间轴、图层详情和 Table 视图的切换。
 
 我准备把自有插件代码转为 MIT 开源，让每个人贡献的动效能力都能被所有人和所有 AI 复用。当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
 

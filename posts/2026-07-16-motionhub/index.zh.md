@@ -39,7 +39,7 @@ MotionPilot 运行在 After Effects 面板里。它结合选中图层、可选�
 
 重点不是“生成一段视频”，而是生成后仍然能继续改：图层、关键帧、效果和表达式都留在正常的 AE 工作流里。
 
-上面的演示直接使用真实 AE 屏幕录制：右侧在 MotionPilot 输入“8 瓣发光花环向中心旋转收拢成圆，再反向展开；节奏放慢 2x”并点击 Generate，随后左侧合成和时间轴出现真实写入的图层与关键帧。片中只把 API 等待段做了明确标注的压缩跳时，生成过程与结果保持原速；后半段则是 MotionSheet 真实页面对同一类动效数据进行预览、定位和交付。
+上面的演示直接使用真实 AE 屏幕录制：右侧在 MotionPilot 输入“8 瓣发光花环向中心旋转收拢成圆，再反向展开；节奏放慢 2x”并点击 Generate，随后左侧合成和时间轴出现真实写入的图层与关键帧。片中只把 API 等待段做了明确标注的压缩跳时，生成过程与结果保持原速；后半段则是 MotionSheet 真实页面对动效数据进行预览、定位和交付。为了说明它不是针对单个案例写死，后段还切换到第二份 JSON，展示另一组图层在时间轴、详情和 Table 视图之间的完整检查流程。
 
 ![MotionPilot 在 After Effects 内运行](ae-motionpilot.png)
 
@@ -74,7 +74,7 @@ MotionPilot 运行在 After Effects 面板里。它结合选中图层、可选�
 
 - MotionSheet 已能解析、检查和导出动效交接数据。
 - MotionPilot 已能读取 AE 场景、生成计划并执行受支持的动效操作。
-- 演示片使用 MotionPilot 的真实 AE 面板和执行结果；API 等待段有明确标注的压缩跳时，MotionSheet 段为真实页面操作。
+- 演示片使用 MotionPilot 的真实 AE 面板和执行结果；API 等待段有明确标注的压缩跳时，MotionSheet 段为两份 JSON 的真实页面操作。
 
 也不吹牛：**目前还不是“一键闭环”。** 下一步要做的是统一 motion contract，让 MotionSheet 的结构化结果可以直接成为 MotionPilot 的输入，不再重复描述时间、缓动、层级和图层意图。
 
