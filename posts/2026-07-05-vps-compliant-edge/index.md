@@ -2,7 +2,7 @@
 title: "Claude Account Suspended? A VPS Might Be the Answer"
 short_title: "Claude + VPS"
 date: 2026-07-05
-summary: Instead of jumping between devices, networks, and proxy chains, I prefer one sufficiently capable VPS: SSH-only if possible, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal is not evasion; it is a stable, explainable Claude work environment.
+summary: Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.
 wechat_url:
 tags: [Claude, VPS, Tailscale, remote-desktop, self-hosting]
 lang: en
@@ -15,7 +15,7 @@ translations: [zh]
 
 ![A Claude remote workstation on a VPS with Tailscale](cover.png)
 
-> **Short version:** A lot of people make Claude account stability sound more complicated than it needs to be. My preferred setup is simple: put Claude, code, browser sessions, and dev tools on one stable VPS. Local devices only connect to it through Tailscale, SSH, or RDP.
+> **Short version:** A lot of people make Claude account stability sound harder than it is. My setup is pretty plain: keep Claude, code, browser sessions, and dev tools on one stable VPS, and let my local devices connect to it through Tailscale, SSH, or RDP.
 
 ## TL;DR
 
@@ -27,29 +27,29 @@ translations: [zh]
 | Need Claude Code, GUI tools, or a browser | Install them on the VPS, not every local machine |
 | Account-safety anxiety | Reduce environment drift; do not claim immunity |
 
-This is not a “never get suspended” promise. No account setup can honestly promise that. It solves a more practical problem: stop making your Claude usage look like a pile of random temporary sessions.
+I won't pretend this guarantees you'll never get suspended — no account setup honestly can. What it helps with is more mundane: your Claude usage stops looking like a pile of random throwaway sessions.
 
 ## 1. Most setups are overcomplicated
 
-Many discussions around Claude stability quickly drift into complex exit chains, browser fingerprints, automation tricks, or “look more human” folklore.
+Discussions about Claude stability tend to spiral into exit chains, browser fingerprints, automation tricks, and "look more human" folklore.
 
-I think that framing is often wrong.
+I've come to think that whole framing usually leads people astray.
 
-If your real need is:
+If what you actually want is:
 
 - stable Claude-assisted coding;
 - the same environment from multiple devices;
 - no repeated Node/Python/Docker/key setup on every laptop;
 - less switching between home network, office network, phone hotspot, and random exits;
-- less false-positive risk from environment drift;
+- less false-positive risk from an environment that keeps changing;
 
-then the direct answer is: **use a sufficiently capable VPS as your remote workstation.**
+then the simplest answer is a capable VPS you treat as your remote workstation.
 
-Your laptop is no longer the real work environment. It is just a terminal or remote display.
+Your laptop stops being the real work environment. It just becomes the thing you connect in with — Mac, Windows, or iPad, they all land in the same place.
 
 ## 2. Pick a VPS that can actually be a workstation
 
-For a small website, a tiny VPS is fine. For a Claude/dev/remote-desktop workstation, do not starve it.
+For a small website, a tiny VPS is fine. But if you want it to be your Claude / dev / remote-desktop machine, don't starve it.
 
 My baseline:
 
@@ -57,10 +57,10 @@ My baseline:
 - **RAM**: 2-4GB for SSH-only; 4-8GB for a lightweight desktop.
 - **Disk**: 40GB minimum; 80GB+ if you keep projects, browser cache, and Docker images there.
 - **OS**: Ubuntu 22.04 or 24.04 LTS.
-- **Region**: choose one place you can use consistently.
-- **Provider**: avoid suspiciously dirty IP pools or machines you need to replace constantly.
+- **Region**: pick one place you can use consistently, and stop moving.
+- **Provider**: avoid suspiciously dirty IP pools or machines you have to replace constantly.
 
-The point is not “one more IP.” The point is a fixed development seat.
+You're not buying it for an extra IP. You're buying a development seat you don't have to rebuild every time.
 
 ## 3. Two modes: SSH-only or lightweight desktop
 
@@ -88,7 +88,7 @@ ssh your-vps
 tmux new -s work
 ```
 
-Code, logs, scripts, and deployments all live in the same stable machine.
+Code, logs, scripts, and deployments all live on the same stable machine. No desktop, no browser layer to maintain, and a smaller attack surface — all you really need is stable SSH and one set of keys.
 
 ### Mode B: lightweight Ubuntu desktop
 
@@ -100,7 +100,7 @@ sudo apt install -y xfce4 xfce4-goodies xrdp
 sudo systemctl enable --now xrdp
 ```
 
-Then connect through RDP. Do not start with a heavy desktop environment. XFCE is not glamorous, but it is light and predictable.
+Then connect through RDP. Don't reach for a heavy desktop environment on day one — XFCE isn't glamorous, but it's light and predictable, and it recovers cleanly.
 
 ## 4. Tailscale makes the setup comfortable
 
@@ -114,17 +114,17 @@ sudo tailscale up
 Then:
 
 - SSH through the Tailscale IP.
-- Keep RDP private; do not expose it to the public internet.
+- Keep RDP private; don't expose it to the public internet.
 - Put admin panels, internal health pages, and private services on the tailnet.
 - Connect from laptop, desktop, phone, or tablet into the same work machine.
 
-Now every local device is just a remote control. The actual Claude/browser/dev environment stays fixed.
+So every device on your desk is basically a remote control, while the real Claude/browser/dev environment stays put on the VPS.
 
 ![VPS edge hub architecture](images/edge-architecture-en.png)
 
 ## 5. Do not skip basic hardening
 
-Create a normal user:
+Create a normal user instead of living as root:
 
 ```bash
 sudo adduser work
@@ -138,7 +138,7 @@ new machine private key stays on the new machine
 new machine public key -> VPS ~/.ssh/authorized_keys
 ```
 
-Do not copy one old private key everywhere.
+Don't copy one old private key onto every machine — lose it once and you lose everything.
 
 Lock down the firewall:
 
@@ -149,11 +149,11 @@ sudo ufw allow OpenSSH
 sudo ufw enable
 ```
 
-If RDP only needs to work over Tailscale, keep it private.
+If RDP only needs to work over Tailscale, keep it private and open as few ports as you can.
 
 ## 6. Deployment should still be boring
 
-Even if the main point is the workstation, keep your VPS deployments repeatable.
+Even though the main point here is the workstation, it's worth keeping your VPS deployments repeatable with a fixed runbook.
 
 ![VPS deployment runbook](images/deploy-runbook-en.png)
 
@@ -161,26 +161,24 @@ Basic order:
 
 1. Align the Git branch.
 2. Update only the target directory.
-3. Backup before replacing.
+3. Back up before replacing.
 4. Restart the target service.
 5. Verify `/health`, logs, and key endpoints.
 6. Keep rollback possible.
 
-Claude can help read logs and draft scripts, but production should not depend on improvisation.
+Claude can help read logs and draft scripts, but production shouldn't ride on improvisation. The more fixed your process is, the more useful the AI gets; the messier it is, the more the AI just amplifies the mess.
 
 ## 7. About account safety
 
-People want to ask: “Does this completely prevent suspension?”
+People always want to ask: does this completely prevent suspension?
 
-No. That is not an honest claim.
+It doesn't, and saying otherwise wouldn't be honest.
 
-Accounts are affected by Usage Policy, Terms, supported locations, payment, abuse detection, and false positives. No VPS setup creates immunity.
+Accounts are affected by Usage Policy, Terms, supported locations, payment, abuse detection, and plain false positives. No VPS setup buys you immunity.
 
-What this setup can reduce is one common risk: **environment drift**.
+What it can reduce is one common risk: environment drift.
 
-You stop jumping between networks, devices, proxy chains, and scripts. Your Claude workflow happens in one stable, auditable environment with logs, keys, backups, and recovery paths.
-
-That is not evasion. It is normal engineering hygiene.
+You stop hopping between networks, devices, proxy chains, and scripts, and your Claude workflow lands in one auditable place with logs, key boundaries, backups, and a recovery path. That's not gaming the system — it's ordinary engineering hygiene.
 
 ## 8. Checklist
 
@@ -197,8 +195,8 @@ That is not evasion. It is normal engineering hygiene.
 
 ## 9. Final thought
 
-Do not turn Claude environment stability into folklore.
+Don't turn Claude environment stability into folklore.
 
-Most of the time, you do not need more evasion tricks. You need one clean, fixed, recoverable remote workstation.
+Most of the time you don't need cleverer evasion tricks. You need one clean, fixed machine you can reconnect to and rebuild when it breaks.
 
-VPS + Tailscale + SSH/RDP is boring. That is exactly why it works.
+VPS + Tailscale + SSH/RDP is boring. That's exactly why it holds up.
