@@ -107,6 +107,33 @@ def make_horizontal_overlays(work: Path) -> list[Path]:
     return outputs
 
 
+def make_soft_focus_overlay(
+    work: Path,
+    name: str,
+    center: tuple[int, int],
+    radius: tuple[int, int],
+    color: tuple[int, int, int],
+) -> Path:
+    cx, cy = center
+    rx, ry = radius
+    box = (cx - rx, cy - ry, cx + rx, cy + ry)
+
+    halo = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+    halo_draw = ImageDraw.Draw(halo)
+    halo_draw.ellipse(box, fill=(*color, 24))
+    halo = halo.filter(ImageFilter.GaussianBlur(72))
+
+    core = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+    core_draw = ImageDraw.Draw(core)
+    core_draw.ellipse(box, fill=(*color, 12))
+    core = core.filter(ImageFilter.GaussianBlur(28))
+    halo.alpha_composite(core)
+
+    output = work / name
+    halo.save(output)
+    return output
+
+
 def make_ae_focus_overlays(work: Path) -> list[Path]:
     specs = [
         ("focus-input.png", (1460, 490), (390, 175), BLUE),
@@ -114,26 +141,10 @@ def make_ae_focus_overlays(work: Path) -> list[Path]:
         ("focus-keyframes.png", (1000, 900), (330, 130), TEAL),
         ("focus-result.png", (960, 535), (470, 315), PINK),
     ]
-    outputs: list[Path] = []
-    for name, center, radius, color in specs:
-        cx, cy = center
-        rx, ry = radius
-        box = (cx - rx, cy - ry, cx + rx, cy + ry)
-
-        glow = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
-        glow_draw = ImageDraw.Draw(glow)
-        glow_draw.ellipse(box, outline=(*color, 68), width=24)
-        glow = glow.filter(ImageFilter.GaussianBlur(40))
-
-        ring = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
-        ring_draw = ImageDraw.Draw(ring)
-        ring_draw.ellipse(box, outline=(*color, 72), width=2)
-        ring.alpha_composite(glow)
-
-        output = work / name
-        ring.save(output)
-        outputs.append(output)
-    return outputs
+    return [
+        make_soft_focus_overlay(work, name, center, radius, color)
+        for name, center, radius, color in specs
+    ]
 
 
 def make_widget_overlays(work: Path) -> list[Path]:
@@ -181,27 +192,12 @@ def make_widget_focus_overlays(work: Path) -> list[Path]:
         ("widget-focus-input.png", (1510, 600), (330, 170), BLUE),
         ("widget-focus-planning.png", (1510, 340), (350, 185), PINK),
         ("widget-focus-result.png", (760, 300), (330, 235), TEAL),
+        ("widget-focus-handle.png", (300, 155), (250, 105), BLUE),
     ]
-    outputs: list[Path] = []
-    for name, center, radius, color in specs:
-        cx, cy = center
-        rx, ry = radius
-        box = (cx - rx, cy - ry, cx + rx, cy + ry)
-
-        glow = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
-        glow_draw = ImageDraw.Draw(glow)
-        glow_draw.ellipse(box, outline=(*color, 64), width=24)
-        glow = glow.filter(ImageFilter.GaussianBlur(40))
-
-        ring = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
-        ring_draw = ImageDraw.Draw(ring)
-        ring_draw.ellipse(box, outline=(*color, 68), width=2)
-        ring.alpha_composite(glow)
-
-        output = work / name
-        ring.save(output)
-        outputs.append(output)
-    return outputs
+    return [
+        make_soft_focus_overlay(work, name, center, radius, color)
+        for name, center, radius, color in specs
+    ]
 
 
 def make_sheet_overlays(work: Path) -> list[Path]:
@@ -432,24 +428,38 @@ def encode_ae_segment(
         f"({center_y})*({return_to_full}),{center_y}))))"
     )
     graph = (
+        "[1:v]format=rgba,fade=t=in:st=0:d=0.35:alpha=1,"
+        "fade=t=out:st=5.65:d=0.35:alpha=1[t1];"
+        "[2:v]format=rgba,fade=t=in:st=6:d=0.30:alpha=1,"
+        "fade=t=out:st=7.90:d=0.30:alpha=1[t2];"
+        "[3:v]format=rgba,fade=t=in:st=8.2:d=0.35:alpha=1,"
+        "fade=t=out:st=19.65:d=0.35:alpha=1[t3];"
+        "[4:v]format=rgba,fade=t=in:st=0:d=0.45:alpha=1,"
+        "fade=t=out:st=5.55:d=0.45:alpha=1[g1];"
+        "[5:v]format=rgba,fade=t=in:st=6:d=0.35:alpha=1,"
+        "fade=t=out:st=7.85:d=0.35:alpha=1[g2];"
+        "[6:v]format=rgba,fade=t=in:st=8.2:d=0.40:alpha=1,"
+        "fade=t=out:st=11.60:d=0.40:alpha=1[g3];"
+        "[7:v]format=rgba,fade=t=in:st=12:d=0.45:alpha=1,"
+        "fade=t=out:st=19.55:d=0.45:alpha=1[g4];"
         "[0:v]split=3[s0][s1][s2];"
         "[s0]trim=start=0:end=6,setpts=PTS-STARTPTS[p0];"
         "[s1]trim=start=6:end=19,setpts=(PTS-STARTPTS)/6[p1];"
         "[s2]trim=start=19:end=30.9,setpts=PTS-STARTPTS[p2];"
         "[p0][p1][p2]concat=n=3:v=1:a=0,fps=30[cut];"
         f"[cut]zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s=1920x1080:fps=30[base];"
-        "[base][1:v]overlay=0:0:enable='between(t,0,6)'[v1];"
-        "[v1][2:v]overlay=0:0:enable='between(t,6,8.2)'[v2];"
-        "[v2][3:v]overlay=0:0:enable='between(t,8.2,20.2)'[v3];"
-        "[v3][4:v]overlay=0:0:enable='between(t,0,6)'[f1];"
-        "[f1][5:v]overlay=0:0:enable='between(t,6,8.2)'[f2];"
-        "[f2][6:v]overlay=0:0:enable='between(t,8.2,12)'[f3];"
-        "[f3][7:v]overlay=0:0:enable='between(t,12,20.2)',"
+        "[base][t1]overlay=0:0:shortest=1:enable='between(t,0,6)'[v1];"
+        "[v1][t2]overlay=0:0:shortest=1:enable='between(t,6,8.2)'[v2];"
+        "[v2][t3]overlay=0:0:shortest=1:enable='between(t,8.2,20.2)'[v3];"
+        "[v3][g1]overlay=0:0:shortest=1:enable='between(t,0,6)'[f1];"
+        "[f1][g2]overlay=0:0:shortest=1:enable='between(t,6,8.2)'[f2];"
+        "[f2][g3]overlay=0:0:shortest=1:enable='between(t,8.2,12)'[f3];"
+        "[f3][g4]overlay=0:0:shortest=1:enable='between(t,12,20.2)',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", source]
     for overlay in [*overlays, *focus_overlays]:
-        args.extend(["-i", overlay])
+        args.extend(["-loop", "1", "-framerate", "30", "-i", overlay])
     args.extend(
         [
             "-filter_complex",
@@ -477,12 +487,16 @@ def encode_widget_segment(
     focus_overlays: list[Path],
     output: Path,
 ) -> None:
+    segment_end = max(5.5, duration(source) - 8.0)
     move_to_progress = "0.5-0.5*cos(PI*(on-90)/30)"
     move_to_result = "0.5-0.5*cos(PI*(on-150)/30)"
+    move_to_handle = "0.5-0.5*cos(PI*(on-222)/24)"
     zoom = (
         "if(lt(on,24),1+0.55*(0.5-0.5*cos(PI*on/24)),"
         "if(lt(on,150),1.55,"
-        "if(lt(on,180),1.55-0.10*(0.5-0.5*cos(PI*(on-150)/30)),1.45)))"
+        "if(lt(on,180),1.55-0.10*(0.5-0.5*cos(PI*(on-150)/30)),"
+        "if(lt(on,222),1.45,"
+        "if(lt(on,246),1.45+0.10*(0.5-0.5*cos(PI*(on-222)/24)),1.55)))))"
     )
     right_x = "iw-iw/zoom"
     result_x = "1100-iw/(2*zoom)"
@@ -492,7 +506,9 @@ def encode_widget_segment(
     x = (
         f"if(lt(on,150),{right_x},"
         f"if(lt(on,180),({right_x})*(1-({move_to_result}))+"
-        f"({result_x})*({move_to_result}),{result_x}))"
+        f"({result_x})*({move_to_result}),"
+        f"if(lt(on,222),{result_x},"
+        f"if(lt(on,246),({result_x})*(1-({move_to_handle})),0))))"
     )
     y = (
         f"if(lt(on,90),{input_y},"
@@ -500,26 +516,43 @@ def encode_widget_segment(
         f"({progress_y})*({move_to_progress}),"
         f"if(lt(on,150),{progress_y},"
         f"if(lt(on,180),({progress_y})*(1-({move_to_result}))+"
-        f"({result_y})*({move_to_result}),{result_y}))))"
+        f"({result_y})*({move_to_result}),"
+        f"if(lt(on,222),{result_y},"
+        f"if(lt(on,246),({result_y})*(1-({move_to_handle})),0))))))"
     )
     graph = (
+        f"[1:v]fade=t=in:st=0:d=0.35:alpha=1,"
+        f"fade=t=out:st=2.65:d=0.35:alpha=1[t1];"
+        f"[2:v]fade=t=in:st=3:d=0.30:alpha=1,"
+        f"fade=t=out:st=4.70:d=0.30:alpha=1[t2];"
+        f"[3:v]fade=t=in:st=5:d=0.35:alpha=1,"
+        f"fade=t=out:st=7.20:d=0.40:alpha=1[t3];"
+        f"[4:v]fade=t=in:st=0:d=0.45:alpha=1,"
+        f"fade=t=out:st=2.55:d=0.45:alpha=1[g1];"
+        f"[5:v]fade=t=in:st=3:d=0.35:alpha=1,"
+        f"fade=t=out:st=4.65:d=0.35:alpha=1[g2];"
+        f"[6:v]fade=t=in:st=5:d=0.40:alpha=1,"
+        f"fade=t=out:st=7.20:d=0.40:alpha=1[g3];"
+        f"[7:v]fade=t=in:st=7.60:d=0.45:alpha=1,"
+        f"fade=t=out:st={segment_end - 0.45:.3f}:d=0.45:alpha=1[g4];"
         "[0:v]split=3[s0][s1][s2];"
         "[s0]trim=start=0:end=3,setpts=PTS-STARTPTS[p0];"
         "[s1]trim=start=3:end=13,setpts=(PTS-STARTPTS)/5[p1];"
         "[s2]trim=start=13,setpts=PTS-STARTPTS[p2];"
         "[p0][p1][p2]concat=n=3:v=1:a=0,fps=30[cut];"
         f"[cut]zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s=1920x1080:fps=30[base];"
-        "[base][1:v]overlay=0:0:enable='between(t,0,3)'[v1];"
-        "[v1][2:v]overlay=0:0:enable='between(t,3,5)'[v2];"
-        "[v2][3:v]overlay=0:0:enable='gte(t,5)'[v3];"
-        "[v3][4:v]overlay=0:0:enable='between(t,0,3)'[f1];"
-        "[f1][5:v]overlay=0:0:enable='between(t,3,5)'[f2];"
-        "[f2][6:v]overlay=0:0:enable='gte(t,5)',"
+        "[base][t1]overlay=0:0:shortest=1:enable='between(t,0,3)'[v1];"
+        "[v1][t2]overlay=0:0:shortest=1:enable='between(t,3,5)'[v2];"
+        "[v2][t3]overlay=0:0:shortest=1:enable='between(t,5,7.6)'[v3];"
+        "[v3][g1]overlay=0:0:shortest=1:enable='between(t,0,3)'[f1];"
+        "[f1][g2]overlay=0:0:shortest=1:enable='between(t,3,5)'[f2];"
+        "[f2][g3]overlay=0:0:shortest=1:enable='between(t,5,7.6)'[f3];"
+        f"[f3][g4]overlay=0:0:shortest=1:enable='between(t,7.6,{segment_end:.3f})',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", source]
     for overlay in [*overlays, *focus_overlays]:
-        args.extend(["-i", overlay])
+        args.extend(["-loop", "1", "-framerate", "30", "-i", overlay])
     args.extend(
         [
             "-filter_complex",
@@ -543,16 +576,22 @@ def encode_widget_segment(
 
 def encode_sheet_segment(gif: Path, overlays: list[Path], output: Path) -> None:
     graph = (
+        "[1:v]fade=t=in:st=0:d=0.35:alpha=1,"
+        "fade=t=out:st=4.65:d=0.35:alpha=1[t1];"
+        "[2:v]fade=t=in:st=5:d=0.35:alpha=1,"
+        "fade=t=out:st=9.65:d=0.35:alpha=1[t2];"
+        "[3:v]fade=t=in:st=10:d=0.35:alpha=1,"
+        "fade=t=out:st=14.32:d=0.35:alpha=1[t3];"
         "[0:v]fps=30,scale=1920:-2:flags=lanczos,"
         "pad=1920:1080:0:(oh-ih)/2:color=0x05070c[base];"
-        "[base][1:v]overlay=0:0:enable='between(t,0,5)'[v1];"
-        "[v1][2:v]overlay=0:0:enable='between(t,5,10)'[v2];"
-        "[v2][3:v]overlay=0:0:enable='between(t,10,14.7)',"
+        "[base][t1]overlay=0:0:shortest=1:enable='between(t,0,5)'[v1];"
+        "[v1][t2]overlay=0:0:shortest=1:enable='between(t,5,10)'[v2];"
+        "[v2][t3]overlay=0:0:shortest=1:enable='between(t,10,14.7)',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", gif]
     for overlay in overlays:
-        args.extend(["-i", overlay])
+        args.extend(["-loop", "1", "-framerate", "30", "-i", overlay])
     args.extend(
         [
             "-filter_complex",
@@ -582,15 +621,21 @@ def encode_extra_sheet_segment(
     output: Path,
 ) -> None:
     graph = (
+        "[1:v]fade=t=in:st=0:d=0.35:alpha=1,"
+        "fade=t=out:st=3.65:d=0.35:alpha=1[t1];"
+        "[2:v]fade=t=in:st=4:d=0.35:alpha=1,"
+        "fade=t=out:st=7.65:d=0.35:alpha=1[t2];"
+        "[3:v]fade=t=in:st=8:d=0.35:alpha=1,"
+        "fade=t=out:st=11.65:d=0.35:alpha=1[t3];"
         "[0:v]fps=30,format=yuv420p[base];"
-        "[base][1:v]overlay=0:0:enable='between(t,0,4)'[v1];"
-        "[v1][2:v]overlay=0:0:enable='between(t,4,8)'[v2];"
-        "[v2][3:v]overlay=0:0:enable='between(t,8,12)',"
+        "[base][t1]overlay=0:0:shortest=1:enable='between(t,0,4)'[v1];"
+        "[v1][t2]overlay=0:0:shortest=1:enable='between(t,4,8)'[v2];"
+        "[v2][t3]overlay=0:0:shortest=1:enable='between(t,8,12)',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", source]
     for overlay in overlays:
-        args.extend(["-i", overlay])
+        args.extend(["-loop", "1", "-framerate", "30", "-i", overlay])
     args.extend(
         [
             "-filter_complex",
@@ -630,7 +675,9 @@ def encode_summary_segment(
         "[sheet-bg][sheet-fg]overlay=20:(H-h)/2[sheet];"
         "[ae][sheet]hstack=inputs=2,"
         "drawbox=x=958:y=0:w=4:h=1080:color=0x263044@0.9:t=fill[base];"
-        "[base][2:v]overlay=0:0,fps=30,format=yuv420p[out]"
+        "[2:v]fade=t=in:st=0:d=0.35:alpha=1,"
+        "fade=t=out:st=3.65:d=0.35:alpha=1[title];"
+        "[base][title]overlay=0:0:shortest=1,fps=30,format=yuv420p[out]"
     )
     run(
         FFMPEG,
@@ -643,6 +690,10 @@ def encode_summary_segment(
         "-1",
         "-i",
         gif,
+        "-loop",
+        "1",
+        "-framerate",
+        "30",
         "-i",
         overlay,
         "-filter_complex",
