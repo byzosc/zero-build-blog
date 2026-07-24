@@ -1,33 +1,42 @@
 ---
-title: "Is Hand-Keyframing Dead? MotionHub Brings AI Into After Effects"
-short_title: "Is Hand-Keyframing Dead?"
+title: "AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff"
+short_title: "AI Enters the Motion Pipeline"
 date: 2026-07-16
-summary: Describe motion on the right and get editable AE layers and keyframes on the left. MotionHub is turning that AI workflow into shared, extensible infrastructure.
+summary: MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.
 wechat_url:
 tags: [motion-design, after-effects, lottie, ai, tools]
 lang: en
 translations: [zh]
 ---
 
-# Is Hand-Keyframing Dead? AI Is Moving Into After Effects
+# AI Is Entering the Editable Motion Pipeline
 
-![MotionHub combines MotionSheet and MotionPilot](cover.png)
+![MotionHub motion pipeline](cover.png)
 
 <video controls playsinline preload="metadata" poster="cover.png">
   <source src="motionhub-demo.mp4" type="video/mp4">
 </video>
 
-> **In one sentence:** MotionSheet explains existing motion; MotionPilot turns new intent into editable work inside After Effects. Together, they form MotionHub.
+![MotionHub connects MotionSpec, MotionPilot, and MotionSheet](motionhub-system.png)
 
-The headline is aggressive; the claim is deliberately narrower. AI has not replaced a motion designer's taste, but it can already take over a growing amount of repetitive execution. MotionHub is the workflow connecting two projects I was already building.
+> **In one sentence:** MotionSpec defines the rules, MotionPilot writes intent into After Effects, and MotionSheet hands off and audits against the same spec. Together, they form MotionHub.
+
+The headline is aggressive; the claim is deliberately narrower. AI has not replaced a motion designer's taste, but it is moving beyond "help me keyframe this" and into an editable, constrained, auditable production pipeline.
 
 The goal is not another black-box generated clip. Structure, planning, and the result all stay inside a normal design workflow.
 
 | Part | Job | Output |
 | --- | --- | --- |
-| MotionSheet | Read Lottie / Bodymovin data | Layers, timing, curves, hierarchy, handoff table |
+| MotionSpec | Define curves, durations, and named presets | Shared `motion-tokens.json` |
 | MotionPilot | Plan and execute motion in AE | Editable layers, keyframes, effects, and expressions |
-| MotionHub | Connect both directions | A shared motion contract from analysis to execution |
+| MotionSheet | Read Lottie / Bodymovin data | Timeline, handoff table, and spec audit |
+| MotionHub | Connect definition, execution, and audit | One shared motion workflow |
+
+## MotionSpec: encode the rules
+
+MotionSpec turns a house motion style from scattered documentation and personal habit into a shared `motion-tokens.json`. Curves, durations, and named presets are edited visually, then read by both MotionPilot and MotionSheet.
+
+![The real MotionSpec interface](motionspec.png)
 
 ## MotionSheet: read motion
 
@@ -41,7 +50,7 @@ MotionPilot lives inside After Effects. It combines selected-layer context, opti
 
 The demo is a real After Effects screen recording. A motion description is entered in MotionPilot on the right and Generate is clicked; the composition and timeline on the left then receive actual layers and editable keyframes. Only the API wait is visibly time-compressed. Generation and playback remain at their recorded speed, followed by the real MotionSheet interface inspecting and handing off motion data. A second JSON example then moves between timeline, layer details, and table view to show that the workflow is not hard-coded to one animation.
 
-![MotionPilot running inside After Effects](ae-motionpilot.png)
+![MotionPilot running inside After Effects](motionpilot-demo.gif)
 
 ## Why the plugin is the important part
 
@@ -70,9 +79,9 @@ Today, MotionHub cannot promise that every motion reference will work on the fir
 
 ## What works now, and what comes next
 
-Both ends already work as prototypes. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with a clearly labeled time compression only during the API wait and two real MotionSheet JSON walkthroughs.
+All three parts have a working page or prototype. MotionSpec edits and exports the shared spec. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with clearly labeled time compression during API waits and two real MotionSheet JSON walkthroughs.
 
-The honest boundary: **the two products are not yet a one-click closed loop.** The next milestone is a shared motion contract so MotionSheet output can become MotionPilot input without re-describing timing, easing, hierarchy, or layer intent.
+The honest boundary: **the suite is not yet a one-click closed loop.** The next milestone is the full handoff import bridge, so MotionSheet output can become MotionPilot input while staying constrained by the same `motion-tokens.json`, without re-describing timing, easing, hierarchy, or layer intent.
 
 That is what MotionHub means to me:
 
@@ -81,6 +90,7 @@ That is what MotionHub means to me:
 ## Try the projects
 
 - [MotionSheet live demo](https://zerb.cc.cd/)
+- [MotionPilot page](https://zerb.cc.cd/pilot)
 - [MotionSheet on GitHub](https://github.com/zerbLion/keyframe_sheet)
 - [MotionPilot on GitHub](https://github.com/zerbLion/motion-design)
 

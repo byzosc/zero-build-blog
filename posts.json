@@ -1,10 +1,10 @@
 [
   {
     "dir": "2026-07-16-motionhub",
-    "title": "Is Hand-Keyframing Dead? MotionHub Brings AI Into After Effects",
-    "short_title": "Is Hand-Keyframing Dead?",
+    "title": "AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff",
+    "short_title": "AI Enters the Motion Pipeline",
     "date": "2026-07-16",
-    "summary": "Describe motion on the right and get editable AE layers and keyframes on the left. MotionHub is turning that AI workflow into shared, extensible infrastructure.",
+    "summary": "MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.",
     "tags": [
       "motion-design",
       "after-effects",
@@ -19,9 +19,9 @@
     ],
     "localized": {
       "zh": {
-        "title": "手K动效已死？AI 正在接管 AE：MotionHub 首次公开",
-        "short_title": "手K动效已死？AI 正在接管 AE",
-        "summary": "右边写一句动效描述，左边得到可继续编辑的 AE 图层与关键帧。MotionHub 正在把这条 AI 动效链路做成可复用、可扩展的公共底座。",
+        "title": "动效设计最危险的一刻：AI 开始接管从规范到交付的整条链路",
+        "short_title": "AI 开始接管整条动效链路",
+        "summary": "MotionSpec 定规范、MotionPilot 在 AE 生成、MotionSheet 交付与走查；一份 motion-tokens.json 开始贯穿可编辑的动效生产链。",
         "tags": [
           "动效设计",
           "After Effects",

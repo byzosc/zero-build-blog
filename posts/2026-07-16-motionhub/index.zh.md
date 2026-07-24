@@ -1,31 +1,40 @@
 ---
-title: "手K动效已死？AI 正在接管 AE：MotionHub 首次公开"
-short_title: "手K动效已死？AI 正在接管 AE"
+title: "动效设计最危险的一刻：AI 开始接管从规范到交付的整条链路"
+short_title: "AI 开始接管整条动效链路"
 date: 2026-07-16
-summary: 右边写一句动效描述，左边得到可继续编辑的 AE 图层与关键帧。MotionHub 正在把这条 AI 动效链路做成可复用、可扩展的公共底座。
+summary: MotionSpec 定规范、MotionPilot 在 AE 生成、MotionSheet 交付与走查；一份 motion-tokens.json 开始贯穿可编辑的动效生产链。
 wechat_url:
 tags: [动效设计, After Effects, Lottie, AI, 工具]
 ---
 
-# 手K动效已死？AI 正在接管 AE
+# 动效设计最危险的一刻：AI 开始接管整条动效链路
 
-![MotionHub 由 MotionSheet 和 MotionPilot 组成](cover.png)
+![MotionHub 动效生产链](cover.png)
 
 <video controls playsinline preload="metadata" poster="cover.png">
   <source src="motionhub-demo.mp4" type="video/mp4">
 </video>
 
-> **一句话：** MotionSheet 负责读懂已有动效，MotionPilot 负责把新的动效意图落到 AE 里，两者合起来就是 MotionHub。
+![MotionHub 从 MotionSpec 到 MotionPilot 再到 MotionSheet](motionhub-system.png)
 
-标题说得狠一点，事实说得克制一点：AI 还没有替代动效师的审美，但它已经可以接管大量重复的执行工作。我最近把两个项目放到一起看，才发现它们其实是同一条链路的两端。这个完整方向，我把它叫做 **MotionHub**。
+> **一句话：** MotionSpec 定规范，MotionPilot 把意图写回 AE，MotionSheet 用同一规范交付与走查。三个工具合起来，就是 MotionHub。
+
+标题说得狠一点，事实说得克制一点：AI 还没有替代动效师的审美，但它已经不只是在“帮你 K 几帧”。我把三个工具放到一起后，才意识到它正在进入一条可编辑、可约束、可走查的专业生产链。
 
 它不是再生成一段无法修改的黑盒视频，而是把结构、计划和结果留在正常的设计工作流里。
 
 | 组成 | 负责什么 | 产出 |
 | --- | --- | --- |
-| MotionSheet | 读取 Lottie / Bodymovin JSON | 图层、时间、曲线、层级和交接表 |
+| MotionSpec | 定义曲线、时长和命名预设 | 共享 `motion-tokens.json` |
 | MotionPilot | 在 AE 内理解并执行动效意图 | 可编辑图层、关键帧、效果和表达式 |
-| MotionHub | 把“读”和“写”接起来 | 从分析、规范到执行的共同协议 |
+| MotionSheet | 读取 Lottie / Bodymovin JSON | 图层、时间轴、交接表和规范走查 |
+| MotionHub | 把定义、生成与走查接起来 | 一份规范贯穿的动效工作流 |
+
+## MotionSpec：把规范写成系统
+
+MotionSpec 把公司动效规范从散落的文档和个人经验，变成一份可共享的 `motion-tokens.json`。曲线、时长与命名预设都能可视化编辑；MotionPilot 和 MotionSheet 读取同一份规范。
+
+![MotionSpec 真实页面](motionspec.png)
 
 ## MotionSheet：读懂动效
 
@@ -41,7 +50,7 @@ MotionPilot 运行在 After Effects 面板里。它结合选中图层、可选�
 
 上面的演示直接使用真实 AE 屏幕录制：右侧在 MotionPilot 输入“8 瓣发光花环向中心旋转收拢成圆，再反向展开；节奏放慢 2x”并点击 Generate，随后左侧合成和时间轴出现真实写入的图层与关键帧。片中只把 API 等待段做了明确标注的压缩跳时，生成过程与结果保持原速；后半段则是 MotionSheet 真实页面对动效数据进行预览、定位和交付。为了说明它不是针对单个案例写死，后段还切换到第二份 JSON，展示另一组图层在时间轴、详情和 Table 视图之间的完整检查流程。
 
-![MotionPilot 在 After Effects 内运行](ae-motionpilot.png)
+![MotionPilot 在 After Effects 内运行](motionpilot-demo.gif)
 
 ## 为什么插件才是关键
 
@@ -70,13 +79,14 @@ MotionPilot 运行在 After Effects 面板里。它结合选中图层、可选�
 
 ## 现在做到哪一步
 
-两端都已经有可工作的原型：
+三个部分都已经有可以工作的页面或原型：
 
+- MotionSpec 已能编辑并导出共享动效规范。
 - MotionSheet 已能解析、检查和导出动效交接数据。
 - MotionPilot 已能读取 AE 场景、生成计划并执行受支持的动效操作。
 - 演示片使用 MotionPilot 的真实 AE 面板和执行结果；API 等待段有明确标注的压缩跳时，MotionSheet 段为两份 JSON 的真实页面操作。
 
-也不吹牛：**目前还不是“一键闭环”。** 下一步要做的是统一 motion contract，让 MotionSheet 的结构化结果可以直接成为 MotionPilot 的输入，不再重复描述时间、缓动、层级和图层意图。
+也不吹牛：**目前还不是“一键闭环”。** 下一步要补的是完整 handoff 导入桥，让 MotionSheet 的结构化结果可以直接成为 MotionPilot 的输入，同时继续受同一份 `motion-tokens.json` 约束，不再重复描述时间、缓动、层级和图层意图。
 
 这就是 MotionHub 想解决的事：
 
@@ -85,6 +95,7 @@ MotionPilot 运行在 After Effects 面板里。它结合选中图层、可选�
 ## 体验与源码
 
 - [MotionSheet 在线体验](https://zerb.cc.cd/)
+- [MotionPilot 页面](https://zerb.cc.cd/pilot)
 - [MotionSheet GitHub](https://github.com/zerbLion/keyframe_sheet)
 - [MotionPilot GitHub](https://github.com/zerbLion/motion-design)
 
