@@ -389,23 +389,36 @@ def build_widget_capture(raw: Path, output: Path) -> None:
     )
 
 
+def ffmpeg_ease_in_out_cubic(start_frame: int, frame_count: int) -> str:
+    if start_frame:
+        progress = f"((on-{start_frame})/{frame_count})"
+    else:
+        progress = f"(on/{frame_count})"
+    return (
+        f"if(lt({progress},0.5),4*pow({progress},3),"
+        f"1-pow(-2*({progress})+2,3)/2)"
+    )
+
+
 def encode_ae_segment(
     source: Path,
     overlays: list[Path],
     focus_overlays: list[Path],
     output: Path,
 ) -> None:
+    zoom_in = ffmpeg_ease_in_out_cubic(0, 24)
+    zoom_to_generate = ffmpeg_ease_in_out_cubic(165, 30)
+    move_to_timeline = ffmpeg_ease_in_out_cubic(246, 30)
+    return_to_full = ffmpeg_ease_in_out_cubic(360, 30)
     zoom = (
-        "if(lt(on,24),1+0.9*(0.5-0.5*cos(PI*on/24)),"
+        f"if(lt(on,24),1+0.9*({zoom_in}),"
         "if(lt(on,165),1.9,"
-        "if(lt(on,195),1.9-0.45*(0.5-0.5*cos(PI*(on-165)/30)),"
+        f"if(lt(on,195),1.9-0.45*({zoom_to_generate}),"
         "if(lt(on,246),1.45,"
-        "if(lt(on,276),1.45+0.45*(0.5-0.5*cos(PI*(on-246)/30)),"
+        f"if(lt(on,276),1.45+0.45*({move_to_timeline}),"
         "if(lt(on,360),1.9,"
-        "if(lt(on,390),1.9-0.9*(0.5-0.5*cos(PI*(on-360)/30)),1)))))))"
+        f"if(lt(on,390),1.9-0.9*({return_to_full}),1)))))))"
     )
-    move_to_timeline = "0.5-0.5*cos(PI*(on-246)/30)"
-    return_to_full = "0.5-0.5*cos(PI*(on-360)/30)"
     timeline_x = "1380-iw/(2*zoom)"
     timeline_y = "ih-ih/zoom"
     center_x = "(iw-iw/zoom)/2"
@@ -488,15 +501,16 @@ def encode_widget_segment(
     output: Path,
 ) -> None:
     segment_end = max(5.5, duration(source) - 8.0)
-    move_to_progress = "0.5-0.5*cos(PI*(on-90)/30)"
-    move_to_result = "0.5-0.5*cos(PI*(on-150)/30)"
-    move_to_handle = "0.5-0.5*cos(PI*(on-222)/24)"
+    zoom_in = ffmpeg_ease_in_out_cubic(0, 24)
+    move_to_progress = ffmpeg_ease_in_out_cubic(90, 30)
+    move_to_result = ffmpeg_ease_in_out_cubic(150, 30)
+    move_to_handle = ffmpeg_ease_in_out_cubic(222, 24)
     zoom = (
-        "if(lt(on,24),1+0.55*(0.5-0.5*cos(PI*on/24)),"
+        f"if(lt(on,24),1+0.55*({zoom_in}),"
         "if(lt(on,150),1.55,"
-        "if(lt(on,180),1.55-0.10*(0.5-0.5*cos(PI*(on-150)/30)),"
+        f"if(lt(on,180),1.55-0.10*({move_to_result}),"
         "if(lt(on,222),1.45,"
-        "if(lt(on,246),1.45+0.10*(0.5-0.5*cos(PI*(on-222)/24)),1.55)))))"
+        f"if(lt(on,246),1.45+0.10*({move_to_handle}),1.55)))))"
     )
     right_x = "iw-iw/zoom"
     result_x = "1100-iw/(2*zoom)"
