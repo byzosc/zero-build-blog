@@ -136,11 +136,79 @@ def make_ae_focus_overlays(work: Path) -> list[Path]:
     return outputs
 
 
+def make_widget_overlays(work: Path) -> list[Path]:
+    specs = [
+        (
+            "widget-input.png",
+            "04",
+            "再写一句，组件参数继续生成",
+            "真实 AE 录屏 / 输入：手柄控制数字",
+            BLUE,
+        ),
+        (
+            "widget-planning.png",
+            "05",
+            "AI 读取组件并规划关键帧",
+            "约 10 秒等待压缩 5x；执行与预览保持原速",
+            PINK,
+        ),
+        (
+            "widget-result.png",
+            "06",
+            "数字控制已经写回 AE 图层",
+            "Slider 与关键帧仍可编辑，结果不是渲染视频",
+            TEAL,
+        ),
+    ]
+    outputs: list[Path] = []
+    for name, step, title, detail, color in specs:
+        image = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+        box = (34, 30, 1090, 151)
+        rounded_panel(draw, box, outline=(*color, 190))
+        draw.rounded_rectangle((58, 53, 132, 125), radius=8, fill=(*color, 235))
+        draw.text((77, 64), step, font=font(28, True), fill=BG)
+        draw.text((162, 45), title, font=font(34, True), fill=WHITE)
+        draw.text((164, 99), detail, font=font(21), fill=color)
+        output = work / name
+        image.save(output)
+        outputs.append(output)
+    return outputs
+
+
+def make_widget_focus_overlays(work: Path) -> list[Path]:
+    specs = [
+        ("widget-focus-input.png", (1510, 600), (330, 170), BLUE),
+        ("widget-focus-planning.png", (1510, 340), (350, 185), PINK),
+        ("widget-focus-result.png", (760, 300), (330, 235), TEAL),
+    ]
+    outputs: list[Path] = []
+    for name, center, radius, color in specs:
+        cx, cy = center
+        rx, ry = radius
+        box = (cx - rx, cy - ry, cx + rx, cy + ry)
+
+        glow = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        glow_draw = ImageDraw.Draw(glow)
+        glow_draw.ellipse(box, outline=(*color, 64), width=24)
+        glow = glow.filter(ImageFilter.GaussianBlur(40))
+
+        ring = Image.new("RGBA", (1920, 1080), (0, 0, 0, 0))
+        ring_draw = ImageDraw.Draw(ring)
+        ring_draw.ellipse(box, outline=(*color, 68), width=2)
+        ring.alpha_composite(glow)
+
+        output = work / name
+        ring.save(output)
+        outputs.append(output)
+    return outputs
+
+
 def make_sheet_overlays(work: Path) -> list[Path]:
     specs = [
-        ("sheet-load.png", "04", "JSON 拖进浏览器", "MotionSheet 本地解析，不上传源文件", BLUE),
-        ("sheet-read.png", "05", "图层、时间和曲线自动展开", "动作分组、父子关系与属性变化不再靠猜", PINK),
-        ("sheet-locate.png", "06", "点一行，直接定位画面", "预览、时间轴、详情与导出保持同一个上下文", TEAL),
+        ("sheet-load.png", "07", "JSON 拖进浏览器", "MotionSheet 本地解析，不上传源文件", BLUE),
+        ("sheet-read.png", "08", "图层、时间和曲线自动展开", "动作分组、父子关系与属性变化不再靠猜", PINK),
+        ("sheet-locate.png", "09", "点一行，直接定位画面", "预览、时间轴、详情与导出保持同一个上下文", TEAL),
     ]
     outputs: list[Path] = []
     for name, step, title, detail, color in specs:
@@ -159,9 +227,9 @@ def make_sheet_overlays(work: Path) -> list[Path]:
 
 def make_extra_sheet_overlays(work: Path) -> list[Path]:
     specs = [
-        ("sheet-extra-preview.png", "07", "再换一个 JSON，结构照样能读", "真实预览与时间轴同步，不是为单个案例写死", BLUE),
-        ("sheet-extra-detail.png", "08", "选中图层，动作与参数一起定位", "doc-front / doc-back / bg 的变化分别可追踪", PINK),
-        ("sheet-extra-table.png", "09", "Timeline 与 Table 随时切换", "从视觉检查切到开发交付，不丢上下文", TEAL),
+        ("sheet-extra-preview.png", "10", "再换一个 JSON，结构照样能读", "真实预览与时间轴同步，不是为单个案例写死", BLUE),
+        ("sheet-extra-detail.png", "11", "选中图层，动作与参数一起定位", "doc-front / doc-back / bg 的变化分别可追踪", PINK),
+        ("sheet-extra-table.png", "12", "Timeline 与 Table 随时切换", "从视觉检查切到开发交付，不丢上下文", TEAL),
     ]
     outputs: list[Path] = []
     for name, step, title, detail, color in specs:
@@ -297,6 +365,34 @@ def build_clean_capture(raw: Path, output: Path) -> None:
     )
 
 
+def build_widget_capture(raw: Path, output: Path) -> None:
+    graph = (
+        "[0:v]trim=start=5,setpts=PTS-STARTPTS,"
+        "crop=trunc(ih*16/9/2)*2:ih:(iw-ow)/2:0,"
+        "scale=1920:1080:flags=lanczos,fps=30,format=yuv420p[out]"
+    )
+    run(
+        FFMPEG,
+        "-y",
+        "-i",
+        raw,
+        "-filter_complex",
+        graph,
+        "-map",
+        "[out]",
+        "-an",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "18",
+        "-movflags",
+        "+faststart",
+        output,
+    )
+
+
 def encode_ae_segment(
     source: Path,
     overlays: list[Path],
@@ -349,6 +445,76 @@ def encode_ae_segment(
         "[f1][5:v]overlay=0:0:enable='between(t,6,8.2)'[f2];"
         "[f2][6:v]overlay=0:0:enable='between(t,8.2,12)'[f3];"
         "[f3][7:v]overlay=0:0:enable='between(t,12,20.2)',"
+        "fps=30,format=yuv420p[out]"
+    )
+    args: list[object] = [FFMPEG, "-y", "-i", source]
+    for overlay in [*overlays, *focus_overlays]:
+        args.extend(["-i", overlay])
+    args.extend(
+        [
+            "-filter_complex",
+            graph,
+            "-map",
+            "[out]",
+            "-an",
+            "-c:v",
+            "libx264",
+            "-preset",
+            "medium",
+            "-crf",
+            "15",
+            "-movflags",
+            "+faststart",
+            output,
+        ]
+    )
+    run(*args)
+
+
+def encode_widget_segment(
+    source: Path,
+    overlays: list[Path],
+    focus_overlays: list[Path],
+    output: Path,
+) -> None:
+    move_to_progress = "0.5-0.5*cos(PI*(on-90)/30)"
+    move_to_result = "0.5-0.5*cos(PI*(on-150)/30)"
+    zoom = (
+        "if(lt(on,24),1+0.55*(0.5-0.5*cos(PI*on/24)),"
+        "if(lt(on,150),1.55,"
+        "if(lt(on,180),1.55-0.10*(0.5-0.5*cos(PI*(on-150)/30)),1.45)))"
+    )
+    right_x = "iw-iw/zoom"
+    result_x = "1100-iw/(2*zoom)"
+    input_y = "max(0,min(ih-ih/zoom,760-ih/(2*zoom)))"
+    progress_y = "0"
+    result_y = "max(0,min(ih-ih/zoom,620-ih/(2*zoom)))"
+    x = (
+        f"if(lt(on,150),{right_x},"
+        f"if(lt(on,180),({right_x})*(1-({move_to_result}))+"
+        f"({result_x})*({move_to_result}),{result_x}))"
+    )
+    y = (
+        f"if(lt(on,90),{input_y},"
+        f"if(lt(on,120),({input_y})*(1-({move_to_progress}))+"
+        f"({progress_y})*({move_to_progress}),"
+        f"if(lt(on,150),{progress_y},"
+        f"if(lt(on,180),({progress_y})*(1-({move_to_result}))+"
+        f"({result_y})*({move_to_result}),{result_y}))))"
+    )
+    graph = (
+        "[0:v]split=3[s0][s1][s2];"
+        "[s0]trim=start=0:end=3,setpts=PTS-STARTPTS[p0];"
+        "[s1]trim=start=3:end=13,setpts=(PTS-STARTPTS)/5[p1];"
+        "[s2]trim=start=13,setpts=PTS-STARTPTS[p2];"
+        "[p0][p1][p2]concat=n=3:v=1:a=0,fps=30[cut];"
+        f"[cut]zoompan=z='{zoom}':x='{x}':y='{y}':d=1:s=1920x1080:fps=30[base];"
+        "[base][1:v]overlay=0:0:enable='between(t,0,3)'[v1];"
+        "[v1][2:v]overlay=0:0:enable='between(t,3,5)'[v2];"
+        "[v2][3:v]overlay=0:0:enable='gte(t,5)'[v3];"
+        "[v3][4:v]overlay=0:0:enable='between(t,0,3)'[f1];"
+        "[f1][5:v]overlay=0:0:enable='between(t,3,5)'[f2];"
+        "[f2][6:v]overlay=0:0:enable='gte(t,5)',"
         "fps=30,format=yuv420p[out]"
     )
     args: list[object] = [FFMPEG, "-y", "-i", source]
@@ -550,6 +716,41 @@ def encode_still(image: Path, seconds: float, output: Path) -> None:
     )
 
 
+def crossfade_video_segments(
+    first: Path,
+    second: Path,
+    output: Path,
+    seconds: float = 0.35,
+) -> None:
+    offset = max(0.0, duration(first) - seconds)
+    graph = (
+        f"[0:v][1:v]xfade=transition=fade:duration={seconds:.2f}:"
+        f"offset={offset:.3f},fps=30,format=yuv420p[out]"
+    )
+    run(
+        FFMPEG,
+        "-y",
+        "-i",
+        first,
+        "-i",
+        second,
+        "-filter_complex",
+        graph,
+        "-map",
+        "[out]",
+        "-an",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "medium",
+        "-crf",
+        "16",
+        "-movflags",
+        "+faststart",
+        output,
+    )
+
+
 def concat_with_silent_audio(segments: list[Path], output: Path, work: Path) -> None:
     concat_file = work / f"{output.stem}-concat.txt"
     concat_file.write_text(
@@ -623,7 +824,7 @@ def make_covers(source: Path, work: Path) -> None:
     social.save(POST / "social-cover.png", quality=95)
 
 
-def build(raw: Path | None) -> None:
+def build(raw: Path | None, widget_raw: Path | None) -> None:
     if not FFMPEG or not FFPROBE:
         raise RuntimeError("ffmpeg and ffprobe must be available on PATH")
     if not FONT_BOLD.exists() or not FONT_REGULAR.exists():
@@ -638,6 +839,16 @@ def build(raw: Path | None) -> None:
     elif not clean.exists():
         raise FileNotFoundError("Pass --raw for the first build; cleaned AE source is missing")
 
+    widget = POST / "ae-widget-live.mp4"
+    if widget_raw:
+        if not widget_raw.exists():
+            raise FileNotFoundError(widget_raw)
+        build_widget_capture(widget_raw, widget)
+    elif not widget.exists():
+        raise FileNotFoundError(
+            "Pass --widget-raw for the first build; cleaned widget source is missing"
+        )
+
     sheet_gif = POST / "motionsheet-demo.gif"
     if not sheet_gif.exists():
         raise FileNotFoundError(sheet_gif)
@@ -649,16 +860,27 @@ def build(raw: Path | None) -> None:
         work = Path(tmp)
         ae_overlays = make_horizontal_overlays(work)
         ae_focus_overlays = make_ae_focus_overlays(work)
+        widget_overlays = make_widget_overlays(work)
+        widget_focus_overlays = make_widget_focus_overlays(work)
         sheet_overlays = make_sheet_overlays(work)
         extra_sheet_overlays = make_extra_sheet_overlays(work)
         summary_overlay = make_summary_overlay(work)
         vertical_ae_overlay = make_vertical_overlay(work)
 
         ae_h = work / "ae-h.mp4"
+        widget_h = work / "widget-h.mp4"
+        ae_chain_h = work / "ae-chain-h.mp4"
         sheet_h = work / "sheet-h.mp4"
         extra_sheet_h = work / "sheet-extra-h.mp4"
         summary_h = work / "summary-h.mp4"
         encode_ae_segment(clean, ae_overlays, ae_focus_overlays, ae_h)
+        encode_widget_segment(
+            widget,
+            widget_overlays,
+            widget_focus_overlays,
+            widget_h,
+        )
+        crossfade_video_segments(ae_h, widget_h, ae_chain_h)
         encode_sheet_segment(sheet_gif, sheet_overlays, sheet_h)
         encode_extra_sheet_segment(
             extra_sheet,
@@ -673,7 +895,7 @@ def build(raw: Path | None) -> None:
         )
         horizontal = POST / "motionhub-demo.mp4"
         concat_with_silent_audio(
-            [ae_h, sheet_h, extra_sheet_h, summary_h],
+            [ae_chain_h, sheet_h, extra_sheet_h, summary_h],
             horizontal,
             work,
         )
@@ -689,6 +911,7 @@ def build(raw: Path | None) -> None:
     print(f"horizontal={duration(POST / 'motionhub-demo.mp4'):.2f}s")
     print(f"vertical={duration(POST / 'motionhub-demo-vertical.mp4'):.2f}s")
     print(f"clean_ae={duration(clean):.2f}s")
+    print(f"clean_widget={duration(widget):.2f}s")
 
 
 def main() -> None:
@@ -699,8 +922,14 @@ def main() -> None:
         default=None,
         help="Raw AE screen recording. Omit after ae-motionpilot-live.mp4 has been generated.",
     )
+    parser.add_argument(
+        "--widget-raw",
+        type=Path,
+        default=None,
+        help="Raw widget AE recording. Omit after ae-widget-live.mp4 has been generated.",
+    )
     args = parser.parse_args()
-    build(args.raw)
+    build(args.raw, args.widget_raw)
 
 
 if __name__ == "__main__":
