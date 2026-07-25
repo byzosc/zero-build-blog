@@ -1,5 +1,38 @@
 [
   {
+    "dir": "2026-07-20-zerb-hub-command-center",
+    "title": "I Turned Homepage into My Personal Command Center",
+    "short_title": "Homepage, Turned into a Command Center",
+    "date": "2026-07-25",
+    "summary": "What began as a page of links grew into the first screen I check every day: VPS and NAS health, WAN/LAN/Tailscale routes, AI limits, and synced personal state.",
+    "tags": [
+      "self-hosting",
+      "homepage",
+      "vps",
+      "nas",
+      "tailscale"
+    ],
+    "cover": "cover.png",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "我把 Homepage 改成了自己的数字驾驶舱：一屏看完 VPS、NAS 和 AI 额度",
+        "short_title": "一屏看完 VPS、NAS 与 AI 额度",
+        "summary": "从一页链接到每天真正会看的工作台：实时状态、WAN/LAN/Tailscale 多路径、AI 额度、跨设备布局与背景，都被我收进了同一块 Zerb Hub。",
+        "tags": [
+          "自托管",
+          "Homepage",
+          "VPS",
+          "NAS",
+          "Tailscale"
+        ]
+      }
+    }
+  },
+  {
     "dir": "2026-07-16-motionhub",
     "title": "AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff",
     "short_title": "AI Enters the Motion Pipeline",
