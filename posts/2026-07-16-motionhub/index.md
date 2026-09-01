@@ -89,8 +89,8 @@ That is what MotionHub means to me:
 
 ## Try the projects
 
-- [MotionSheet live demo](https://zerb.cc.cd/)
-- [MotionPilot page](https://zerb.cc.cd/pilot)
+- [MotionSheet live demo](https://motionrules.com/)
+- [MotionPilot page](https://motionrules.com/pilot)
 - [MotionSheet on GitHub](https://github.com/zerbLion/keyframe_sheet)
 - [MotionPilot on GitHub](https://github.com/zerbLion/motion-design)
 

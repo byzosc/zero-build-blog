@@ -17,7 +17,7 @@ tags: [动效设计, After Effects, Lottie, AI, 工具]
 
 ![MotionHub 从 MotionSpec 到 MotionPilot 再到 MotionSheet](motionhub-system.png)
 
-MotionSpec 定规范，MotionPilot 把意图写回 AE，MotionSheet 用同一份规范交付与走查。这三个工具是我做的，合起来叫 MotionHub，现在都挂在 [zerb.cc.cd](https://zerb.cc.cd/) 上。
+MotionSpec 定规范，MotionPilot 把意图写回 AE，MotionSheet 用同一份规范交付与走查。这三个工具是我做的，合起来叫 MotionHub，现在都挂在 [motionrules.com](https://motionrules.com/) 上。
 
 标题起得狠，要说的事其实很克制：AI 还没有替代动效师的审美，但它确实已经不只是"帮你 K 几帧"。我把三个工具接在一起之后才看清，它正在进入一条可编辑、可约束、可走查的生产链——结构、计划和结果都留在正常的设计工作流里，而不是又生成一段改不了的黑盒视频。
 
@@ -70,10 +70,10 @@ MotionPilot 把这些最容易出错的工程问题固定下来：场景读取�
 
 ## 体验与源码
 
-- [MotionHub 首页](https://zerb.cc.cd/)
-- [MotionSheet 在线体验](https://zerb.cc.cd/app)
-- [MotionSpec 规范编辑](https://zerb.cc.cd/tokens)
-- [MotionPilot 页面](https://zerb.cc.cd/pilot)
+- [MotionHub 首页](https://motionrules.com/)
+- [MotionSheet 在线体验](https://motionrules.com/app)
+- [MotionSpec 规范编辑](https://motionrules.com/tokens)
+- [MotionPilot 页面](https://motionrules.com/pilot)
 - [MotionSheet GitHub](https://github.com/zerbLion/keyframe_sheet)
 - [MotionPilot GitHub](https://github.com/zerbLion/motion-design)
 

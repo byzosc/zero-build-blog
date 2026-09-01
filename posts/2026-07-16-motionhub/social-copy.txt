@@ -84,6 +84,6 @@ MotionPilot：在 After Effects 内理解文字意图，写入仍可继续编辑
 
 我准备把自有插件代码转为 MIT 开源，让每个人贡献的动效能力都能被所有人和所有 AI 复用。当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
 
-MotionSheet：https://zerb.cc.cd/
+MotionSheet：https://motionrules.com/
 GitHub：https://github.com/zerbLion/keyframe_sheet
 MotionPilot：https://github.com/zerbLion/motion-design
