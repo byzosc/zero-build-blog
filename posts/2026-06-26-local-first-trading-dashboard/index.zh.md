@@ -167,4 +167,4 @@ tags: [前端, 数据可视化, FastAPI, React, 自托管]
 
 这三件事不只适用于交易面板，也适用于任何会影响判断的 dashboard。
 
-→ **[github.com/ZerbLion/trading-pannel](https://github.com/ZerbLion/trading-pannel)**
+→ **[github.com/byzosc/trading-pannel](https://github.com/byzosc/trading-pannel)**

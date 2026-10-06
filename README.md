@@ -110,7 +110,7 @@ Push it. The post shows up on the home page automatically — no index to update
 
 <div align="center">
 
-A homemade, zero-build blog by [**@ZerbLion**](https://github.com/ZerbLion). <br/>
+A homemade, zero-build blog by [**@byzosc**](https://github.com/byzosc). <br/>
 If it saved you from spinning up yet another static-site generator, a ⭐ means a lot.
 
 </div>

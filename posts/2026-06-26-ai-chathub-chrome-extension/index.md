@@ -69,4 +69,4 @@ So I didn't bet on it. The default is API mode; webtab is an opt-in escape hatch
 
 The keeper isn't the product; it's the shape: two interchangeable engines behind one interface, orchestration kept out of the Service Worker, and a scraping path that the architecture treats as the liability it is.
 
-→ **[github.com/ZerbLion/AI_Chat_ChromeExtension](https://github.com/ZerbLion/AI_Chat_ChromeExtension)**
+→ **[github.com/byzosc/AiChat-Extension](https://github.com/byzosc/AiChat-Extension)**

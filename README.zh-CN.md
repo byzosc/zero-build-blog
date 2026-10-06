@@ -110,7 +110,7 @@ push 上去就行。文章自动出现在首页——不用更新索引，不用
 
 <div align="center">
 
-一个自己手搓的零构建博客，作者 [**@ZerbLion**](https://github.com/ZerbLion)。<br/>
+一个自己手搓的零构建博客，作者 [**@byzosc**](https://github.com/byzosc)。<br/>
 如果它帮你省掉了又一次折腾静态站点生成器，点个 ⭐ 我会很开心。
 
 </div>

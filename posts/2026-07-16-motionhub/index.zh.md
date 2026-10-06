@@ -74,7 +74,7 @@ MotionPilot 把这些最容易出错的工程问题固定下来：场景读取�
 - [MotionSheet 在线体验](https://motionrules.com/app)
 - [MotionSpec 规范编辑](https://motionrules.com/tokens)
 - [MotionPilot 页面](https://motionrules.com/pilot)
-- [MotionSheet GitHub](https://github.com/zerbLion/keyframe_sheet)
-- [MotionPilot GitHub](https://github.com/zerbLion/motion-design)
+- [MotionSheet GitHub](https://github.com/byzosc/keyframe_sheet)
+- [MotionPilot GitHub](https://github.com/byzosc/motion-design)
 
 本篇的源码目录里还放着横版和竖版完整演示、真实 AE 动画源片，以及各平台可直接发布的短文案。

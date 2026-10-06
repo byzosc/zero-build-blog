@@ -92,7 +92,7 @@ Push，完事。
 
 匿名 GitHub API 的限额是**每小时每 IP 60 次**。在共享网络、运营商级 NAT 后面（以及任何刷新了几次的人那里），这点额度一下就没了，列目录的请求就失败。一个首页时不时打不开的博客，不算博客。
 
-修法既不丢"仓库是唯一真相"的精神，又不必为每次访问交 API 税：一个零依赖的小脚本 [`scripts/gen-posts.mjs`](https://github.com/ZerbLion/zrxl_blog/blob/main/scripts/gen-posts.mjs) 扫描每个 `posts/<slug>/index.md`，解析它的 frontmatter，写出一个静态 `posts.json`。引擎优先读这个文件——不调 API、不限流、不 403。
+修法既不丢"仓库是唯一真相"的精神，又不必为每次访问交 API 税：一个零依赖的小脚本 [`scripts/gen-posts.mjs`](https://github.com/byzosc/zero-build-blog/blob/main/scripts/gen-posts.mjs) 扫描每个 `posts/<slug>/index.md`，解析它的 frontmatter，写出一个静态 `posts.json`。引擎优先读这个文件——不调 API、不限流、不 403。
 
 为了不破坏作者"只管 push"的承诺，一个 GitHub Actions 工作流会在每次 push 时跑这个脚本、把重新生成的 `posts.json` 提交回去。所以索引仍然是从文章推导出来的，只是把推导**从"访客浏览器、每次都算"挪到了"CI、每次 push 算一次"**。脚本里的 frontmatter 解析器，刻意和客户端引擎里的那个一模一样——这样 CI 索引到的和浏览器渲染的，永远不会对不上。
 
@@ -121,6 +121,6 @@ translations: [zh]
 
 引擎是 MIT 协议（开放的是机器，不是我的文字）。Fork 它，把 `assets/app.js` 里的 `CONFIG.repo` 指向你的仓库，在 `main` 上开 GitHub Pages，你就有了一个"写文章=写文件"的博客。
 
-→ **[github.com/ZerbLion/zrxl_blog](https://github.com/ZerbLion/zrxl_blog)**
+→ **[github.com/byzosc/zero-build-blog](https://github.com/byzosc/zero-build-blog)**
 
 如果它帮你省下了又一次折腾静态站点生成器的功夫，给个 ⭐ 对我意义很大。

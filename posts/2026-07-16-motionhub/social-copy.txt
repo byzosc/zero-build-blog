@@ -53,7 +53,7 @@ X / Twitter 中文
 
 准备把自有插件代码转为 MIT 开源：不是开源一个效果，而是开源 AI 操作 AE 的公共底座。
 
-https://zerblion.github.io/zero-build-blog/#/post/2026-07-16-motionhub
+https://blog.zosc.com/#/post/2026-07-16-motionhub
 
 
 X / Twitter English
@@ -67,7 +67,7 @@ Not a black-box generated clip. The result stays editable in AE.
 
 The first-party plugin is planned for an MIT release: shared infrastructure for AI to operate After Effects, not a one-off effect.
 
-https://zerblion.github.io/zero-build-blog/#/post/2026-07-16-motionhub
+https://blog.zosc.com/#/post/2026-07-16-motionhub
 
 
 Bilibili / YouTube
@@ -85,5 +85,5 @@ MotionPilot：在 After Effects 内理解文字意图，写入仍可继续编辑
 我准备把自有插件代码转为 MIT 开源，让每个人贡献的动效能力都能被所有人和所有 AI 复用。当前两端已有可工作原型，下一步是统一 motion contract，完成从动效分析到 AE 执行的闭环。
 
 MotionSheet：https://motionrules.com/
-GitHub：https://github.com/zerbLion/keyframe_sheet
-MotionPilot：https://github.com/zerbLion/motion-design
+GitHub：https://github.com/byzosc/keyframe_sheet
+MotionPilot：https://github.com/byzosc/motion-design
