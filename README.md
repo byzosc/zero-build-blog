@@ -6,7 +6,7 @@
 
 **A zero-build, push-to-publish personal blog — write Markdown, `git push`, and a clean GitHub Pages site renders itself. No generator, no CMS, no pipeline.**
 
-[![Live](https://img.shields.io/badge/live-zerblion.github.io-0969da)](https://zerblion.github.io/zero-build-blog/)
+[![Live](https://img.shields.io/badge/live-blog.zosc.com-0969da)](https://blog.zosc.com/)
 ![Build](https://img.shields.io/badge/build-none%20(zero--build)-2ea44f)
 ![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%2B%20Markdown-f7df1e)
 ![Hosting](https://img.shields.io/badge/hosting-GitHub%20Pages-1f2328)
@@ -15,7 +15,7 @@
 
 <br/>
 
-[![zero-build-blog home page](docs/screenshot-home.png)](https://zerblion.github.io/zero-build-blog/)
+[![zero-build-blog home page](docs/screenshot-home.png)](https://blog.zosc.com/)
 
 </div>
 
