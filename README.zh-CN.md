@@ -6,7 +6,7 @@
 
 **一个零构建、push 即发布的个人博客——写 Markdown、`git push`，GitHub Pages 上就自动渲染成一个干净的网站。没有生成器，没有 CMS，没有流水线。**
 
-[![Live](https://img.shields.io/badge/live-zerblion.github.io-0969da)](https://zerblion.github.io/zero-build-blog/)
+[![Live](https://img.shields.io/badge/live-blog.zosc.com-0969da)](https://blog.zosc.com/)
 ![Build](https://img.shields.io/badge/build-none%20(零构建)-2ea44f)
 ![Stack](https://img.shields.io/badge/stack-Vanilla%20JS%20%2B%20Markdown-f7df1e)
 ![Hosting](https://img.shields.io/badge/hosting-GitHub%20Pages-1f2328)
@@ -15,7 +15,7 @@
 
 <br/>
 
-[![zero-build-blog 首页](docs/screenshot-home.png)](https://zerblion.github.io/zero-build-blog/)
+[![zero-build-blog 首页](docs/screenshot-home.png)](https://blog.zosc.com/)
 
 </div>
 
