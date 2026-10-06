@@ -91,7 +91,7 @@ That is what MotionHub means to me:
 
 - [MotionSheet live demo](https://motionrules.com/)
 - [MotionPilot page](https://motionrules.com/pilot)
-- [MotionSheet on GitHub](https://github.com/zerbLion/keyframe_sheet)
-- [MotionPilot on GitHub](https://github.com/zerbLion/motion-design)
+- [MotionSheet on GitHub](https://github.com/byzosc/keyframe_sheet)
+- [MotionPilot on GitHub](https://github.com/byzosc/motion-design)
 
 The vertical social demo, real AE source clip, and platform-ready copy are included with this post's source assets.

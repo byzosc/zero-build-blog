@@ -134,6 +134,6 @@ This project is not really about displaying temperatures. It is about this quest
 
 On a platform where sensors are scattered across half-working tools, this gives me one endpoint I can explain, verify, and feed into a desk display.
 
-→ **[github.com/ZerbLion/nas_monitoring](https://github.com/ZerbLion/nas_monitoring)**
+→ **[github.com/byzosc/nas-monitoring](https://github.com/byzosc/nas-monitoring)**
 
 If it saved you an afternoon of fighting `smartctl`, a star means a lot.

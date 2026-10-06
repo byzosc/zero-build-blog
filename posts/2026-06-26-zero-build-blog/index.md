@@ -94,7 +94,7 @@ Then the home page started returning **403** for some visitors.
 
 The anonymous GitHub API is rate-limited to **60 requests per hour per IP**. On shared or carrier-grade-NAT networks (and to anyone who refreshed a few times), that budget evaporates, and the listing call fails. A blog whose home page sometimes just doesn't load is not a blog.
 
-The fix keeps the "repo is the source of truth" spirit without paying the API tax on every page view: a tiny zero-dependency script, [`scripts/gen-posts.mjs`](https://github.com/ZerbLion/zrxl_blog/blob/main/scripts/gen-posts.mjs), scans every `posts/<slug>/index.md`, parses its frontmatter, and writes a static `posts.json`. The engine reads that file first — no API call, no rate limit, no 403.
+The fix keeps the "repo is the source of truth" spirit without paying the API tax on every page view: a tiny zero-dependency script, [`scripts/gen-posts.mjs`](https://github.com/byzosc/zero-build-blog/blob/main/scripts/gen-posts.mjs), scans every `posts/<slug>/index.md`, parses its frontmatter, and writes a static `posts.json`. The engine reads that file first — no API call, no rate limit, no 403.
 
 And to keep the author's promise intact ("just push"), a GitHub Actions workflow runs that script on every push and commits the regenerated `posts.json`. So the index is still derived from the posts — the derivation just moved from *the visitor's browser, every time* to *CI, once per push*. The frontmatter parser in the script is deliberately identical to the one in the client engine, so what CI indexes and what the browser renders can never drift apart.
 
@@ -123,6 +123,6 @@ None of these dent the core win: the distance from *idea* to *published* is one 
 
 It's MIT-licensed (the engine, not my words). Fork it, point `CONFIG.repo` in `assets/app.js` at your repo, enable GitHub Pages on `main`, and you have a blog where writing a post means writing a file.
 
-→ **[github.com/ZerbLion/zrxl_blog](https://github.com/ZerbLion/zrxl_blog)**
+→ **[github.com/byzosc/zero-build-blog](https://github.com/byzosc/zero-build-blog)**
 
 If it saves you from spinning up yet another static-site generator, a ⭐ means a lot.

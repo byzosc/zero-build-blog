@@ -163,4 +163,4 @@ It was about building a tool that is honest about data, restrained with permissi
 
 Those three properties matter in any dashboard.
 
-→ **[github.com/ZerbLion/trading-pannel](https://github.com/ZerbLion/trading-pannel)**
+→ **[github.com/byzosc/trading-pannel](https://github.com/byzosc/trading-pannel)**

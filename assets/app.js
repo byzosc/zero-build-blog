@@ -5,11 +5,11 @@
  *   3) 文章列表自动生成：读 GitHub API 列出 posts/ 下的文件夹，无需手维护索引
  * 改仓库名后，只改下面 CONFIG.repo / giscus.repo 即可。 */
 const CONFIG = {
-  repo: 'ZerbLion/zero-build-blog',   // ← owner/repo，改名仓库后改这里
+  repo: 'byzosc/zero-build-blog',   // ← owner/repo，改名仓库后改这里
   branch: 'main',
   postsDir: 'posts',
   giscus: {
-    repo: 'ZerbLion/zero-build-blog',
+    repo: 'byzosc/zero-build-blog',
     repoId: 'R_kgDOTA_3bA',                 // data-repo-id
     category: 'Announcements',
     categoryId: 'DIC_kwDOTA_3bM4C_qMH',     // data-category-id（Announcements 分类）

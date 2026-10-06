@@ -143,6 +143,6 @@ tags: [自托管, NAS, 群晖, 监控, Docker]
 
 在 AMD 群晖这种温度散落在三个半残工具里的平台上，这份 JSON 至少给了我一个能解释、能验证、能喂给小屏的答案。
 
-→ **[github.com/ZerbLion/nas_monitoring](https://github.com/ZerbLion/nas_monitoring)**
+→ **[github.com/byzosc/nas-monitoring](https://github.com/byzosc/nas-monitoring)**
 
 如果它帮你省下一下午跟 `smartctl` 较劲的功夫，给个 star 我会很开心。

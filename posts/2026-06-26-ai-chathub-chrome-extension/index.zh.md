@@ -67,4 +67,4 @@ Manifest V3 希望你的后台逻辑放在 Service Worker 里。但 Service Work
 
 值得留下的不是这个产品，而是这个形状：一个接口背后两套可互换的引擎、把编排挪出 Service Worker、以及一条被架构当作"负债"来对待的 scraping 路。
 
-→ **[github.com/ZerbLion/AI_Chat_ChromeExtension](https://github.com/ZerbLion/AI_Chat_ChromeExtension)**
+→ **[github.com/byzosc/AiChat-Extension](https://github.com/byzosc/AiChat-Extension)**
