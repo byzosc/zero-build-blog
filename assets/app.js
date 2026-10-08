@@ -231,8 +231,8 @@ function langSwitchHtml(langs, active, className = '') {
 
 function listCopy(lang) {
   return lang === 'zh'
-    ? { kicker: 'Zerb 的笔记', title: '最新文章' }
-    : { kicker: "Zerb's Notebook", title: 'Recent writing' };
+    ? { kicker: 'zosc 的笔记', title: '最新文章' }
+    : { kicker: "zosc's notebook", title: 'Recent writing' };
 }
 
 function localizedMeta(post, lang) {
@@ -265,7 +265,7 @@ async function renderList() {
   app.innerHTML = `<p class="state">${t('loadingList', lang)}</p>`;
   try {
     const posts = await getPosts();
-    document.title = "Zerb's Blog";
+    document.title = "zosc blog";
     if (!posts.length) { app.innerHTML = `<p class="empty">${t('empty', lang)}</p>`; return; }
     const langs = listLangs(posts);
     const copy = listCopy(lang);
@@ -396,7 +396,7 @@ async function renderPost(dir) {
       }));
 
     await load(cur);
-    document.title = (meta.title || dir) + " · Zerb's Blog";
+    document.title = (meta.title || dir) + " · zosc blog";
 
     // 上一篇/下一篇：与语言无关，渲染一次
     try {
