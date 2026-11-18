@@ -22,20 +22,20 @@ An [earlier post](/posts/2026-07-16-motionhub/) covered the whole MotionRules to
 
 Most easing tools give you curves. You pick "ease out", the handles change, and the timing is still whatever you happened to drag. But a real motion spec doesn't say "use this curve"; it says "this kind of movement uses this curve *for this long*." In a spec, `gentle` and `250ms` are one decision, not two.
 
-So the spec MotionPilot reads, `motion-tokens.json`, keeps it small. A motion is three things: which property moves, which curve it follows, and how long it takes. The file pins down the allowed values. Here's a trimmed example from the schema docs:
+So the spec MotionPilot reads, `motion-tokens.json`, keeps it small. A motion is three things: which property moves, which curve it follows, and how long it takes. The file pins down the allowed values. Here's a trimmed excerpt from the spec published at motionrules.com:
 
 ```json
 {
   "curves": [
-    { "name": "easeStandard",   "bezier": [0.40, 0.00, 0.20, 1.00] },
-    { "name": "easeEmphasized", "bezier": [0.20, 0.00, 0.00, 1.00] },
-    { "name": "springSnappy",   "bezier": [0.30, 1.30, 0.50, 1.00] }
+    { "name": "standard", "bezier": [0.25, 0.10, 0.25, 1.00] },
+    { "name": "gentle",   "bezier": [0.66, 0.00, 0.34, 1.00] },
+    { "name": "bounce",   "bezier": [0.20, 1.00, 0.30, 1.15] }
   ],
-  "durations": { "instant": 100, "fast": 150, "base": 250, "slow": 400 }
+  "durations": { "instant": 100, "fast": 150, "base": 250, "slow": 350 }
 }
 ```
 
-There is no separate "overshoot" field. A bounce lives in the curve itself: when the bezier's y goes above 1 (like `springSnappy`), it overshoots. Fewer fields means fewer ways for two people to describe the same motion differently.
+There is no separate "overshoot" field. A bounce lives in the curve itself: when the bezier's y goes above 1 (like `bounce`), it overshoots. Fewer fields means fewer ways for two people to describe the same motion differently.
 
 ## What Apply Spec does
 
@@ -83,7 +83,7 @@ The pitfall here was silent. The panel ships an offline fallback copy of the spe
 ## Two more After Effects surprises
 
 - **Non-English layer names produced empty files.** The panel passes larger results through a file, and ExtendScript's `File.write` fails on non-ASCII text, leaving a 0-byte file. Comps with Chinese layer names broke every time with a vague "unexpected end of JSON". The old panel had already fixed this by escaping text to `\uXXXX`; I left that fix behind when I moved to the new CEP panel. Lesson: when you port code, port its old patches too.
-- **"The AI is slow" was the network.** A prompt asking for a one-word reply took about 116 seconds at the default reasoning level and 115 at low. The same time at both levels meant the model wasn't the problem. The API host wasn't reachable directly, and the CLI kept retrying until it timed out. After Effects started from the Start menu doesn't inherit a user's proxy environment variables. With a proxy set explicitly, the same prompt took 5.5 seconds. The panel now manages the proxy itself, and never sends local endpoints like Ollama through it.
+- **"The AI is slow" was the network.** A prompt asking for a one-word reply took about 116 seconds at the default reasoning level and 115 at low. The same time at both levels meant the model wasn't the problem. That machine reached the API through a proxy, and After Effects started from the Start menu doesn't inherit a user's proxy environment variables, so the CLI kept retrying a direct connection until it timed out. With the proxy set explicitly, the same prompt took 5.5 seconds. The panel now manages the proxy itself, and never sends local endpoints like Ollama through it.
 
 ## Requirements and links
 

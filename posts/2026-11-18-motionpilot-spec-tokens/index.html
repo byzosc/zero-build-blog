@@ -55,17 +55,17 @@
 <p>An <a href="/posts/2026-07-16-motionhub/">earlier post</a> covered the whole MotionRules toolset. This one stays on a single idea inside MotionPilot: <strong>an easing curve and a duration are one decision, so the panel applies them as one token.</strong></p>
 <h2>A curve without a duration is half a rule</h2>
 <p>Most easing tools give you curves. You pick &quot;ease out&quot;, the handles change, and the timing is still whatever you happened to drag. But a real motion spec doesn&#39;t say &quot;use this curve&quot;; it says &quot;this kind of movement uses this curve <em>for this long</em>.&quot; In a spec, <code>gentle</code> and <code>250ms</code> are one decision, not two.</p>
-<p>So the spec MotionPilot reads, <code>motion-tokens.json</code>, keeps it small. A motion is three things: which property moves, which curve it follows, and how long it takes. The file pins down the allowed values. Here&#39;s a trimmed example from the schema docs:</p>
+<p>So the spec MotionPilot reads, <code>motion-tokens.json</code>, keeps it small. A motion is three things: which property moves, which curve it follows, and how long it takes. The file pins down the allowed values. Here&#39;s a trimmed excerpt from the spec published at motionrules.com:</p>
 <pre><code class="language-json">{
   &quot;curves&quot;: [
-    { &quot;name&quot;: &quot;easeStandard&quot;,   &quot;bezier&quot;: [0.40, 0.00, 0.20, 1.00] },
-    { &quot;name&quot;: &quot;easeEmphasized&quot;, &quot;bezier&quot;: [0.20, 0.00, 0.00, 1.00] },
-    { &quot;name&quot;: &quot;springSnappy&quot;,   &quot;bezier&quot;: [0.30, 1.30, 0.50, 1.00] }
+    { &quot;name&quot;: &quot;standard&quot;, &quot;bezier&quot;: [0.25, 0.10, 0.25, 1.00] },
+    { &quot;name&quot;: &quot;gentle&quot;,   &quot;bezier&quot;: [0.66, 0.00, 0.34, 1.00] },
+    { &quot;name&quot;: &quot;bounce&quot;,   &quot;bezier&quot;: [0.20, 1.00, 0.30, 1.15] }
   ],
-  &quot;durations&quot;: { &quot;instant&quot;: 100, &quot;fast&quot;: 150, &quot;base&quot;: 250, &quot;slow&quot;: 400 }
+  &quot;durations&quot;: { &quot;instant&quot;: 100, &quot;fast&quot;: 150, &quot;base&quot;: 250, &quot;slow&quot;: 350 }
 }
 </code></pre>
-<p>There is no separate &quot;overshoot&quot; field. A bounce lives in the curve itself: when the bezier&#39;s y goes above 1 (like <code>springSnappy</code>), it overshoots. Fewer fields means fewer ways for two people to describe the same motion differently.</p>
+<p>There is no separate &quot;overshoot&quot; field. A bounce lives in the curve itself: when the bezier&#39;s y goes above 1 (like <code>bounce</code>), it overshoots. Fewer fields means fewer ways for two people to describe the same motion differently.</p>
 <h2>What Apply Spec does</h2>
 <p>In the Spec tab you select two or more keyframes, pick a curve and a duration, and click Apply. It works offline, with no account, no API key and no network request. Under the hood it runs five steps, in this order.</p>
 <p><strong>1. Find every selected keyframe, on every layer.</strong> When you box-select keyframes across several layers, After Effects often reports only the current layer through <code>selectedLayers</code> and <code>selectedProperties</code>. So the panel walks every layer&#39;s property tree and collects every property with at least two selected keys. Each adjacent pair of selected keys is one segment.</p>
@@ -93,7 +93,7 @@
 <h2>Two more After Effects surprises</h2>
 <ul>
 <li><strong>Non-English layer names produced empty files.</strong> The panel passes larger results through a file, and ExtendScript&#39;s <code>File.write</code> fails on non-ASCII text, leaving a 0-byte file. Comps with Chinese layer names broke every time with a vague &quot;unexpected end of JSON&quot;. The old panel had already fixed this by escaping text to <code>\uXXXX</code>; I left that fix behind when I moved to the new CEP panel. Lesson: when you port code, port its old patches too.</li>
-<li><strong>&quot;The AI is slow&quot; was the network.</strong> A prompt asking for a one-word reply took about 116 seconds at the default reasoning level and 115 at low. The same time at both levels meant the model wasn&#39;t the problem. The API host wasn&#39;t reachable directly, and the CLI kept retrying until it timed out. After Effects started from the Start menu doesn&#39;t inherit a user&#39;s proxy environment variables. With a proxy set explicitly, the same prompt took 5.5 seconds. The panel now manages the proxy itself, and never sends local endpoints like Ollama through it.</li>
+<li><strong>&quot;The AI is slow&quot; was the network.</strong> A prompt asking for a one-word reply took about 116 seconds at the default reasoning level and 115 at low. The same time at both levels meant the model wasn&#39;t the problem. That machine reached the API through a proxy, and After Effects started from the Start menu doesn&#39;t inherit a user&#39;s proxy environment variables, so the CLI kept retrying a direct connection until it timed out. With the proxy set explicitly, the same prompt took 5.5 seconds. The panel now manages the proxy itself, and never sends local endpoints like Ollama through it.</li>
 </ul>
 <h2>Requirements and links</h2>
 <p>MotionPilot needs After Effects 26.0–26.9. It&#39;s developed and tested on Windows; macOS is not verified yet.</p>
