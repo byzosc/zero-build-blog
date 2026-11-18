@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口 · zosc blog</title>
+  <meta name="description" content="从 ChatALL 踩坑到自建——用订阅桥 + Open WebUI + NAS，一天搭出全家共享、多模型并排的 AI 入口。">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/zh/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口">
+  <meta property="og:description" content="从 ChatALL 踩坑到自建——用订阅桥 + Open WebUI + NAS，一天搭出全家共享、多模型并排的 AI 入口。">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/zh/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/cover.png">
+  <meta property="article:published_time" content="2026-06-21">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口","description":"从 ChatALL 踩坑到自建——用订阅桥 + Open WebUI + NAS，一天搭出全家共享、多模型并排的 AI 入口。","datePublished":"2026-06-21","inLanguage":"zh-CN","image":"https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/cover.png","url":"https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/zh/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/zh/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换到暗色模式">暗色</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-21-multi-model-ai-gateway"><a class="back" href="/">← 返回列表</a><div class="lang-switch"><a data-lang="en" class="" href="/posts/2026-06-21-multi-model-ai-gateway/" hreflang="en">English</a><a data-lang="zh" class="active" href="/posts/2026-06-21-multi-model-ai-gateway/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>一天搭建自己的多模型 AI 网关：把付费订阅变成全家共享入口</h1>
+<h2>导语</h2>
+<p>我一直想要一个很简单的东西：</p>
+<p><strong>输入一句话，Claude、GPT、Gemini 同时回答，并排放在一起，让我一眼看出谁更好。</strong></p>
+<p>听起来不难吧？但找了一圈现成工具，没一个顺手的——要么收费、要么不让我填自己的 key、要么压根不能并排。</p>
+<p>折腾到最后，我干脆自己搭了一个。这篇就讲讲：我怎么从&quot;踩了个大坑&quot;，到&quot;一天搭出一套全家能用的多模型 AI 入口&quot;。</p>
+<p><img src="/posts/2026-06-21-multi-model-ai-gateway/images/openwebui.png" alt="Open WebUI 里 Claude / GPT / Gemini 三个模型并排回答同一个问题" loading="lazy"></p>
+<hr>
+<h2>一、我先走了一条死路</h2>
+<p>最开始，我盯上了一个开源项目 <strong>ChatALL</strong>——号称能&quot;同时和所有 AI 聊天&quot;。我把它 clone 下来，想自己维护一份。</p>
+<p>结果一路全是坑：Windows 构建链报错、打包出来直接白屏……我硬是把这些 bug 都修好了，app 能正常打开了。</p>
+<p>但就在这时候，我才看清一件更扎心的事：</p>
+<p><strong>它&quot;聚合所有 AI&quot;靠的是模拟浏览器去抓各家网页——而这条路，今天基本已经死了。</strong></p>
+<p>各家网站疯狂反爬、频繁改版，抓取逻辑根本追不上；不光是这个项目，连它官方版本自己打开都白屏。我修好的只是&quot;打不开&quot;，修不好的是&quot;路线本身错了&quot;。</p>
+<blockquote>
+<p>一句话总结这段：<strong>问题不在代码，在方向。</strong> 网页抓取这条路，是个无底洞。</p>
+</blockquote>
+<p>于是我把它放下，换了个完全不同的思路。</p>
+<p><img src="/posts/2026-06-21-multi-model-ai-gateway/images/route-comparison.png" alt="网页抓取 vs API 直连：两条路线的对比" loading="lazy"></p>
+<hr>
+<h2>二、换个思路：不抓网页，桥接订阅</h2>
+<p>新思路其实一句话就能说清：</p>
+<p><strong>别去抓网页了。改成：把&quot;订阅&quot;统一成一个标准 API，再用一个能并排的前端去调它。</strong></p>
+<p>整套架构长这样👇</p>
+<p><img src="/posts/2026-06-21-multi-model-ai-gateway/images/arch.png" alt="架构图" loading="lazy"></p>
+<p>从上到下就四层：</p>
+<ul>
+<li><strong>客户端</strong>：电脑浏览器、手机、各种 AI 客户端，谁都能连。</li>
+<li><strong>入口</strong>：让我在家、在外面都能安全访问。</li>
+<li><strong>NAS</strong>：真正干活的两个服务跑在这，24 小时在线。</li>
+<li><strong>出口</strong>：智能分流——该走代理的走代理，该直连的直连。</li>
+</ul>
+<hr>
+<h2>三、三块拼图</h2>
+<p><strong>拼图①：订阅桥</strong></p>
+<p>这是整套方案的灵魂。</p>
+<p>我本来就付费用着 Claude、GPT 这些。有一个开源工具，能把这些<strong>订阅的登录态</strong>，统一&quot;桥&quot;成一个标准的、所有客户端都认识的接口（OpenAI 兼容）。</p>
+<p>说人话：<strong>我已经付费的那些 AI，被收拢成了一个我自己的接口。</strong></p>
+<p><strong>拼图②：前端（Open WebUI）</strong></p>
+<p>光有接口还得有个好用的界面。我选了开源的 <strong>Open WebUI</strong>，因为它正好满足我全部要求：</p>
+<ul>
+<li>✅ 并排多模型，一个问题甩给好几个模型</li>
+<li>✅ 能把多家答案<strong>合成一个</strong>（业内叫 Mixture-of-Agents）</li>
+<li>✅ 能连<strong>任意</strong>符合标准的接口地址</li>
+<li>✅ 数据全在自己手里，手机网页也能用</li>
+</ul>
+<p><strong>拼图③：让它 24 小时活着（NAS）</strong></p>
+<p>前两块如果跑在我的 Mac 上，那我合上盖、一出门，全家就都断了。</p>
+<p>所以我把它们塞进 <strong>NAS</strong>，用 Docker 跑起来——<strong>不依赖我的电脑开不开机，24 小时常驻。</strong></p>
+<hr>
+<h2>四、一个最容易搞混的点：到底哪一步要&quot;翻墙&quot;</h2>
+<p>这个点我必须单独拎出来讲，因为太多人一上来就被它绕晕：</p>
+<p><strong>这是两件互相独立的事，千万别混：</strong></p>
+<ol>
+<li><strong>那个聊天网页本身，不需要翻墙。</strong> 它只是跑在我家内网的一个网页，手机连它走的是局域网。</li>
+<li><strong>只有&quot;出国去调用 OpenAI / Claude 这种国外模型&quot;那一跳，才需要走代理。</strong> 国内模型（DeepSeek、智谱、Kimi、通义）<strong>直连就行，根本不用代理。</strong></li>
+</ol>
+<p>所以正确做法是<strong>规则分流</strong>：只让国外 AI 的域名走代理，剩下的全部直连。又快又省。</p>
+<p><img src="/posts/2026-06-21-multi-model-ai-gateway/images/proxy-split.png" alt="哪一步要翻墙：访问网页走局域网不翻墙，只有调用国外模型那一跳才走代理" loading="lazy"></p>
+<hr>
+<h2>五、让全家、出门也能用：远程访问</h2>
+<p>家里能用还不够，我希望在外面、用手机也能随时打开。两个工具搞定：</p>
+<ul>
+<li><strong>Tailscale</strong>：把我所有设备组成一张私有网，人在外面也能&quot;回到&quot;家里的 NAS。</li>
+<li><strong>Cloudflare 隧道 + 门禁</strong>：给它配一个固定网址当公网入口，再加一道门禁——<strong>只放行我自己的邮箱</strong>，别人连页面都进不来。</li>
+</ul>
+<p>更香的是，这些代理和隧道我 NAS 上<strong>本来就有</strong>（之前跑别的服务搭的），直接接上去，几乎零额外成本。</p>
+<hr>
+<h2>六、几个真实的坑（这才是干货）</h2>
+<p>搭的过程不是一帆风顺，几个坑值得记一下：</p>
+<ul>
+<li><strong>服务半夜莫名其妙崩。</strong> 查下来是 NAS 一个系统资源上限（inotify 实例数）被占满了。把上限调高，再设成开机自动执行，扛住了每晚重启。</li>
+<li><strong>有些代理节点连不上 AI 接口。</strong> 我把节点的&quot;健康检查&quot;地址，从默认那个测试页<strong>改成了 OpenAI 的真实接口</strong>——这样连不上 AI 的坏节点会被自动判死、自动避开。</li>
+<li><strong>网页第一次打开有点慢。</strong> 因为前端整包一百多 MB，还要跨境下载。解法很简单：<strong>把它&quot;添加到主屏幕&quot;装成 APP（PWA）</strong>，外壳缓存到本地，之后近乎秒开。</li>
+</ul>
+<hr>
+<h2>七、安全：别人偷不走我的 key</h2>
+<p>很多人自建最担心的就是 key 泄露。我的做法是：</p>
+<p><strong>所有 API key 只存在服务端，永远不发给浏览器。</strong></p>
+<p>就算有人进了我的网页，他也只能&quot;在网站里用模型&quot;，<strong>偷不到 key</strong>。再加上前面那道邮箱门禁 + 登录，双层保险。</p>
+<hr>
+<h2>八、一天下来，我到底得到了什么</h2>
+<p>收个尾。这套东西的本质是：</p>
+<blockquote>
+<p>把<strong>我已经付费的 AI 能力</strong>，收拢成<strong>一个属于我自己的接口</strong>，让全家任意设备、任意客户端都能并排调用多个大模型——<strong>一天搭完，几乎没有新增月费。</strong></p>
+</blockquote>
+<p>还有一个更大的判断想分享：</p>
+<p><strong>&quot;靠抓网页来聚合多个 AI&quot;这条路，已经走到头了</strong>（我用 ChatALL 亲手证实了这一点）。真正可持续的方向，是 <strong>API 聚合 + 自建前端</strong>。与其追着各家网站改版疲于奔命，不如把能力收进自己的接口。</p>
+<p>最后，两句诚实话：</p>
+<ol>
+<li>用订阅&quot;桥&quot;出 API，严格说属于<strong>灰色地带</strong>（可能触碰各家的服务条款）。自己内部用没什么问题，但别拿去滥用、更别转卖。</li>
+<li>我这套目前 <strong>Claude 和 GPT 很稳，Gemini 的账号授权还没跑通</strong>——不忽悠，有就是有，没有就是没有。</li>
+</ol>
+<hr>
+<p><em>如果你也想要一个&quot;自己掌控、多模型并排&quot;的 AI 入口，这套思路可以抄。具体工具名和踩坑细节，评论区/后台聊。</em></p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-26-local-first-trading-dashboard/zh/"><span class="post-nav-label">← 更早</span><span class="post-nav-title">交易面板第一步：只读边界</span></a><a class="next" href="/posts/2026-06-26-ai-chathub-chrome-extension/zh/"><span class="post-nav-label">更新 →</span><span class="post-nav-title">AI ChatHub：API 与标签页双引擎</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">纯 Markdown · 免构建 · push 即发布。</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

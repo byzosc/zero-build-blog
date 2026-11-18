@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS · zosc blog</title>
+  <meta name="description" content="On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS">
+  <meta property="og:description" content="On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/cover.png">
+  <meta property="article:published_time" content="2026-06-26">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS","description":"On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.","datePublished":"2026-06-26","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-amd-synology-temperature-json-api"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-06-26-amd-synology-temperature-json-api/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-06-26-amd-synology-temperature-json-api/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS</h1>
+<p><img src="/posts/2026-06-26-amd-synology-temperature-json-api/cover.png" alt="Verified temperature telemetry for an AMD Synology NAS" loading="lazy"></p>
+<blockquote>
+<p><strong>Short version:</strong> Monitoring does not end when you read a number. A temperature that has not been checked against a second source is just a number that looks official.</p>
+</blockquote>
+<h2>TL;DR</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>My approach</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Glances misses board temperature</td>
+<td>Read system temp from DSM&#39;s own <code>synowebapi</code></td>
+</tr>
+<tr>
+<td>AMD CPU is not <code>Core 0</code></td>
+<td>Read <code>k10temp</code> as <code>Tctl</code>, fallback <code>Tdie</code></td>
+</tr>
+<tr>
+<td>Synology&#39;s bundled <code>smartctl</code> is limited</td>
+<td>Force <code>-d sat</code> and parse SMART attributes</td>
+</tr>
+<tr>
+<td>A pipeline can be self-consistent and wrong</td>
+<td>Cross-check each value on every run</td>
+</tr>
+<tr>
+<td>Downstream devices need a stable contract</td>
+<td>Write one flat JSON atomically</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>1. Why this small thing became hard</h2>
+<p><strong>Point:</strong> An AMD Synology is not the default target of most temperature tutorials.</p>
+<p>I wanted a small desk display for my NAS temperatures: CPU, system, and every disk. It sounded like an afternoon project. Then the platform broke several common assumptions:</p>
+<table>
+<thead>
+<tr>
+<th>Assumption</th>
+<th>Reality on this machine</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>smartctl --json</code> works</td>
+<td>The bundled version is old; no JSON, broken scan</td>
+</tr>
+<tr>
+<td>CPU shows up as <code>Core 0</code></td>
+<td>AMD <code>k10temp</code> reports <code>Tctl</code> / <code>Tdie</code></td>
+</tr>
+<tr>
+<td>Glances sees all sensors</td>
+<td>It sees CPU, but not board temp reliably</td>
+</tr>
+<tr>
+<td>One tool can do everything</td>
+<td>Each tool is missing a different piece</td>
+</tr>
+</tbody></table>
+<p>This is not a “find the right command” problem. It is a “compose incomplete sources into one trustworthy contract” problem.</p>
+<h2>2. Pick the right source per value</h2>
+<p><strong>Point:</strong> Do not force one tool to report everything.</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Source</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CPU</td>
+<td>Glances REST API</td>
+<td><code>.../api/4/sensors</code>, label <code>Tctl</code>, fallback <code>Tdie</code></td>
+</tr>
+<tr>
+<td>System / board</td>
+<td>DSM Web API</td>
+<td><code>SYNO.Core.System</code> -&gt; <code>sys_temp</code></td>
+</tr>
+<tr>
+<td>Disks</td>
+<td><code>smartctl</code></td>
+<td><code>-A -d sat /dev/sataN</code>, attribute <code>194</code> or <code>190</code></td>
+</tr>
+</tbody></table>
+<p>The collector does three things:</p>
+<ol>
+<li>Query those sources.</li>
+<li>Normalize to integer Celsius.</li>
+<li>Write one flat JSON document.</li>
+</ol>
+<p>If a source is unavailable, the field becomes <code>null</code>. I would rather show missing data than invent a plausible number.</p>
+<h2>3. Do not trust your own pipeline</h2>
+<p><strong>Point:</strong> The most valuable part is verification, not collection.</p>
+<p>Most homelab monitoring is self-consistent: it reads one tool and plots that tool&#39;s answer. Self-consistent is not the same as correct.</p>
+<p>So the project includes <code>verify.py</code>, which checks the endpoint against independent sources every run:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Endpoint source</th>
+<th>Independent check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CPU</td>
+<td>Glances</td>
+<td>Direct sysfs read from <code>k10temp</code></td>
+</tr>
+<tr>
+<td>System</td>
+<td>JSON output</td>
+<td>DSM <code>synowebapi</code> <code>sys_temp</code></td>
+</tr>
+<tr>
+<td>Disks</td>
+<td><code>smartctl</code></td>
+<td>DSM Storage Manager</td>
+</tr>
+</tbody></table>
+<p>It allows a <code>3°C</code> tolerance for sampling delay and exits non-zero on mismatch.</p>
+<blockquote>
+<p>The point is not “I can read it.” The point is “I can prove I did not read it wrong.”</p>
+</blockquote>
+<h2>4. One small JSON for every downstream client</h2>
+<p><strong>Point:</strong> The simpler the downstream client, the more stable the contract needs to be.</p>
+<pre><code class="language-json">{
+  &quot;ts&quot;: 1750900000,
+  &quot;unit&quot;: &quot;C&quot;,
+  &quot;model&quot;: &quot;DS1525+&quot;,
+  &quot;cpu&quot;: 53,
+  &quot;cpu_label&quot;: &quot;Tctl&quot;,
+  &quot;system&quot;: 41,
+  &quot;disks&quot;: [
+    { &quot;name&quot;: &quot;sata1&quot;, &quot;temp&quot;: 38 }
+  ]
+}
+</code></pre>
+<p>The daemon refreshes every 30 seconds and writes atomically: temp file first, then <code>mv</code>. That keeps ESP32 clients and the browser dashboard from ever reading a half-written file.</p>
+<h2>5. Pits and fixes</h2>
+<table>
+<thead>
+<tr>
+<th>Pit</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Script killed itself</td>
+<td>BusyBox lacks <code>pgrep</code>; <code>pkill -f</code> matched the launcher</td>
+<td>Track a PID file and kill by PID</td>
+</tr>
+<tr>
+<td>Empty CPU sensors in Docker</td>
+<td>Container could not see host sensors</td>
+<td>Add <code>pid: host</code> for Glances</td>
+</tr>
+<tr>
+<td><code>scp</code> failed on DSM</td>
+<td>Synology lacks the modern SFTP subsystem used by default</td>
+<td>Use <code>scp -O</code></td>
+</tr>
+<tr>
+<td>Disk temps were missing</td>
+<td>Device type was not explicit</td>
+<td>Use <code>smartctl -A -d sat /dev/sataN</code></td>
+</tr>
+</tbody></table>
+<h2>6. Trade-offs</h2>
+<ul>
+<li>It is tuned to one AMD Synology model; disk slots, <code>Tctl</code>, and <code>hwmon</code> paths are assumptions.</li>
+<li>It reports temperatures only; throughput, fans, UPS, and capacity are future work.</li>
+<li>The endpoint belongs on the LAN. Do not port-forward it or expose it publicly.</li>
+<li>The physical M5Dial firmware is still evolving; the JSON contract is the stable part.</li>
+</ul>
+<h2>7. Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> List the trusted source for every value.</li>
+<li><input disabled="" type="checkbox"> Do not force one tool to read everything.</li>
+<li><input disabled="" type="checkbox"> Find a second source for each value.</li>
+<li><input disabled="" type="checkbox"> Use <code>null</code> for missing data; do not fabricate numbers.</li>
+<li><input disabled="" type="checkbox"> Write JSON atomically.</li>
+<li><input disabled="" type="checkbox"> Use <code>ts</code> to detect stale data downstream.</li>
+<li><input disabled="" type="checkbox"> Keep the endpoint internal.</li>
+</ul>
+<h2>8. Final thought</h2>
+<p>This project is not really about displaying temperatures. It is about this question:</p>
+<blockquote>
+<p>If a number influences your judgment, can you prove it deserves trust?</p>
+</blockquote>
+<p>On a platform where sensors are scattered across half-working tools, this gives me one endpoint I can explain, verify, and feed into a desk display.</p>
+<p>→ <strong><a href="https://github.com/byzosc/nas-monitoring" target="_blank" rel="noopener">github.com/byzosc/nas-monitoring</a></strong></p>
+<p>If it saved you an afternoon of fighting <code>smartctl</code>, a star means a lot.</p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-26-zero-build-blog/"><span class="post-nav-label">← Older</span><span class="post-nav-title">Zero-Build Blog: Markdown + Push</span></a><a class="next" href="/posts/2026-07-05-vps-compliant-edge/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">Claude + VPS</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

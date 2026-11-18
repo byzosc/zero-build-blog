@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>zosc blog</title>
+  <subtitle>The blog of zosc — self-hosting, AI, motion tools and experiments. zosc 的博客。</subtitle>
+  <link rel="alternate" type="text/html" href="https://blog.zosc.com/"/>
+  <link rel="self" type="application/atom+xml" href="https://blog.zosc.com/feed.xml"/>
+  <id>https://blog.zosc.com/</id>
+  <updated>2026-07-25T00:00:00Z</updated>
+  <author>
+    <name>zosc</name>
+    <uri>https://zosc.com/</uri>
+  </author>
+  <entry>
+    <title>I Turned Homepage into My Personal Command Center</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/"/>
+    <id>https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/</id>
+    <published>2026-07-25T00:00:00Z</published>
+    <updated>2026-07-25T00:00:00Z</updated>
+    <summary>What began as a page of links grew into the first screen I check every day: VPS and NAS health, WAN/LAN/Tailscale routes, AI limits, and synced personal state.</summary>
+  </entry>
+  <entry>
+    <title>AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-07-16-motionhub/"/>
+    <id>https://blog.zosc.com/posts/2026-07-16-motionhub/</id>
+    <published>2026-07-16T00:00:00Z</published>
+    <updated>2026-07-16T00:00:00Z</updated>
+    <summary>MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.</summary>
+  </entry>
+  <entry>
+    <title>Claude Account Suspended? A VPS Might Be the Answer</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/"/>
+    <id>https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/</id>
+    <published>2026-07-05T00:00:00Z</published>
+    <updated>2026-07-05T00:00:00Z</updated>
+    <summary>Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn&apos;t to dodge detection — just to stop my Claude usage from drifting all over the place.</summary>
+  </entry>
+  <entry>
+    <title>Stop Trusting a Single Temperature Source: Verified JSON for an AMD Synology NAS</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/"/>
+    <id>https://blog.zosc.com/posts/2026-06-26-amd-synology-temperature-json-api/</id>
+    <published>2026-06-26T00:00:00Z</published>
+    <updated>2026-06-26T00:00:00Z</updated>
+    <summary>On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.</summary>
+  </entry>
+  <entry>
+    <title>I Built a Zero-Build Blog: Just Markdown and git push</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/"/>
+    <id>https://blog.zosc.com/posts/2026-06-26-zero-build-blog/</id>
+    <published>2026-06-26T00:00:00Z</published>
+    <updated>2026-06-26T00:00:00Z</updated>
+    <summary>No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here&apos;s how it works and the one rate-limit pit I fell into.</summary>
+  </entry>
+  <entry>
+    <title>AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/"/>
+    <id>https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/</id>
+    <published>2026-06-23T00:00:00Z</published>
+    <updated>2026-06-23T00:00:00Z</updated>
+    <summary>A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a &quot;webtab&quot; mode that drives your already-logged-in tabs — because each alone isn&apos;t enough.</summary>
+  </entry>
+  <entry>
+    <title>Build Your Own Multi-Model AI Gateway in a Day: Turn Paid Subscriptions into a Family-Wide Hub</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/"/>
+    <id>https://blog.zosc.com/posts/2026-06-21-multi-model-ai-gateway/</id>
+    <published>2026-06-21T00:00:00Z</published>
+    <updated>2026-06-21T00:00:00Z</updated>
+    <summary>From ChatALL pitfalls to rolling my own — a subscription bridge + Open WebUI + NAS, a family-shared, side-by-side multi-model AI hub built in a day.</summary>
+  </entry>
+  <entry>
+    <title>The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/"/>
+    <id>https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/</id>
+    <published>2026-03-26T00:00:00Z</published>
+    <updated>2026-03-26T00:00:00Z</updated>
+    <summary>A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.</summary>
+  </entry>
+  <entry>
+    <title>Silence Is an Eternal Theme</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2017-07-01-silence-is-an-eternal-theme/"/>
+    <id>https://blog.zosc.com/posts/2017-07-01-silence-is-an-eternal-theme/</id>
+    <published>2017-07-01T00:00:00Z</published>
+    <updated>2017-07-01T00:00:00Z</updated>
+    <summary>A farewell under a 38°C blaze — looking back to where it all felt certain, meetings and partings, and a steadfast creed that we will surely meet again.</summary>
+  </entry>
+  <entry>
+    <title>Gentle Gale</title>
+    <link rel="alternate" type="text/html" href="https://blog.zosc.com/posts/2017-06-06-gentle-gale/"/>
+    <id>https://blog.zosc.com/posts/2017-06-06-gentle-gale/</id>
+    <published>2017-06-06T00:00:00Z</published>
+    <updated>2017-06-06T00:00:00Z</updated>
+    <summary>A quiet afternoon at the Fourteen-Inch Resort — post-rock in my ears, draped in a gentle gale, wanting only to walk this road to its end.</summary>
+  </entry>
+</feed>

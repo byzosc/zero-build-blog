@@ -57,6 +57,8 @@ Every "simple" blog wants you to install a static-site generator, learn its temp
 
 The home page lists posts by reading the repo's `posts/` directory through the **public GitHub API**; each article's Markdown is fetched and rendered client-side. That's the whole trick — **the data source is the Git repo itself.**
 
+> **Pre-rendering (for search engines):** on every push, the GitHub Action now also runs `scripts/gen-static.mjs` after building `posts.json`. It pre-renders each post (every language version) into a static `posts/<dir>/index.html`, refreshes the home-page post list, and writes `sitemap.xml` and an Atom `feed.xml`, then commits them back. Authors still just write Markdown and push.
+
 ## 🚀 Use it yourself
 
 ```bash

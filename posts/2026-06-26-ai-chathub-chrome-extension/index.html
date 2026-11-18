@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration · zosc blog</title>
+  <meta name="description" content="A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a &quot;webtab&quot; mode that drives your already-logged-in tabs — because each alone isn't enough.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration">
+  <meta property="og:description" content="A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a &quot;webtab&quot; mode that drives your already-logged-in tabs — because each alone isn't enough.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/cover.png">
+  <meta property="article:published_time" content="2026-06-23">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration","description":"A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a \"webtab\" mode that drives your already-logged-in tabs — because each alone isn't enough.","datePublished":"2026-06-23","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-ai-chathub-chrome-extension"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-06-26-ai-chathub-chrome-extension/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-06-26-ai-chathub-chrome-extension/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>AI ChatHub: a Multi-AI Side-Panel Extension That Hedges API vs. Tab-Orchestration</h1>
+<p><img src="/posts/2026-06-26-ai-chathub-chrome-extension/cover.png" alt="A browser side panel routes one prompt to multiple AI panes" loading="lazy"></p>
+<blockquote>
+<p>This is a build write-up of a <em>skeleton</em> project I&#39;ve since paused. I&#39;m publishing it for the architecture decisions, which I think are the interesting part — including one path I implemented and then deliberately made optional. See the honest caveats at the end.</p>
+</blockquote>
+<h2>Intro</h2>
+<p>I wanted a browser side panel where I type one prompt and several AIs answer it side by side, each in its own pane. Easy to picture; the interesting question is <em>how each pane talks to its model.</em> I ended up building two completely different engines into the same extension — and the reason why is the whole story.</p>
+<p>The stack: a Manifest V3 extension built with WXT + React 19 + TypeScript + Tailwind. A side panel with N panes and one input box at the bottom; hit send and it broadcasts to every pane.</p>
+<hr>
+<h2>1. Two engines, on purpose</h2>
+<p>Each pane can run in one of two modes, and you can even mix them — one pane on the API, another on a logged-in web tab:</p>
+<ul>
+<li><strong>API mode</strong> (the default): POST to an OpenAI-compatible <code>/chat/completions</code> with <code>stream: true</code>, render tokens as they arrive. Clean, fast, truly streaming. The cost: you need an API key, and you pay per token.</li>
+<li><strong>webtab mode</strong>: open (or reuse) your already-logged-in ChatGPT / Claude / Gemini tab, inject the prompt into its input box, and read the answer back out of the DOM. The upside: it rides your existing subscription, no API key. The cost: it&#39;s fragile, it can&#39;t stream token-by-token (it returns the whole reply at once), and — being browser automation of someone else&#39;s site — it&#39;s against their terms.</li>
+</ul>
+<p>Neither alone is satisfying, which is exactly why both exist. API mode is the dependable default; webtab is the &quot;use what you&#39;re already paying for&quot; escape hatch, kept behind a setting.</p>
+<h2>2. The MV3 lesson: avoid the Service Worker for long work</h2>
+<p>Manifest V3 wants your background logic in a Service Worker. But a Service Worker can be <strong>recycled mid-task</strong> by the browser — and an AI generation is exactly the kind of long-running task that gets killed halfway.</p>
+<p>So the background script here does precisely one thing: tell Chrome to open the side panel when you click the toolbar icon. That&#39;s it. All the orchestration lives in the <strong>side panel page</strong>, which stays alive as long as the panel is open. The panel itself calls <code>tabs.query</code> / <code>tabs.create</code> and messages content scripts directly. Fighting the platform&#39;s lifecycle is a losing game; the fix was to stop putting durable work where the platform feels free to evict it.</p>
+<p>Permissions stay deliberately small: <code>sidePanel</code>, <code>storage</code>, <code>tabs</code>, <code>scripting</code>, plus a short host allowlist.</p>
+<h2>3. The parts worth keeping</h2>
+<p>A few pieces I&#39;d reuse in any similar project:</p>
+<ul>
+<li><strong>One input, N independent contexts.</strong> The broadcast function appends <em>that pane&#39;s own history</em> before each send, so follow-up questions keep each column on its own thread. Token/done/error events are dispatched by pane index.</li>
+<li><strong>A 27-line SSE parser.</strong> No SDK — just <code>ReadableStream</code> + <code>TextDecoder({ stream: true })</code>, splitting on newlines, handling chunks that get cut mid-line, and swallowing non-JSON heartbeats. Because it only assumes OpenAI-compatible SSE, any such endpoint drops in.</li>
+<li><strong>Injection that survives React.</strong> Writing into a controlled React input by setting <code>.value</code> doesn&#39;t work — the framework ignores it. You have to use the prototype&#39;s value setter <em>and</em> dispatch a real <code>input</code> event; for a contenteditable like ChatGPT&#39;s ProseMirror, use <code>execCommand(&#39;insertText&#39;)</code>, and if that fails, synthesize a paste event. Three fallbacks, because every site&#39;s editor is different.</li>
+<li><strong>Knowing when it&#39;s done.</strong> For a streaming web UI, completion is detected in two layers: wait for the stop button to appear and then disappear, then confirm the reply text hasn&#39;t changed for ~1 second. Either signal alone is unreliable.</li>
+</ul>
+<h2>4. The honest part (and how it relates to &quot;scraping is dead&quot;)</h2>
+<p>I&#39;ve written before that aggregating AIs by scraping their web pages is a dead end. This project is the first-hand evidence: webtab mode <em>is</em> that dead path, implemented for real. Living inside the code, the fragility is concrete:</p>
+<ul>
+<li>The DOM selectors are, by the project&#39;s own note, &quot;extremely prone to breaking on site redesigns — the main long-term maintenance burden.&quot; Only the ChatGPT selectors are actually tested; Claude and Gemini are placeholders.</li>
+<li>It&#39;s browser automation of a logged-in session, which violates those services&#39; terms and can break or get your account flagged at any time.</li>
+</ul>
+<p>So I didn&#39;t bet on it. The default is API mode; webtab is an opt-in escape hatch with a warning in the README. That&#39;s the difference between this post and the earlier one: that post drew the <em>conclusion</em> (&quot;scraping is dead, move to APIs&quot;); this is the <em>exhibit</em> — I built the dead path, and the code itself hedges against it.</p>
+<h2>5. Honest trade-offs</h2>
+<ul>
+<li><strong>It&#39;s a skeleton, and paused.</strong> It works end to end in API mode, but it&#39;s not a finished product.</li>
+<li><strong>No icons or store assets yet</strong> — the build warns about it; that&#39;s a pre-publish chore.</li>
+<li><strong>webtab has no token streaming</strong>, only ChatGPT is verified, and it&#39;s ToS-risky by nature.</li>
+<li><strong>Claude&#39;s native API isn&#39;t wired up</strong> — API mode speaks OpenAI-compatible, so Claude would need its own provider.</li>
+</ul>
+<p>The keeper isn&#39;t the product; it&#39;s the shape: two interchangeable engines behind one interface, orchestration kept out of the Service Worker, and a scraping path that the architecture treats as the liability it is.</p>
+<p>→ <strong><a href="https://github.com/byzosc/AiChat-Extension" target="_blank" rel="noopener">github.com/byzosc/AiChat-Extension</a></strong></p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-21-multi-model-ai-gateway/"><span class="post-nav-label">← Older</span><span class="post-nav-title">Multi-Model AI Gateway in a Day</span></a><a class="next" href="/posts/2026-06-26-zero-build-blog/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">Zero-Build Blog: Markdown + Push</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

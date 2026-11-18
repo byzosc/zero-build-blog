@@ -57,6 +57,8 @@
 
 首页通过**公开的 GitHub API** 读取仓库 `posts/` 目录来列文章；每篇文章的 Markdown 在浏览器端拉取并渲染。整个魔法就这一点——**数据源就是 Git 仓库本身。**
 
+> **预渲染（为了搜索引擎）：** 每次 push 后，GitHub Action 除了生成 `posts.json`，还会跑 `scripts/gen-static.mjs`，把每篇文章（含各语言版）预渲染成 `posts/<dir>/index.html` 静态页，并更新首页文章列表、`sitemap.xml` 和 Atom `feed.xml`，一起提交回仓库。作者照旧只写 Markdown、push。
+
 ## 🚀 自己用一套
 
 ```bash

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路 · zosc blog</title>
+  <meta name="description" content="用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你&quot;已登录标签页&quot;的 webtab 模式——因为每套单独都不够。">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路">
+  <meta property="og:description" content="用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你&quot;已登录标签页&quot;的 webtab 模式——因为每套单独都不够。">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/cover.png">
+  <meta property="article:published_time" content="2026-06-23">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路","description":"用 WXT + React 19 写的 MV3 侧边栏扩展，一个输入框把同一问题同时发给多个 AI 窗格。最有意思的决定是同时塞了两套引擎——干净的 OpenAI 兼容流式模式，和一套驱动你\"已登录标签页\"的 webtab 模式——因为每套单独都不够。","datePublished":"2026-06-23","inLanguage":"zh-CN","image":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-ai-chathub-chrome-extension/zh/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换到暗色模式">暗色</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-ai-chathub-chrome-extension"><a class="back" href="/">← 返回列表</a><div class="lang-switch"><a data-lang="en" class="" href="/posts/2026-06-26-ai-chathub-chrome-extension/" hreflang="en">English</a><a data-lang="zh" class="active" href="/posts/2026-06-26-ai-chathub-chrome-extension/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>AI ChatHub：一个多 AI 并排的浏览器侧边栏扩展——API 聚合与「标签页编排」两条腿走路</h1>
+<p><img src="/posts/2026-06-26-ai-chathub-chrome-extension/cover.png" alt="一个浏览器侧边栏把同一个提示词分发给多个 AI 窗格" loading="lazy"></p>
+<blockquote>
+<p>这是一个我后来<em>暂停</em>了的<em>骨架</em>项目的复盘。我把它写出来，是因为其中的架构取舍才是有意思的部分——包括一条我实现了、然后刻意做成可选项的路。诚实的 caveat 见文末。</p>
+</blockquote>
+<h2>开头</h2>
+<p>我想要一个浏览器侧边栏：我输入一个问题，多个 AI 各占一栏、并排回答。画面很好想象；真正有意思的问题是<em>每一栏怎么和它的模型对话</em>。最后我在同一个扩展里塞了两套完全不同的引擎——而&quot;为什么这么做&quot;就是全部的故事。</p>
+<p>技术栈：用 WXT + React 19 + TypeScript + Tailwind 写的 Manifest V3 扩展。一个侧边栏，N 个窗格，底部一个输入框；点发送，广播给每一栏。</p>
+<hr>
+<h2>1. 故意做两套引擎</h2>
+<p>每个窗格可以跑在两种模式之一，甚至能混搭——一栏走 API、另一栏走已登录的网页标签页：</p>
+<ul>
+<li><strong>API 模式</strong>（默认）：POST 到 OpenAI 兼容的 <code>/chat/completions</code>、<code>stream: true</code>，逐 token 渲染。干净、快、真流式。代价：你得有 API key，而且按 token 付费。</li>
+<li><strong>webtab 模式</strong>：打开（或复用）你已经登录的 ChatGPT / Claude / Gemini 标签页，把 prompt 注入它的输入框，再从 DOM 里把回答读回来。好处：蹭你已有的订阅，不要 API key。代价：它脆，做不到逐 token 流式（一次性把整段回吐），而且——这是对别人网站的浏览器自动化——违反人家的服务条款。</li>
+</ul>
+<p>两套单独都不让人满意，这恰恰是它俩都存在的理由。API 模式是靠得住的默认项；webtab 是&quot;用你已经付了钱的东西&quot;的逃生口，藏在一个开关后面。</p>
+<h2>2. MV3 的教训：长任务别放 Service Worker</h2>
+<p>Manifest V3 希望你的后台逻辑放在 Service Worker 里。但 Service Worker 会被浏览器<strong>中途回收</strong>——而一次 AI 生成，正是那种会被干到一半的长任务。</p>
+<p>所以这里的 background 脚本只干一件事：点工具栏图标时让 Chrome 打开侧边栏。就这。所有编排逻辑都放在<strong>侧边栏页面</strong>里，只要面板开着它就活着。面板自己调 <code>tabs.query</code> / <code>tabs.create</code>、直接给 content script 发消息。跟平台的生命周期硬刚是输家游戏；修法是别把需要持续运行的活，放在平台觉得可以随时清掉的地方。</p>
+<p>权限刻意精简：<code>sidePanel</code>、<code>storage</code>、<code>tabs</code>、<code>scripting</code>，加一个短短的 host 白名单。</p>
+<h2>3. 值得留下的几块</h2>
+<p>几块我在任何类似项目里都会复用的东西：</p>
+<ul>
+<li><strong>一个输入框，N 个独立上下文。</strong> 广播函数在每次发送前各自拼上<em>该窗格自己的历史</em>，所以追问时每一栏都保持各自独立的线程。token/完成/出错事件按窗格下标分发。</li>
+<li><strong>27 行的 SSE 解析器。</strong> 不引 SDK——就是 <code>ReadableStream</code> + <code>TextDecoder({ stream: true })</code>，按换行切、处理被切在半行的 chunk、吞掉非 JSON 的心跳行。因为它只假设 OpenAI 兼容的 SSE，任何这样的端点都能直接接。</li>
+<li><strong>能扛住 React 的注入。</strong> 往受控 React 输入框里写东西，直接设 <code>.value</code> 没用——框架不认。你得用原型的 value setter <em>并且</em>派发一个真的 <code>input</code> 事件；对 ChatGPT 的 ProseMirror 这种 contenteditable，用 <code>execCommand(&#39;insertText&#39;)</code>，再不行就伪造一个 paste 事件。三段兜底，因为每个站点的编辑器都不一样。</li>
+<li><strong>判断&quot;写完了没&quot;。</strong> 对一个流式的网页 UI，完成靠两层判定：先等停止按钮出现、再消失；然后确认回复文本连续约 1 秒没变。任一信号单独都不靠谱。</li>
+</ul>
+<h2>4. 诚实的部分（以及它和「scraping is dead」的关系）</h2>
+<p>我之前写过：靠抓网页来聚合 AI 是一条死路。这个项目就是第一手证据：webtab 模式<em>就是</em>那条死路，被真刀真枪实现了一遍。住在代码里，那种脆是具体的：</p>
+<ul>
+<li>那些 DOM 选择器，用项目自己的话说，&quot;极易随网站改版失效，是长期维护的重点负担&quot;。只有 ChatGPT 的选择器是真的测过的；Claude 和 Gemini 是占位。</li>
+<li>它是对已登录会话的浏览器自动化，违反这些服务的条款，随时可能失效或让你的账号被标记。</li>
+</ul>
+<p>所以我没押注它。默认是 API 模式；webtab 是一个带 README 警告的、需手动开启的逃生口。这就是这篇和上一篇的区别：上一篇给的是<em>结论</em>（&quot;scraping 已死，转 API&quot;）；这篇是<em>物证</em>——我把那条死路造了出来，而代码本身就在对冲它。</p>
+<h2>5. 诚实的取舍</h2>
+<ul>
+<li><strong>它是个骨架，而且暂停了。</strong> API 模式端到端能跑，但不是成品。</li>
+<li><strong>还没有图标和上架素材</strong>——构建会警告；这是上架前的杂活。</li>
+<li><strong>webtab 没有 token 流式</strong>，只有 ChatGPT 验证过，而且天生有 ToS 风险。</li>
+<li><strong>Claude 的原生 API 没接</strong>——API 模式说的是 OpenAI 兼容，接 Claude 得单独写一个 provider。</li>
+</ul>
+<p>值得留下的不是这个产品，而是这个形状：一个接口背后两套可互换的引擎、把编排挪出 Service Worker、以及一条被架构当作&quot;负债&quot;来对待的 scraping 路。</p>
+<p>→ <strong><a href="https://github.com/byzosc/AiChat-Extension" target="_blank" rel="noopener">github.com/byzosc/AiChat-Extension</a></strong></p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-21-multi-model-ai-gateway/zh/"><span class="post-nav-label">← 更早</span><span class="post-nav-title">一天搭建多模型 AI 网关</span></a><a class="next" href="/posts/2026-06-26-zero-build-blog/zh/"><span class="post-nav-label">更新 →</span><span class="post-nav-title">零构建博客：Markdown + Push</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">纯 Markdown · 免构建 · push 即发布。</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

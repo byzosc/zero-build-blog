@@ -11,38 +11,10 @@
 
 import { access, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { normalizeList, parseDir, parseFrontmatter } from './frontmatter.mjs';
 
 const ROOT = process.cwd();
 const POSTS = 'posts';
-
-// 与引擎 app.js 的 parseFrontmatter 保持一致：按第一个冒号切，去掉首尾引号，tags 支持 [a, b]
-function parseFrontmatter(md) {
-  const m = md.replace(/^﻿/, '').match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!m) return {};
-  const fm = {};
-  for (const line of m[1].split(/\r?\n/)) {
-    const i = line.indexOf(':');
-    if (i === -1) continue;
-    const key = line.slice(0, i).trim();
-    let val = line.slice(i + 1).trim();
-    if (val.startsWith('[') && val.endsWith(']')) {
-      val = val.slice(1, -1).split(',').map(s => s.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
-    } else {
-      val = val.replace(/^["']|["']$/g, '');
-    }
-    fm[key] = val;
-  }
-  return fm;
-}
-
-function parseDir(name) {
-  const m = name.match(/^(\d{4}-\d{2}-\d{2})-(.+)$/);
-  return m ? { date: m[1], slug: m[2] } : { date: '', slug: name };
-}
-
-function normalizeList(value) {
-  return Array.isArray(value) ? value : value ? [value] : [];
-}
 
 async function exists(file) {
   try {

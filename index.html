@@ -1,19 +1,20 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>zosc blog</title>
-  <meta name="description" content="zosc 的博客 · 自托管 / AI / 折腾。">
+  <meta name="description" content="The blog of zosc — self-hosting, AI, motion tools and experiments. zosc 的博客。">
   <link rel="canonical" href="https://blog.zosc.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="zosc blog">
   <meta property="og:title" content="zosc blog">
-  <meta property="og:description" content="zosc 的博客 · 自托管 / AI / 折腾。">
+  <meta property="og:description" content="The blog of zosc — self-hosting, AI, motion tools and experiments. zosc 的博客。">
   <meta property="og:url" content="https://blog.zosc.com/">
   <meta property="og:image" content="https://zosc.com/media/images/common/brand/og-default.png">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
   <!-- Same author entity as zosc.com (@id https://zosc.com/#person): ties this blog to zosc in Google. -->
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"Blog","@id":"https://blog.zosc.com/#blog","name":"zosc blog","url":"https://blog.zosc.com/","inLanguage":["zh-CN","en"],"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/","sameAs":["https://github.com/byzosc","https://x.com/byzosc","https://www.behance.net/zosc","https://steamcommunity.com/id/byzosc"]},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"}}</script>
   <script>
@@ -44,15 +45,119 @@
     </nav>
   </header>
 
-  <main id="app"><p class="state">Loading…</p></main>
+  <main id="app"><!-- posts:start --><section class="list-hero">
+        <div>
+          <p class="list-kicker">zosc's notebook</p>
+          <h1>Recent writing</h1>
+        </div>
+        <div class="lang-switch list-lang-switch"><button data-lang="en" class="active">English</button><button data-lang="zh" class="">中文</button></div>
+      </section>
+      <ul class="post-list">
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-07-20-zerb-hub-command-center/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-07-20-zerb-hub-command-center/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Homepage, Turned into a Command Center</h2>
+            <div class="post-meta">2026-07-25 · self-hosting / homepage / vps / nas / tailscale</div>
+            <p class="post-summary">What began as a page of links grew into the first screen I check every day: VPS and NAS health, WAN/LAN/Tailscale routes, AI limits, and synced personal state.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-07-16-motionhub/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-07-16-motionhub/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>AI Enters the Motion Pipeline</h2>
+            <div class="post-meta">2026-07-16 · motion-design / after-effects / lottie / ai / tools</div>
+            <p class="post-summary">MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-07-05-vps-compliant-edge/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-07-05-vps-compliant-edge/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Claude + VPS</h2>
+            <div class="post-meta">2026-07-05 · Claude / VPS / Tailscale / remote-desktop / self-hosting</div>
+            <p class="post-summary">Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-06-26-amd-synology-temperature-json-api/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-06-26-amd-synology-temperature-json-api/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>AMD Synology Temps: Verified JSON</h2>
+            <div class="post-meta">2026-06-26 · self-hosting / NAS / homelab / monitoring / docker</div>
+            <p class="post-summary">On an AMD Synology, no single tool reliably reports CPU, board, and disk temperatures. I pick the best source per value, merge them into one small JSON endpoint, and cross-check every reading against an independent source.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-06-26-zero-build-blog/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-06-26-zero-build-blog/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Zero-Build Blog: Markdown + Push</h2>
+            <div class="post-meta">2026-06-26 · blog / vanilla-js / github-pages / markdown / self-hosting</div>
+            <p class="post-summary">No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-06-26-ai-chathub-chrome-extension/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-06-26-ai-chathub-chrome-extension/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>AI ChatHub: API + Webtab Engines</h2>
+            <div class="post-meta">2026-06-23 · chrome / extension / AI / javascript / opensource</div>
+            <p class="post-summary">A WXT + React 19 MV3 side-panel extension that broadcasts one prompt to several AI panes. The interesting decision was shipping two engines at once — a clean OpenAI-compatible streaming mode and a &quot;webtab&quot; mode that drives your already-logged-in tabs — because each alone isn't enough.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-06-21-multi-model-ai-gateway/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-06-21-multi-model-ai-gateway/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Multi-Model AI Gateway in a Day</h2>
+            <div class="post-meta">2026-06-21 · self-hosting / AI / NAS / multi-model / OpenWebUI</div>
+            <p class="post-summary">From ChatALL pitfalls to rolling my own — a subscription bridge + Open WebUI + NAS, a family-shared, side-by-side multi-model AI hub built in a day.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2026-06-26-local-first-trading-dashboard/">
+          <img class="post-card-visual post-card-cover" src="/posts/2026-06-26-local-first-trading-dashboard/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Trading Dashboard: Read-Only First</h2>
+            <div class="post-meta">2026-03-26 · webdev / dataviz / fastapi / react / self-hosting</div>
+            <p class="post-summary">A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2017-07-01-silence-is-an-eternal-theme/">
+          <img class="post-card-visual post-card-cover" src="/posts/2017-07-01-silence-is-an-eternal-theme/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Silence Is an Eternal Theme</h2>
+            <div class="post-meta">2017-07-01 · writing / photography</div>
+            <p class="post-summary">A farewell under a 38°C blaze — looking back to where it all felt certain, meetings and partings, and a steadfast creed that we will surely meet again.</p>
+          </div>
+        </a>
+      </li>
+      <li class="post-card has-cover">
+        <a class="post-card-link" href="/posts/2017-06-06-gentle-gale/">
+          <img class="post-card-visual post-card-cover" src="/posts/2017-06-06-gentle-gale/cover.png" alt="" loading="lazy">
+          <div class="post-card-body">
+            <h2>Gentle Gale</h2>
+            <div class="post-meta">2017-06-06 · writing / photography</div>
+            <p class="post-summary">A quiet afternoon at the Fourteen-Inch Resort — post-rock in my ears, draped in a gentle gale, wanting only to walk this road to its end.</p>
+          </div>
+        </a>
+      </li></ul><!-- posts:end --></main>
 
   <footer class="site-footer">
     © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
   <script src="assets/app.js"></script>
 </body>
 </html>

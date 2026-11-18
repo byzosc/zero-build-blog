@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claude Account Suspended? A VPS Might Be the Answer · zosc blog</title>
+  <meta name="description" content="Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="Claude Account Suspended? A VPS Might Be the Answer">
+  <meta property="og:description" content="Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/cover.png">
+  <meta property="article:published_time" content="2026-07-05">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Claude Account Suspended? A VPS Might Be the Answer","description":"Instead of jumping between devices, networks, and proxy chains, I keep Claude on one capable VPS: SSH-only when I can, or a lightweight Ubuntu desktop over Tailscale/RDP when I need a GUI. The goal isn't to dodge detection — just to stop my Claude usage from drifting all over the place.","datePublished":"2026-07-05","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/cover.png","url":"https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-07-05-vps-compliant-edge/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-07-05-vps-compliant-edge"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-07-05-vps-compliant-edge/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-07-05-vps-compliant-edge/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>Claude Account Suspended? A VPS Might Be the Answer</h1>
+<p><img src="/posts/2026-07-05-vps-compliant-edge/cover.png" alt="A Claude remote workstation on a VPS with Tailscale" loading="lazy"></p>
+<blockquote>
+<p><strong>Short version:</strong> A lot of people make Claude account stability sound harder than it is. My setup is pretty plain: keep Claude, code, browser sessions, and dev tools on one stable VPS, and let my local devices connect to it through Tailscale, SSH, or RDP.</p>
+</blockquote>
+<h2>TL;DR</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>My approach</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Too many devices and networks</td>
+<td>Use one VPS as the fixed Claude work environment</td>
+</tr>
+<tr>
+<td>Too much proxy-chain complexity</td>
+<td>Use SSH-only if possible; add a lightweight Ubuntu desktop only if needed</td>
+</tr>
+<tr>
+<td>Need the same setup across devices</td>
+<td>Join everything with Tailscale</td>
+</tr>
+<tr>
+<td>Need Claude Code, GUI tools, or a browser</td>
+<td>Install them on the VPS, not every local machine</td>
+</tr>
+<tr>
+<td>Account-safety anxiety</td>
+<td>Reduce environment drift; do not claim immunity</td>
+</tr>
+</tbody></table>
+<p>I won&#39;t pretend this guarantees you&#39;ll never get suspended — no account setup honestly can. What it helps with is more mundane: your Claude usage stops looking like a pile of random throwaway sessions.</p>
+<h2>1. Most setups are overcomplicated</h2>
+<p>Discussions about Claude stability tend to spiral into exit chains, browser fingerprints, automation tricks, and &quot;look more human&quot; folklore.</p>
+<p>I&#39;ve come to think that whole framing usually leads people astray.</p>
+<p>If what you actually want is:</p>
+<ul>
+<li>stable Claude-assisted coding;</li>
+<li>the same environment from multiple devices;</li>
+<li>no repeated Node/Python/Docker/key setup on every laptop;</li>
+<li>less switching between home network, office network, phone hotspot, and random exits;</li>
+<li>less false-positive risk from an environment that keeps changing;</li>
+</ul>
+<p>then the simplest answer is a capable VPS you treat as your remote workstation.</p>
+<p>Your laptop stops being the real work environment. It just becomes the thing you connect in with — Mac, Windows, or iPad, they all land in the same place.</p>
+<h2>2. Pick a VPS that can actually be a workstation</h2>
+<p>For a small website, a tiny VPS is fine. But if you want it to be your Claude / dev / remote-desktop machine, don&#39;t starve it.</p>
+<p>My baseline:</p>
+<ul>
+<li><strong>CPU</strong>: 2 vCPU minimum; 4 vCPU feels better.</li>
+<li><strong>RAM</strong>: 2-4GB for SSH-only; 4-8GB for a lightweight desktop.</li>
+<li><strong>Disk</strong>: 40GB minimum; 80GB+ if you keep projects, browser cache, and Docker images there.</li>
+<li><strong>OS</strong>: Ubuntu 22.04 or 24.04 LTS.</li>
+<li><strong>Region</strong>: pick one place you can use consistently, and stop moving.</li>
+<li><strong>Provider</strong>: avoid suspiciously dirty IP pools or machines you have to replace constantly.</li>
+</ul>
+<p>You&#39;re not buying it for an extra IP. You&#39;re buying a development seat you don&#39;t have to rebuild every time.</p>
+<h2>3. Two modes: SSH-only or lightweight desktop</h2>
+<h3>Mode A: SSH-only</h3>
+<p>This is the simplest and cleanest mode.</p>
+<pre><code class="language-bash">sudo apt update
+sudo apt install -y git curl vim tmux htop ufw
+</code></pre>
+<p>Then install whatever you actually need:</p>
+<ul>
+<li>Node.js / pnpm / npm</li>
+<li>Python / uv / pipx</li>
+<li>Docker / Docker Compose</li>
+<li>Claude Code or your CLI tools</li>
+<li>GitHub CLI</li>
+</ul>
+<p>Daily use becomes:</p>
+<pre><code class="language-bash">ssh your-vps
+tmux new -s work
+</code></pre>
+<p>Code, logs, scripts, and deployments all live on the same stable machine. No desktop, no browser layer to maintain, and a smaller attack surface — all you really need is stable SSH and one set of keys.</p>
+<h3>Mode B: lightweight Ubuntu desktop</h3>
+<p>If you need a GUI, a browser, cc gui, or desktop-only tools, install a light desktop.</p>
+<pre><code class="language-bash">sudo apt update
+sudo apt install -y xfce4 xfce4-goodies xrdp
+sudo systemctl enable --now xrdp
+</code></pre>
+<p>Then connect through RDP. Don&#39;t reach for a heavy desktop environment on day one — XFCE isn&#39;t glamorous, but it&#39;s light and predictable, and it recovers cleanly.</p>
+<h2>4. Tailscale makes the setup comfortable</h2>
+<p>Install Tailscale on the VPS and your local devices:</p>
+<pre><code class="language-bash">curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+</code></pre>
+<p>Then:</p>
+<ul>
+<li>SSH through the Tailscale IP.</li>
+<li>Keep RDP private; don&#39;t expose it to the public internet.</li>
+<li>Put admin panels, internal health pages, and private services on the tailnet.</li>
+<li>Connect from laptop, desktop, phone, or tablet into the same work machine.</li>
+</ul>
+<p>So every device on your desk is basically a remote control, while the real Claude/browser/dev environment stays put on the VPS.</p>
+<p><img src="/posts/2026-07-05-vps-compliant-edge/images/edge-architecture-en.png" alt="VPS edge hub architecture" loading="lazy"></p>
+<h2>5. Do not skip basic hardening</h2>
+<p>Create a normal user instead of living as root:</p>
+<pre><code class="language-bash">sudo adduser work
+sudo usermod -aG sudo work
+</code></pre>
+<p>Use one SSH keypair per device:</p>
+<pre><code class="language-text">new machine private key stays on the new machine
+new machine public key -&gt; VPS ~/.ssh/authorized_keys
+</code></pre>
+<p>Don&#39;t copy one old private key onto every machine — lose it once and you lose everything.</p>
+<p>Lock down the firewall:</p>
+<pre><code class="language-bash">sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow OpenSSH
+sudo ufw enable
+</code></pre>
+<p>If RDP only needs to work over Tailscale, keep it private and open as few ports as you can.</p>
+<h2>6. Deployment should still be boring</h2>
+<p>Even though the main point here is the workstation, it&#39;s worth keeping your VPS deployments repeatable with a fixed runbook.</p>
+<p><img src="/posts/2026-07-05-vps-compliant-edge/images/deploy-runbook-en.png" alt="VPS deployment runbook" loading="lazy"></p>
+<p>Basic order:</p>
+<ol>
+<li>Align the Git branch.</li>
+<li>Update only the target directory.</li>
+<li>Back up before replacing.</li>
+<li>Restart the target service.</li>
+<li>Verify <code>/health</code>, logs, and key endpoints.</li>
+<li>Keep rollback possible.</li>
+</ol>
+<p>Claude can help read logs and draft scripts, but production shouldn&#39;t ride on improvisation. The more fixed your process is, the more useful the AI gets; the messier it is, the more the AI just amplifies the mess.</p>
+<h2>7. About account safety</h2>
+<p>People always want to ask: does this completely prevent suspension?</p>
+<p>It doesn&#39;t, and saying otherwise wouldn&#39;t be honest.</p>
+<p>Accounts are affected by Usage Policy, Terms, supported locations, payment, abuse detection, and plain false positives. No VPS setup buys you immunity.</p>
+<p>What it can reduce is one common risk: environment drift.</p>
+<p>You stop hopping between networks, devices, proxy chains, and scripts, and your Claude workflow lands in one auditable place with logs, key boundaries, backups, and a recovery path. That&#39;s not gaming the system — it&#39;s ordinary engineering hygiene.</p>
+<h2>8. Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Buy a VPS with enough RAM.</li>
+<li><input disabled="" type="checkbox"> Install Ubuntu LTS.</li>
+<li><input disabled="" type="checkbox"> Create a normal user; do not live as root.</li>
+<li><input disabled="" type="checkbox"> Use one SSH keypair per device.</li>
+<li><input disabled="" type="checkbox"> Install Tailscale.</li>
+<li><input disabled="" type="checkbox"> Get SSH working first.</li>
+<li><input disabled="" type="checkbox"> Add XFCE + xrdp only if you need a GUI.</li>
+<li><input disabled="" type="checkbox"> Keep RDP on Tailscale, not the public internet.</li>
+<li><input disabled="" type="checkbox"> Install Claude Code / cc gui / browser / dev tools on the VPS.</li>
+<li><input disabled="" type="checkbox"> Write deployment runbooks with backup, verification, and rollback.</li>
+</ul>
+<h2>9. Final thought</h2>
+<p>Don&#39;t turn Claude environment stability into folklore.</p>
+<p>Most of the time you don&#39;t need cleverer evasion tricks. You need one clean, fixed machine you can reconnect to and rebuild when it breaks.</p>
+<p>VPS + Tailscale + SSH/RDP is boring. That&#39;s exactly why it holds up.</p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-26-amd-synology-temperature-json-api/"><span class="post-nav-label">← Older</span><span class="post-nav-title">AMD Synology Temps: Verified JSON</span></a><a class="next" href="/posts/2026-07-16-motionhub/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">AI Enters the Motion Pipeline</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

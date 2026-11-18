@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我把 Homepage 改成了自己的数字驾驶舱：一屏看完 VPS、NAS 和 AI 额度 · zosc blog</title>
+  <meta name="description" content="从一页链接到每天真正会看的工作台：实时状态、WAN/LAN/Tailscale 多路径、AI 额度、跨设备布局与背景，都被我收进了同一块 Zerb Hub。">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/zh/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="我把 Homepage 改成了自己的数字驾驶舱：一屏看完 VPS、NAS 和 AI 额度">
+  <meta property="og:description" content="从一页链接到每天真正会看的工作台：实时状态、WAN/LAN/Tailscale 多路径、AI 额度、跨设备布局与背景，都被我收进了同一块 Zerb Hub。">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/zh/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/cover.png">
+  <meta property="article:published_time" content="2026-07-25">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"我把 Homepage 改成了自己的数字驾驶舱：一屏看完 VPS、NAS 和 AI 额度","description":"从一页链接到每天真正会看的工作台：实时状态、WAN/LAN/Tailscale 多路径、AI 额度、跨设备布局与背景，都被我收进了同一块 Zerb Hub。","datePublished":"2026-07-25","inLanguage":"zh-CN","image":"https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/cover.png","url":"https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/zh/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-07-20-zerb-hub-command-center/zh/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换到暗色模式">暗色</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-07-20-zerb-hub-command-center"><a class="back" href="/">← 返回列表</a><div class="lang-switch"><a data-lang="en" class="" href="/posts/2026-07-20-zerb-hub-command-center/" hreflang="en">English</a><a data-lang="zh" class="active" href="/posts/2026-07-20-zerb-hub-command-center/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>我把 Homepage 改成了自己的数字驾驶舱</h1>
+<p><img src="/posts/2026-07-20-zerb-hub-command-center/cover.png" alt="Zerb Hub 真实生产页面" loading="lazy"></p>
+<blockquote>
+<p><strong>一句话：</strong> 我原本只想做一页常用链接，最后却做成了一块每天真正会看的工作台——机器是否正常、服务该走哪条路径、AI 额度还剩多少，都能在打开浏览器的第一眼看见。</p>
+</blockquote>
+<p>这张图不是概念稿，也不是为了发文章临时拼出来的界面。它是 Zerb Hub 当时正在运行的生产页面。</p>
+<p>我最初用开源项目 <a href="https://github.com/gethomepage/homepage" target="_blank" rel="noopener">Homepage</a> 搭了一个主页。服务越来越多以后，单纯的“链接收藏”很快就不够用了：一个入口能打开服务，却不能告诉我服务是否正常；同一个服务可能有公网、家庭局域网和 Tailscale 三条路径；VPS、NAS、AI 工具又各有一套状态页。</p>
+<p>我真正需要的，不是更多卡片，而是一个能回答日常问题的第一屏。</p>
+<h2>它不是从一张设计稿开始的</h2>
+<p>Zerb Hub 是被真实使用一点点推出来的。</p>
+<table>
+<thead>
+<tr>
+<th>我每天会问的问题</th>
+<th>首页应该直接给出的答案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>VPS 今天正常吗？</td>
+<td>CPU、内存、磁盘、负载、流量和在线时长</td>
+</tr>
+<tr>
+<td>NAS 有没有过热？</td>
+<td>CPU、主板与硬盘温度</td>
+</tr>
+<tr>
+<td>服务是不是挂了？</td>
+<td>实时延迟与应用自身的统计</td>
+</tr>
+<tr>
+<td>现在该从哪里进去？</td>
+<td>WAN、LAN、Tailscale 三条真实路径</td>
+</tr>
+<tr>
+<td>Claude / Codex 还能用多久？</td>
+<td>当前额度窗口与重置倒计时</td>
+</tr>
+<tr>
+<td>换台设备以后还要重新整理吗？</td>
+<td>同步后的布局、书签和背景状态</td>
+</tr>
+</tbody></table>
+<p>这也改变了我对“主页”的理解。主页不是把所有系统重新做一遍，而是把最值得第一眼看到的信息，放在真正的入口旁边。</p>
+<h2>先承认：我没有从零重写</h2>
+<p>Homepage 已经提供了成熟的应用仪表盘底座：YAML 配置、服务卡片、书签、天气、主题和大量服务集成。它使用 GPL-3.0 许可证，这些基础能力都应该清楚归功于上游。</p>
+<p>我的工作主要发生在另一层：</p>
+<ul>
+<li>重新编排 VPS、NAS、AI、社媒与日常工具；</li>
+<li>把一个服务的多条访问路径合进同一张卡片；</li>
+<li>增加自定义 CSS / JavaScript 交互；</li>
+<li>做跨设备书签、布局与背景同步；</li>
+<li>聚合本机指标与脱敏后的 AI 额度；</li>
+<li>把页面、容器、隧道和访问控制接成一套可恢复的生产链路。</li>
+</ul>
+<p>这不是“换了一套皮肤”，也不是“从零造了一个 Homepage”。更准确的说法是：<strong>我把一个成熟的开源底座，长成了自己的工作流。</strong></p>
+<h2>实时状态必须出现在入口旁边</h2>
+<p>过去我会分别打开 VPS 监控、NAS 面板、媒体服务后台和状态页。每个页面都能给出完整信息，但我要的往往只是一个很小的答案：正常，还是需要处理？</p>
+<p>所以 Zerb Hub 把信息压到两个层级：</p>
+<ul>
+<li>第一层只回答“要不要管”：资源占用、温度、延迟、在线时长、连接数。</li>
+<li>第二层才进入原服务，继续看日志、配置和详细统计。</li>
+</ul>
+<p>这样做的好处不是少点几次鼠标，而是把异常变得显眼。一个平时稳定在绿色的服务突然变慢，比藏在独立后台里的曲线更容易被注意到。</p>
+<p>但我没有把所有管理能力都塞进首页。Hub 主要是只读入口；真正的修改、部署和运维仍回到各自系统。一个控制台越接近基础设施，越应该克制它能写什么。</p>
+<h2>一张卡片，收住三条访问路径</h2>
+<p>自托管环境里，同一个服务经常不止一个地址：</p>
+<ul>
+<li>在外面，用受访问控制保护的公网入口；</li>
+<li>在家里，走局域网；</li>
+<li>没有合适公网链路时，走 Tailscale。</li>
+</ul>
+<p>最笨的做法是把一个服务复制成三张卡片。服务一多，首页很快又变成另一种混乱。</p>
+<p>我最后把 WAN、LAN、TAIL 做成同一张服务卡里的分段入口。只有一条路径的服务不会硬画一个“选择器”，而是直接在标题里标清路径。页面展示的是“一个服务”，路径只是进入它的方式。</p>
+<p><img src="/posts/2026-07-20-zerb-hub-command-center/edge-architecture.png" alt="VPS 边缘枢纽与访问边界" loading="lazy"></p>
+<p>上图是我之前在 social 里整理过的 VPS 边缘枢纽思路。Zerb Hub 沿用了同一条边界：公网访问先经过身份验证，私有管理优先走 Tailscale，NAS 保留自己的数据与桥接职责。页面只是统一入口，不把所有网络能力揉成一条不可解释的链。</p>
+<h2>AI 额度卡最重要的不是“显示”，而是凭据边界</h2>
+<p>我每天同时使用 Claude 和 Codex。真正影响工作节奏的不是“今天用了多少 token”，而是当前额度窗口还剩多少、什么时候重置。</p>
+<p>于是 Hub 里多了两张额度卡，展示短周期与周周期的剩余比例和倒计时。</p>
+<p>这件事看起来只是多几个数字，背后最重要的设计却是：<strong>浏览器永远不应该拿到 CLI 的 OAuth 凭据。</strong></p>
+<p>额度采集在 VPS 本机完成，只把白名单里的比例、时间窗口和重置时间写成脱敏缓存。Homepage 后端读取这些字段，页面只负责显示。认证目录不挂进网页容器，access token、refresh token 也不会写进前端或日志。</p>
+<p>如果上游暂时没有返回某个窗口，页面就显示 <code>--</code>。缺数据就承认缺数据，比根据另一个窗口猜一个“看起来完整”的数字可靠得多。</p>
+<h2>跨设备同步以后，主页才真的属于我</h2>
+<p>一开始，布局、收藏和背景都存在浏览器本地。很快就出现一个很现实的问题：电脑上整理好的首页，换到手机或远程桌面以后又回到默认状态。</p>
+<p><code>localStorage</code> 很方便，但它不是跨设备的事实来源。</p>
+<p>我后来给 Hub 加了一个很小的个人同步 API，把这些状态保存在 VPS：</p>
+<ul>
+<li>自己添加的书签；</li>
+<li>服务卡与书签的顺序；</li>
+<li>收藏的背景；</li>
+<li>当前正在使用的背景；</li>
+<li>编辑模式下每次拖放后的布局。</li>
+</ul>
+<p>布局还有一个容易忽略的坑。早期我按 <code>g0 / g1 / g2</code> 这类数组位置保存分组，一旦在前面插入新分组，后面的卡片就会整体错位。现在改为根据分组名称生成稳定 ID，新增内容不再把旧布局推翻。</p>
+<h2>一张背景图，也能长出一套状态机</h2>
+<p>每日背景最初只是定时替换一张 <code>bg.jpg</code>。真正使用以后，需求很自然地冒出来：喜欢的要收藏，不喜欢的要马上消失，自己的图要能上传，收藏要能轮换，而且换设备以后还得保持一致。</p>
+<p>这个过程中我踩了两个很典型的坑。</p>
+<p>第一个坑是：<strong>抓图成功，不等于已经打开的页面会换图。</strong> 单页应用可能继续使用同一个 URL 的缓存，所以前端还要检查更新时间，并只在用户仍处于“每日背景”模式时自动换图。</p>
+<p>第二个坑是：<strong>原子替换文件，不等于容器里的单文件挂载会跟着换。</strong> 新文件可能已经是另一个 inode，而容器仍然看着旧文件。最后我改成只读挂载整个图片目录，让原子替换后的新文件能被服务立即读取。</p>
+<p>一张背景图看似是装饰，真正做成跨设备、可收藏、可拒绝、可恢复的功能以后，它已经是一套小型状态机。</p>
+<h2>做完以后，我留下了五条判断</h2>
+<h3>1. 文档不是运行时事实</h3>
+<p>Git、容器和 Cloudflare Tunnel 的路由都可能各自漂移。部署完成不能只看 README，也不能只看“容器是绿色的”；必须同时核对代码版本、本地端口、实际 ingress 和公网访问控制。</p>
+<h3>2. <code>GET 200</code> 不代表写入链路正常</h3>
+<p>健康检查和静态资源正常，只能证明读路径可用。书签、布局和背景同步依赖写请求，代理的路径改写、缓存或路由优先级可能只影响 <code>POST</code>。读写要分别验收。</p>
+<h3>3. 实时数字宁可缺失，也不要伪造</h3>
+<p>监控面板最危险的不是少一个数字，而是展示一个看起来合理、其实由错误来源拼出的数字。温度、额度和服务状态都应该保留来源边界。</p>
+<h3>4. 跨设备状态不能只放浏览器</h3>
+<p>如果它是“我的主页”而不是“这台浏览器的主页”，布局、书签和收藏就必须有服务器端事实来源。浏览器存储最多只能做缓存。</p>
+<h3>5. 首页不是新的单体应用</h3>
+<p>Zerb Hub 不负责替代 NAS、媒体服务、部署工具或 AI 平台。它负责把入口、状态和路径组织好。每个系统继续保持自己的权限与故障边界，Hub 才不会成为新的单点风险。</p>
+<h2>为什么仓库暂时还是私有的</h2>
+<p>这套东西已经很适合我，但还不适合直接让别人照抄。里面包含大量和个人基础设施绑定的假设：服务命名、域名结构、网络路径、容器编排、监控来源和访问策略。</p>
+<p>我愿意公开的是方法和踩坑，而不是把私人基础设施配置包装成“开箱即用”。</p>
+<p>如果以后整理公开版本，我会先把可复用的部分抽出来：多路径卡片、稳定布局 ID、脱敏额度采集、跨设备状态同步，以及对应的最小权限部署示例。上游 Homepage 的 GPL-3.0 许可证与署名也会继续保留清楚。</p>
+<h2>从什么时候起，主页变成了运维面板？</h2>
+<p>我的答案是：当它不再只告诉你“去哪里”，而开始可靠地回答“现在是否正常、该走哪条路、要不要处理”，它就已经不只是导航页了。</p>
+<p>Zerb Hub 没有让我少拥有几个系统。它只是把那些系统最重要的第一句话，放到了同一个地方。</p>
+<p>现在我打开浏览器，先看到的不是一排书签，而是自己这套数字生活今天是否运转正常。</p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-07-16-motionhub/zh/"><span class="post-nav-label">← 更早</span><span class="post-nav-title">AI 开始接管整条动效链路</span></a><span class="next"></span></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">纯 Markdown · 免构建 · push 即发布。</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

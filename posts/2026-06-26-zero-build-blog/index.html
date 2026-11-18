@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>I Built a Zero-Build Blog: Just Markdown and git push · zosc blog</title>
+  <meta name="description" content="No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="I Built a Zero-Build Blog: Just Markdown and git push">
+  <meta property="og:description" content="No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-zero-build-blog/cover.png">
+  <meta property="article:published_time" content="2026-06-26">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"I Built a Zero-Build Blog: Just Markdown and git push","description":"No Hugo, no Jekyll, no node_modules, no CI. The repo is the website — write a Markdown file, push, and a ~400-line vanilla-JS engine renders it. Here's how it works and the one rate-limit pit I fell into.","datePublished":"2026-06-26","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-06-26-zero-build-blog/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-zero-build-blog/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-zero-build-blog/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-zero-build-blog"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-06-26-zero-build-blog/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-06-26-zero-build-blog/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>I Built a Zero-Build Blog: Just Markdown and git push</h1>
+<p><img src="/posts/2026-06-26-zero-build-blog/cover.png" alt="A zero-build Markdown blog rendered directly by the browser" loading="lazy"></p>
+<h2>Intro</h2>
+<p>Every &quot;simple&quot; blog I tried wanted the same thing from me first: install a static-site generator, learn its templating language, run a build, then babysit a deploy pipeline. I just wanted to <strong>write a Markdown file and have it show up online.</strong></p>
+<p>So I built the smallest thing that does exactly that — and nothing else. No Hugo, no Jekyll, no Astro, no <code>node_modules</code>, no CI to stare at. You add a folder, you <code>git push</code>, and the post is live. This is the blog you&#39;re reading right now, and this post is about how it works.</p>
+<p>The whole idea fits in one sentence: <strong>the Git repo <em>is</em> the website.</strong></p>
+<hr>
+<h2>1. The frustration that started it</h2>
+<p>A blog is, structurally, almost nothing: a list of posts, and a way to render one. Yet the standard advice turns that into a toolchain — a generator, a theme system, a build command, a deploy action, and a <code>node_modules</code> folder heavier than everything you&#39;ll ever write.</p>
+<p>Every one of those is a thing that can break between you and hitting &quot;publish.&quot; I wanted the gap between <em>I wrote something</em> and <em>it&#39;s online</em> to be a single <code>git push</code>. Nothing to build, nothing to wait on, nothing to debug at 1 a.m. because a generator bumped a major version.</p>
+<h2>2. The trick: let the browser do the work</h2>
+<p>Instead of building HTML ahead of time, the site builds itself in the browser, on demand:</p>
+<pre><code>   write Markdown              git push                 GitHub Pages
+  posts/&lt;date&gt;-slug/   ──────────────────►   main   ──────────────────►   index.html + assets/
+        index.md                                                                 │
+                                                                                 │  in the browser
+            ┌─────────────────────────────────────────────────────────────────────┘
+            ▼
+   list posts (title / date / summary / tags)
+   posts/&lt;dir&gt;/index.md ──►  marked + DOMPurify + highlight.js  ──►  rendered article
+</code></pre>
+<p>There is no server of mine in this picture. GitHub Pages serves a static <code>index.html</code> plus a ~400-line vanilla-JS engine. The engine:</p>
+<ol>
+<li><strong>Finds the posts</strong> by reading the repo&#39;s <code>posts/</code> directory.</li>
+<li><strong>Fetches</strong> the chosen post&#39;s <code>index.md</code> as raw text.</li>
+<li><strong>Renders</strong> it client-side with <a href="https://marked.js.org/" target="_blank" rel="noopener">marked</a> (Markdown → HTML), sanitizes the result with <a href="https://github.com/cure53/DOMPurify" target="_blank" rel="noopener">DOMPurify</a>, and colors code with <a href="https://highlightjs.org/" target="_blank" rel="noopener">highlight.js</a>.</li>
+</ol>
+<p>Libraries load from a CDN; the app shell caches like an installed app. That&#39;s the entire architecture. The &quot;database&quot; is the folder tree.</p>
+<h2>3. What you get for free</h2>
+<p>Because the post list is derived, not hand-maintained, a lot of housekeeping just disappears:</p>
+<ul>
+<li>🗂 <strong>Auto index</strong> — drop a post folder, it appears on the home page, newest first. No list to edit.</li>
+<li>🔗 <strong>Auto prev/next</strong> — inter-post navigation is generated from the post order.</li>
+<li>🖼 <strong>Relative images</strong> — write <code>images/diagram.png</code> and the engine resolves it <em>per post</em>, so two posts can both have an <code>images/cover.png</code> without colliding.</li>
+<li>💬 <strong>Comments</strong> — GitHub Discussions via <a href="https://giscus.app" target="_blank" rel="noopener">Giscus</a>, no third-party tracker.</li>
+<li>🌓 <strong>Dark mode</strong> that follows the system theme, and light/dark-aware syntax highlighting.</li>
+</ul>
+<p>Writing a post is just:</p>
+<pre><code>posts/
+└─ 2026-06-26-zero-build-blog/
+   ├─ index.md      # frontmatter + body
+   └─ images/       # referenced as images/x.png
+</code></pre>
+<pre><code class="language-markdown">---
+title: My Post
+date: 2026-06-26
+summary: One line shown on the home-page card.
+tags: [blog, vanilla-js]
+---
+
+The body starts here…
+</code></pre>
+<p>Push it. Done.</p>
+<h2>4. The one pit I fell into: the GitHub API rate limit</h2>
+<p>The first version was even purer: it listed posts live through the <strong>anonymous GitHub Contents API</strong> at page load. Beautiful in theory — zero stored state, the directory listing was always the source of truth.</p>
+<p>Then the home page started returning <strong>403</strong> for some visitors.</p>
+<p>The anonymous GitHub API is rate-limited to <strong>60 requests per hour per IP</strong>. On shared or carrier-grade-NAT networks (and to anyone who refreshed a few times), that budget evaporates, and the listing call fails. A blog whose home page sometimes just doesn&#39;t load is not a blog.</p>
+<p>The fix keeps the &quot;repo is the source of truth&quot; spirit without paying the API tax on every page view: a tiny zero-dependency script, <a href="https://github.com/byzosc/zero-build-blog/blob/main/scripts/gen-posts.mjs" target="_blank" rel="noopener"><code>scripts/gen-posts.mjs</code></a>, scans every <code>posts/&lt;slug&gt;/index.md</code>, parses its frontmatter, and writes a static <code>posts.json</code>. The engine reads that file first — no API call, no rate limit, no 403.</p>
+<p>And to keep the author&#39;s promise intact (&quot;just push&quot;), a GitHub Actions workflow runs that script on every push and commits the regenerated <code>posts.json</code>. So the index is still derived from the posts — the derivation just moved from <em>the visitor&#39;s browser, every time</em> to <em>CI, once per push</em>. The frontmatter parser in the script is deliberately identical to the one in the client engine, so what CI indexes and what the browser renders can never drift apart.</p>
+<h2>5. Bilingual without a framework</h2>
+<p>Each post can ship two files: <code>index.md</code> (English, the default) and <code>index.zh.md</code> (Chinese). Frontmatter declares the relationship:</p>
+<pre><code class="language-markdown">lang: en
+translations: [zh]
+</code></pre>
+<p>The engine sees <code>translations</code> and shows a language toggle; clicking it swaps to <code>index.zh.md</code>. No i18n library, no routing config — two files and two lines of frontmatter.</p>
+<h2>6. Honest trade-offs</h2>
+<p>This approach is deliberately narrow, and it&#39;s worth being clear about the costs:</p>
+<ul>
+<li><strong>The repo must be public.</strong> The engine (and the no-build ethos) assumes anyone can fetch the raw Markdown. Private blogging is not what this is for.</li>
+<li><strong>Rendering is client-side.</strong> First paint waits on JS + CDN libraries. For a text blog this is imperceptible; for a latency-critical or SEO-maximalist site, prerendering would win.</li>
+<li><strong>Mainland-China reach</strong> is still on the roadmap — GitHub Pages can be flaky there, so a Cloudflare Pages / self-hosted mirror is the next step.</li>
+</ul>
+<p>None of these dent the core win: the distance from <em>idea</em> to <em>published</em> is one commit.</p>
+<h2>7. Use it yourself</h2>
+<p>It&#39;s MIT-licensed (the engine, not my words). Fork it, point <code>CONFIG.repo</code> in <code>assets/app.js</code> at your repo, enable GitHub Pages on <code>main</code>, and you have a blog where writing a post means writing a file.</p>
+<p>→ <strong><a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">github.com/byzosc/zero-build-blog</a></strong></p>
+<p>If it saves you from spinning up yet another static-site generator, a ⭐ means a lot.</p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-06-26-ai-chathub-chrome-extension/"><span class="post-nav-label">← Older</span><span class="post-nav-title">AI ChatHub: API + Webtab Engines</span></a><a class="next" href="/posts/2026-06-26-amd-synology-temperature-json-api/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">AMD Synology Temps: Verified JSON</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

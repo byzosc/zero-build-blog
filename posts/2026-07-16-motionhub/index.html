@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff · zosc blog</title>
+  <meta name="description" content="MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-07-16-motionhub/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-07-16-motionhub/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-07-16-motionhub/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-07-16-motionhub/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff">
+  <meta property="og:description" content="MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-07-16-motionhub/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-07-16-motionhub/cover.png">
+  <meta property="article:published_time" content="2026-07-16">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"AI Is Entering the Editable Motion Pipeline: Spec, AE, and Handoff","description":"MotionSpec defines the rules, MotionPilot builds editable AE motion, and MotionSheet hands it off and audits it against the same shared spec.","datePublished":"2026-07-16","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-07-16-motionhub/cover.png","url":"https://blog.zosc.com/posts/2026-07-16-motionhub/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-07-16-motionhub/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-07-16-motionhub"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-07-16-motionhub/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-07-16-motionhub/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>AI Is Entering the Editable Motion Pipeline</h1>
+<p><img src="/posts/2026-07-16-motionhub/cover.png" alt="MotionHub motion pipeline" loading="lazy"></p>
+<video controls playsinline preload="metadata" poster="/posts/2026-07-16-motionhub/cover.png">
+  <source src="/posts/2026-07-16-motionhub/motionhub-demo.mp4" type="video/mp4">
+</video><p><img src="/posts/2026-07-16-motionhub/motionhub-system.png" alt="MotionHub connects MotionSpec, MotionPilot, and MotionSheet" loading="lazy"></p>
+<blockquote>
+<p><strong>In one sentence:</strong> MotionSpec defines the rules, MotionPilot writes intent into After Effects, and MotionSheet hands off and audits against the same spec. Together, they form MotionHub.</p>
+</blockquote>
+<p>The headline is aggressive; the claim is deliberately narrower. AI has not replaced a motion designer&#39;s taste, but it is moving beyond &quot;help me keyframe this&quot; and into an editable, constrained, auditable production pipeline.</p>
+<p>The goal is not another black-box generated clip. Structure, planning, and the result all stay inside a normal design workflow.</p>
+<table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Job</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MotionSpec</td>
+<td>Define curves, durations, and named presets</td>
+<td>Shared <code>motion-tokens.json</code></td>
+</tr>
+<tr>
+<td>MotionPilot</td>
+<td>Plan and execute motion in AE</td>
+<td>Editable layers, keyframes, effects, and expressions</td>
+</tr>
+<tr>
+<td>MotionSheet</td>
+<td>Read Lottie / Bodymovin data</td>
+<td>Timeline, handoff table, and spec audit</td>
+</tr>
+<tr>
+<td>MotionHub</td>
+<td>Connect definition, execution, and audit</td>
+<td>One shared motion workflow</td>
+</tr>
+</tbody></table>
+<h2>MotionSpec: encode the rules</h2>
+<p>MotionSpec turns a house motion style from scattered documentation and personal habit into a shared <code>motion-tokens.json</code>. Curves, durations, and named presets are edited visually, then read by both MotionPilot and MotionSheet.</p>
+<p><img src="/posts/2026-07-16-motionhub/motionspec.png" alt="The real MotionSpec interface" loading="lazy"></p>
+<h2>MotionSheet: read motion</h2>
+<p>MotionSheet runs in the browser and reads JSON locally. It turns animation data into a developer-readable table, adds timeline inspection, and keeps parent-child motion visible instead of flattening it into a vague duration.</p>
+<p><img src="/posts/2026-07-16-motionhub/motionsheet-demo.gif" alt="MotionSheet timeline and layer inspection" loading="lazy"></p>
+<h2>MotionPilot: write motion</h2>
+<p>MotionPilot lives inside After Effects. It combines selected-layer context, optional visual context, an LLM-generated plan, and deterministic JSX execution. The result remains editable in AE; it is not a rendered black-box clip.</p>
+<p>The demo is a real After Effects screen recording. A motion description is entered in MotionPilot on the right and Generate is clicked; the composition and timeline on the left then receive actual layers and editable keyframes. Only the API wait is visibly time-compressed. Generation and playback remain at their recorded speed, followed by the real MotionSheet interface inspecting and handing off motion data. A second JSON example then moves between timeline, layer details, and table view to show that the workflow is not hard-coded to one animation.</p>
+<p><img src="/posts/2026-07-16-motionhub/motionpilot-demo.gif" alt="MotionPilot running inside After Effects" loading="lazy"></p>
+<h2>Why the plugin is the important part</h2>
+<p>Without MotionPilot, an AI can still produce a one-off JSX script. But every new effect risks rebuilding layer lookup, AE API calls, JSON transport, permissions, undo handling, and error reporting. A script that runs once is not the same as a capability that can be reused reliably.</p>
+<table>
+<thead>
+<tr>
+<th>Without the plugin</th>
+<th>With MotionPilot</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Start each effect from another JSX file</td>
+<td>Solve scene I/O, execution, feedback, and undo once</td>
+</tr>
+<tr>
+<td>Ask the LLM to guess intent and AE internals</td>
+<td>Let the LLM interpret; let a deterministic executor apply</td>
+</tr>
+<tr>
+<td>Debug failures across scripts, AE, and transport</td>
+<td>Trace failures to a command and layer</td>
+</tr>
+<tr>
+<td>Finish once, then rewrite next time</td>
+<td>Add a motion primitive once and reuse it</td>
+</tr>
+</tbody></table>
+<p>The plugin is not merely a shortcut. It is shared infrastructure for AI to operate After Effects, keeping the fragile engineering stable while people and models focus on timing, hierarchy, and taste.</p>
+<h2>Why I plan to open-source it under MIT</h2>
+<p>The exciting part is compounding capability. One contributor can add a keyframe strategy, another an effect or expression, and another a test project or failure case. Every person and every AI can then reuse that vocabulary.</p>
+<p>I plan to release the first-party plugin code under MIT and keep iterating on the execution contract, motion strategies, aesthetic constraints, and safe rollback. <strong>The repository has not completed its license transition yet, so this is the plan, not a claim that the conversion is already done.</strong> Third-party code will retain its original notices and licenses.</p>
+<p>The destination is not “generate this one flower.” It is an extensible loop:</p>
+<blockquote>
+<p>Send an image, GIF, or video -&gt; AI decomposes structure and timing -&gt; MotionPilot writes editable AE -&gt; a human refines it</p>
+</blockquote>
+<p>Today, MotionHub cannot promise that every motion reference will work on the first try. But every reliable execution primitive means the next attempt no longer starts from zero.</p>
+<h2>What works now, and what comes next</h2>
+<p>All three parts have a working page or prototype. MotionSpec edits and exports the shared spec. MotionSheet can inspect and export motion handoff data. MotionPilot can read an AE scene, generate a plan, execute supported operations, and return to the normal AE editing workflow. The launch video uses the real MotionPilot panel and AE result, with clearly labeled time compression during API waits and two real MotionSheet JSON walkthroughs.</p>
+<p>The honest boundary: <strong>the suite is not yet a one-click closed loop.</strong> The next milestone is the full handoff import bridge, so MotionSheet output can become MotionPilot input while staying constrained by the same <code>motion-tokens.json</code>, without re-describing timing, easing, hierarchy, or layer intent.</p>
+<p>That is what MotionHub means to me:</p>
+<blockquote>
+<p>Designers can explain motion. Developers can reproduce it. After Effects can execute it.</p>
+</blockquote>
+<h2>Try the projects</h2>
+<ul>
+<li><a href="https://motionrules.com/" target="_blank" rel="noopener">MotionSheet live demo</a></li>
+<li><a href="https://motionrules.com/pilot" target="_blank" rel="noopener">MotionPilot page</a></li>
+<li><a href="https://github.com/byzosc/keyframe_sheet" target="_blank" rel="noopener">MotionSheet on GitHub</a></li>
+<li><a href="https://github.com/byzosc/motion-design" target="_blank" rel="noopener">MotionPilot on GitHub</a></li>
+</ul>
+<p>The vertical social demo, real AE source clip, and platform-ready copy are included with this post&#39;s source assets.</p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-07-05-vps-compliant-edge/"><span class="post-nav-label">← Older</span><span class="post-nav-title">Claude + VPS</span></a><a class="next" href="/posts/2026-07-20-zerb-hub-command-center/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">Homepage, Turned into a Command Center</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

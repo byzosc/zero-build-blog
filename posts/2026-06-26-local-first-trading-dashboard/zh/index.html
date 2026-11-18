@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>我做交易面板时最先写的不是图表，而是“只读边界” · zosc blog</title>
+  <meta name="description" content="一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="我做交易面板时最先写的不是图表，而是“只读边界”">
+  <meta property="og:description" content="一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/cover.png">
+  <meta property="article:published_time" content="2026-03-26">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"我做交易面板时最先写的不是图表，而是“只读边界”","description":"一个自托管交易分析面板，聚合只读券商持仓、延迟行情、宏观数据和个人法则库。本地计算数学期望并拼装 LLM 提示词，但架构上不下单、不发信号、不承诺收益。","datePublished":"2026-03-26","inLanguage":"zh-CN","image":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换到暗色模式">暗色</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-local-first-trading-dashboard"><a class="back" href="/">← 返回列表</a><div class="lang-switch"><a data-lang="en" class="" href="/posts/2026-06-26-local-first-trading-dashboard/" hreflang="en">English</a><a data-lang="zh" class="active" href="/posts/2026-06-26-local-first-trading-dashboard/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>我做交易面板时最先写的不是图表，而是“只读边界”</h1>
+<p><img src="/posts/2026-06-26-local-first-trading-dashboard/cover.png" alt="本地优先、只读的交易分析面板" loading="lazy"></p>
+<blockquote>
+<p><strong>先说清楚：</strong> 这是一篇软件工程文章，不是投资建议。这个项目只读、只分析、不下单、不发买卖信号。它的重点不是“预测市场”，而是“怎样做一个不会替你乱动的分析面板”。</p>
+</blockquote>
+<h2>TL;DR</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>我的做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>交易工具最怕越权</td>
+<td>默认不连券商，连上也只读</td>
+</tr>
+<tr>
+<td>数据看起来对但其实坏</td>
+<td>失真报价直接标“勿用”，坏 IV 不算 Greeks</td>
+</tr>
+<tr>
+<td>实时数据可能收费</td>
+<td>UI 二次确认 + 服务端节流</td>
+</tr>
+<tr>
+<td>LLM 容易胡说</td>
+<td>只把法则和事实拼进提示词，不让它下单</td>
+</tr>
+<tr>
+<td>页面不能被慢网关冻住</td>
+<td>single-flight + 硬超时 + 缓存快照</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>1. 为什么先写边界，而不是先画图表</h2>
+<p><strong>小结论：</strong> 交易软件里，“不会做危险动作”比“看起来高级”更重要。</p>
+<p>我想要一块屏幕，把决策前要看的东西放在一起：</p>
+<ul>
+<li>当前持仓。</li>
+<li>延迟行情。</li>
+<li>技术指标。</li>
+<li>宏观背景。</li>
+<li>新闻摘要。</li>
+<li>自己写的交易法则。</li>
+<li>一段可以丢给 LLM 的上下文。</li>
+</ul>
+<p>但我给它定了一个很硬的约束：<strong>本地优先，默认只读。</strong></p>
+<p>它可以帮我整理信息、框定风险、提醒法则冲突，但不能替我下单。这个边界不是 README 里写一句“不会下单”就算了，而是要写进架构。</p>
+<h2>2. 误区 / 正解</h2>
+<table>
+<thead>
+<tr>
+<th>误区</th>
+<th>正解</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>交易面板的核心是图表</td>
+<td>对我来说，核心是安全边界和数据可信度</td>
+</tr>
+<tr>
+<td>LLM 可以直接给交易建议</td>
+<td>LLM 只读事实和法则，不产生下单动作</td>
+</tr>
+<tr>
+<td>“只读”靠自律就行</td>
+<td>只读必须由代码路径强制</td>
+</tr>
+<tr>
+<td>数据缺了就 mock 一个</td>
+<td>缺了就标缺失，不给漂亮假数</td>
+</tr>
+<tr>
+<td>实时越多越好</td>
+<td>延迟数据够用时，不主动触发付费实时源</td>
+</tr>
+</tbody></table>
+<h2>3. 只读是设计出来的</h2>
+<p><strong>小结论：</strong> 安全属性要被多个层次同时约束。</p>
+<p>我把“只读”放在几个互相独立的地方：</p>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>约束</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>默认状态</td>
+<td>页面和轮询只用本地快照 + 免费/延迟行情</td>
+</tr>
+<tr>
+<td>券商连接</td>
+<td>只有用户显式刷新才连接</td>
+</tr>
+<tr>
+<td>会话配置</td>
+<td>broker session 用 <code>readonly=True</code></td>
+</tr>
+<tr>
+<td>代码路径</td>
+<td>代码库里没有下单调用</td>
+</tr>
+<tr>
+<td>降级策略</td>
+<td>网关离线时重估旧快照，不编假数据</td>
+</tr>
+</tbody></table>
+<p>这就是我最在意的地方：<strong>只读不是一句承诺，而是代码的形状。</strong></p>
+<h2>4. 数据诚实：宁可不好看，也别骗人</h2>
+<p><strong>小结论：</strong> 一个你不能一眼信任的面板，比没有面板更糟。</p>
+<p>我给数据可信度加了几道闸：</p>
+<ul>
+<li>买卖价差过宽，或买价大于卖价：标记为失真，界面写“勿用”。</li>
+<li>隐含波动率落在合理区间外：相关 Greeks 直接弃用。</li>
+<li>期权 Greeks 拿不到：说明原因，比如“未订阅实时期权数据源”。</li>
+<li>实时盘口会产生费用：必须 UI 确认，后端再节流，防止双击扣两次。</li>
+<li>旧快照重估时：明确标记估值模式，比如 <code>live</code>、<code>snapshot_external_mark</code>、<code>snapshot_stale</code>。</li>
+</ul>
+<blockquote>
+<p>我不想做一个“看起来很懂市场”的面板。我想做一个知道自己什么时候不该被相信的面板。</p>
+</blockquote>
+<h2>5. 技术栈：克制比堆料重要</h2>
+<p><strong>小结论：</strong> 这个项目不是炫图表，而是把信息组织成可靠工作台。</p>
+<table>
+<thead>
+<tr>
+<th>层</th>
+<th>选择</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>前端</td>
+<td>Vite + React + TypeScript</td>
+</tr>
+<tr>
+<td>后端</td>
+<td>FastAPI + uvicorn</td>
+</tr>
+<tr>
+<td>图表</td>
+<td>没有大型图表库，主要是面板、表格、状态条</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>免费/延迟行情为主，实时数据按需开启</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>只负责整理上下文，不拥有执行权</td>
+</tr>
+</tbody></table>
+<p>这里“不用图表库”不是因为图表不重要，而是这个工具的目标不是盯盘。它是一个<strong>决策前的信息整理面板</strong>。</p>
+<h2>6. 不靠 WebSocket 的“实时”</h2>
+<p><strong>小结论：</strong> 不是所有面板都需要 socket 管线。</p>
+<p>前端用克制的轮询：</p>
+<ul>
+<li>几秒检查一次券商连接和组合状态。</li>
+<li>更慢节奏刷新宏观和日历。</li>
+<li>后端按数据源设置 TTL：报价按秒、期权按分、基本面和日线按小时、日历按天。</li>
+<li>多个跨国请求用线程池并行，总耗时接近最慢的单个源。</li>
+<li>全局信号量限制并发，避免免费 API 返回 429。</li>
+</ul>
+<p>这套方案不酷，但很稳。对一个只读分析面板来说，稳定比“看起来实时”更重要。</p>
+<h2>7. LLM：只读事实，不碰按钮</h2>
+<p><strong>小结论：</strong> 让 LLM 参与分析，不等于让它拥有动作权限。</p>
+<p>我的个人法则库是一堆笔记。程序会检索相关法则，和当前持仓、行情、宏观背景一起拼成提示词。</p>
+<p>检索管线是分层降级的：</p>
+<pre><code class="language-text">词法召回 -&gt; 语义向量 -&gt; 多查询扩展 -&gt; section 扩展 -&gt; LLM 重排 -&gt; 全量复核
+</code></pre>
+<p>任何高级阶段失败，就退回纯词法检索。embedding 落盘缓存，签名包含正文哈希；法则改了，缓存自动失效。</p>
+<p>还有一个很实用的逃生口：导出整套法则为纯文本。法则库不大时，可以直接粘进长上下文网页版 LLM，完全不依赖服务端 key。</p>
+<h2>8. 踩坑 / 修法</h2>
+<table>
+<thead>
+<tr>
+<th>坑</th>
+<th>表现</th>
+<th>修法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>半开的券商网关冻住页面</td>
+<td>账户/组合调用挂约 54 秒，还占着锁</td>
+<td>single-flight executor + 硬超时 + 返回缓存</td>
+</tr>
+<tr>
+<td>免费数据源失效</td>
+<td>页面搬家 + JS 反爬挑战</td>
+<td>换数据源并处理 cookie/token 握手</td>
+</tr>
+<tr>
+<td>期权“陈旧”误诊</td>
+<td>休市时宽价差被误判为坏数据</td>
+<td>加固可信度规则，不追不存在的 bug</td>
+</tr>
+<tr>
+<td>部署像 boss 战</td>
+<td>缓存、stdin、SSH 参数长度、git-bash 路径转换都踩坑</td>
+<td>拆部署步骤，写成 runbook</td>
+</tr>
+</tbody></table>
+<h2>9. 取舍</h2>
+<ul>
+<li>它是单用户个人工具，不是 SaaS。</li>
+<li>CORS 钉在 localhost，靠私网和本地环境兜底。</li>
+<li>免费行情有延迟，实时数据需要付费。</li>
+<li>一些第三方非官方接口随时可能变。</li>
+<li>树里还有 MVP 残留，代码比 README 的部分内容更超前。</li>
+<li>最重要的再说一遍：它不是自动交易，也不是投资建议。</li>
+</ul>
+<h2>10. 可复制清单</h2>
+<ul>
+<li><input disabled="" type="checkbox"> 先定义“这个工具绝不能做什么”。</li>
+<li><input disabled="" type="checkbox"> 默认不连接高权限系统。</li>
+<li><input disabled="" type="checkbox"> 高风险数据源必须显式确认。</li>
+<li><input disabled="" type="checkbox"> 坏数据直接标坏，不显示漂亮假数。</li>
+<li><input disabled="" type="checkbox"> LLM 只读上下文，不拥有执行按钮。</li>
+<li><input disabled="" type="checkbox"> 慢外部依赖必须有超时和缓存。</li>
+<li><input disabled="" type="checkbox"> 部署也要 runbook 化。</li>
+</ul>
+<h2>11. 最后</h2>
+<p>这个项目有意思的地方，从来不是“能不能预测市场”。</p>
+<p>它真正解决的是：</p>
+<blockquote>
+<p>怎样做一个对数据诚实、对权限克制、对用户负责的分析工具。</p>
+</blockquote>
+<p>这三件事不只适用于交易面板，也适用于任何会影响判断的 dashboard。</p>
+<p>→ <strong><a href="https://github.com/byzosc/trading-pannel" target="_blank" rel="noopener">github.com/byzosc/trading-pannel</a></strong></p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2017-07-01-silence-is-an-eternal-theme/zh/"><span class="post-nav-label">← 更早</span><span class="post-nav-title">静默是永恒的主题</span></a><a class="next" href="/posts/2026-06-21-multi-model-ai-gateway/zh/"><span class="post-nav-label">更新 →</span><span class="post-nav-title">一天搭建多模型 AI 网关</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">纯 Markdown · 免构建 · push 即发布。</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>

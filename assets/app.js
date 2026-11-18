@@ -1,6 +1,6 @@
 /* Zerb's Blog — 零构建博客引擎
  * 三个借鉴来的概念，自己重写、更简洁：
- *   1) GitHub Pages + 客户端渲染：把 posts/<dir>/index.md 渲染成有样式的网页
+ *   1) GitHub Pages + 预渲染：CI 用 scripts/gen-static.mjs 把 posts/<dir>/index.md 渲染成静态页，本文件只管主题、列表和评论
  *   2) GitHub 做评论系统：用 Giscus（基于 GitHub Discussions）
  *   3) 文章列表自动生成：读 GitHub API 列出 posts/ 下的文件夹，无需手维护索引
  * 改仓库名后，只改下面 CONFIG.repo / giscus.repo 即可。 */
@@ -18,9 +18,12 @@ const CONFIG = {
 
 const app = document.getElementById('app');
 document.getElementById('year').textContent = new Date().getFullYear();
+// 文章页由 scripts/gen-static.mjs 预渲染，带 data-giscus-term；没有它就是首页
+const postEl = document.querySelector('article.post[data-giscus-term]');
+const postLang = postEl ? (document.documentElement.lang === 'zh-CN' ? 'zh' : 'en') : null;
 
-// 站点 UI 文案：跟随当前阅读语言（localStorage 'lang'，默认英文）
-function currentLang() { return localStorage.getItem('lang') === 'zh' ? 'zh' : 'en'; }
+// 站点 UI 文案：文章页跟随页面语言，首页跟随当前阅读语言（localStorage 'lang'，默认英文）
+function currentLang() { return postLang || (localStorage.getItem('lang') === 'zh' ? 'zh' : 'en'); }
 const THEME_KEY = 'theme';
 function systemTheme() {
   return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -33,13 +36,11 @@ function currentTheme() {
   return savedTheme() || systemTheme();
 }
 const STR = {
-  en: { back: '← Back to posts', loadingList: 'Loading posts…', empty: 'No posts yet.',
+  en: { loadingList: 'Loading posts…', empty: 'No posts yet.',
         listErr: 'Failed to load list: ', rate: 'If this is GitHub API rate limiting (60/hr for anonymous), just try again shortly.',
-        loadingPost: 'Loading…', postErr: 'Failed to load post: ', older: '← Older', newer: 'Newer →',
         footer: 'Plain Markdown · no build · push to publish.' },
-  zh: { back: '← 返回列表', loadingList: '加载文章列表…', empty: '还没有文章。',
+  zh: { loadingList: '加载文章列表…', empty: '还没有文章。',
         listErr: '列表加载失败：', rate: '若是 GitHub API 限流（匿名每小时 60 次），稍后再试即可。',
-        loadingPost: '加载文章…', postErr: '文章加载失败：', older: '← 更早', newer: '更新 →',
         footer: '纯 Markdown · 免构建 · push 即发布。' },
 };
 function t(k, lang = currentLang()) { return (STR[lang] && STR[lang][k]) || STR.en[k] || k; }
@@ -198,7 +199,7 @@ async function listPosts() {
 }
 
 let _postsCache = null;
-// 列表缓存：同一会话里 renderList / renderPost 复用，省 GitHub API 调用（匿名每小时 60 次）。
+// 列表缓存：同一会话里重复渲染列表时复用，省 GitHub API 调用（匿名每小时 60 次）。
 async function getPosts() {
   if (!_postsCache) _postsCache = await listPosts();
   return _postsCache;
@@ -259,10 +260,17 @@ function postCoverSrc(post) {
   return `${CONFIG.postsDir}/${post.dir}/${cover}`;
 }
 
+// 文章静态页网址：当前语言是 zh 且该文有 zh 版时指向 /posts/<dir>/zh/
+function postHref(dir, post, lang = currentLang()) {
+  const base = `/${CONFIG.postsDir}/${encodeURIComponent(dir)}/`;
+  const primary = post ? normalizeLang(post.lang || 'en') : 'en';
+  return post && lang !== primary && postLangs(post).includes(lang) ? `${base}${lang}/` : base;
+}
+
 async function renderList() {
   const lang = currentLang();
   applyChrome(lang);
-  app.innerHTML = `<p class="state">${t('loadingList', lang)}</p>`;
+  if (!app.querySelector('.post-list')) app.innerHTML = `<p class="state">${t('loadingList', lang)}</p>`;
   try {
     const posts = await getPosts();
     document.title = "zosc blog";
@@ -282,7 +290,7 @@ async function renderList() {
         const tagLabel = view.tags.length ? view.tags[0] : 'note';
         return `
       <li class="post-card${cover ? ' has-cover' : ''}">
-        <a class="post-card-link" href="#/post/${encodeURIComponent(p.dir)}">
+        <a class="post-card-link" href="${postHref(p.dir, p, lang)}">
           ${cover
             ? `<img class="post-card-visual post-card-cover" src="${escapeHtml(cover)}" alt="" loading="lazy">`
             : `<div class="post-card-visual post-card-fallback" aria-hidden="true"><span>Z</span><small>${escapeHtml(tagLabel)}</small></div>`}
@@ -304,29 +312,6 @@ async function renderList() {
     app.innerHTML = `<p class="error">${t('listErr', lang)}${escapeHtml(e.message)}</p>
       <p class="state"><small>${t('rate', lang)}</small></p>`;
   }
-}
-
-// 把正文里的相对链接和媒体改成相对文章目录解析（如 images/arch.png → posts/<dir>/images/arch.png）
-function fixRelativeUrls(root, base) {
-  const isRelative = value => value && !/^(https?:|\/\/|\/|#|data:|blob:)/.test(value);
-  root.querySelectorAll('img[src]').forEach(img => {
-    const s = img.getAttribute('src');
-    if (isRelative(s)) img.setAttribute('src', base + s);
-    img.setAttribute('loading', 'lazy');
-  });
-  root.querySelectorAll('video[src], audio[src], source[src]').forEach(media => {
-    const s = media.getAttribute('src');
-    if (isRelative(s)) media.setAttribute('src', base + s);
-  });
-  root.querySelectorAll('video[poster]').forEach(video => {
-    const poster = video.getAttribute('poster');
-    if (isRelative(poster)) video.setAttribute('poster', base + poster);
-  });
-  root.querySelectorAll('a[href]').forEach(a => {
-    const h = a.getAttribute('href') || '';
-    if (h && !/^(https?:|\/\/|\/|#|mailto:)/.test(h)) a.setAttribute('href', base + h);
-    if (/^https?:/.test(a.getAttribute('href') || '')) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener'); }
-  });
 }
 
 function mountGiscus(term) {
@@ -351,84 +336,27 @@ function mountGiscus(term) {
 
 const LANG_LABEL = { en: 'English', zh: '中文', 'zh-CN': '中文', ja: '日本語' };
 
-async function renderPost(dir) {
-  applyChrome();
-  app.innerHTML = `<p class="state">${t('loadingPost')}</p>`;
-  const base = `${CONFIG.postsDir}/${dir}/`;
-  try {
-    // index.md 是默认语言版；frontmatter 里 translations: [zh] 声明有哪些其它语言（文件名 index.<lang>.md）
-    const primary = parseFrontmatter(await fetchText(base + 'index.md'));
-    const meta = primary.meta;
-    const tr = Array.isArray(meta.translations) ? meta.translations
-             : (meta.translations ? [meta.translations] : []);
-    const langs = [{ code: meta.lang || 'en', file: 'index.md', body: primary.body }]
-      .concat(tr.map(c => ({ code: c, file: `index.${c}.md`, body: null })));
-
-    let cur = localStorage.getItem('lang');
-    if (!langs.some(l => l.code === cur)) cur = langs[0].code;
-
-    const switcher = langSwitchHtml(langs.map(l => l.code), cur);
-    app.innerHTML = `<article class="post"><a class="back" href="#/">${t('back', cur)}</a>${switcher}<div class="post-body"></div></article>`;
-    const bodyEl = app.querySelector('.post-body');
-
-    // 切换语言只换正文，不动上一篇/下一篇和评论
-    async function load(code) {
-      const lang = langs.find(l => l.code === code) || langs[0];
-      if (lang.body === null) lang.body = parseFrontmatter(await fetchText(base + lang.file)).body;
-      bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(lang.body), {
-        ADD_TAGS: ['video', 'source'],
-        ADD_ATTR: ['controls', 'playsinline', 'preload', 'poster'],
-      });
-      fixRelativeUrls(bodyEl, base);
-      bodyEl.querySelectorAll('pre code').forEach(el => { try { hljs.highlightElement(el); } catch (e) {} });
-      app.querySelectorAll('.lang-switch button').forEach(b =>
-        b.classList.toggle('active', b.getAttribute('data-lang') === code));
-      applyChrome(code);
-      const backEl = app.querySelector('.back'); if (backEl) backEl.textContent = t('back', code);
-      const pl = app.querySelector('.post-nav .prev .post-nav-label'); if (pl) pl.textContent = t('older', code);
-      const nl = app.querySelector('.post-nav .next .post-nav-label'); if (nl) nl.textContent = t('newer', code);
-    }
-    app.querySelectorAll('.lang-switch button').forEach(btn =>
-      btn.addEventListener('click', () => {
-        const c = btn.getAttribute('data-lang');
-        localStorage.setItem('lang', c);
-        load(c);
-      }));
-
-    await load(cur);
-    document.title = (meta.title || dir) + " · zosc blog";
-
-    // 上一篇/下一篇：与语言无关，渲染一次
-    try {
-      const posts = await getPosts();
-      const i = posts.findIndex(p => p.dir === dir);
-      const older = i >= 0 ? posts[i + 1] : null; // 更早
-      const newer = i >= 0 ? posts[i - 1] : null; // 更新
-      if (older || newer) {
-        const cell = (p, side, label) => p
-          ? `<a class="${side}" href="#/post/${encodeURIComponent(p.dir)}"><span class="post-nav-label">${label}</span><span class="post-nav-title">${escapeHtml(postListView(p, currentLang()).title)}</span></a>`
-          : `<span class="${side}"></span>`;
-        const nav = document.createElement('nav');
-        nav.className = 'post-nav';
-        nav.innerHTML = cell(older, 'prev', t('older')) + cell(newer, 'next', t('newer'));
-        app.querySelector('.post').appendChild(nav);
-      }
-    } catch (e) { /* 列表获取失败：不显示上下篇，不影响正文 */ }
-
-    window.scrollTo(0, 0);
-    mountGiscus(dir);
-  } catch (e) {
-    app.innerHTML = `<p class="error">${t('postErr')}${escapeHtml(e.message)}</p><a class="back" href="#/">${t('back')}</a>`;
-  }
+function setupPost() {
+  if (window.hljs) hljs.highlightAll();
+  postEl.querySelectorAll('.lang-switch a[data-lang]').forEach(a =>
+    a.addEventListener('click', () => { try { localStorage.setItem('lang', a.getAttribute('data-lang')); } catch (e) {} }));
+  mountGiscus(postEl.getAttribute('data-giscus-term'));
 }
 
-function router() {
+// 旧网址 #/post/<dir> 跳到静态页
+async function router() {
   const m = location.hash.replace(/^#/, '').match(/^\/post\/(.+)$/);
-  if (m) renderPost(decodeURIComponent(m[1]));
-  else renderList();
+  if (!m) return renderList();
+  const dir = decodeURIComponent(m[1]);
+  let post = null;
+  try { post = (await getPosts()).find(p => p.dir === dir) || null; } catch (e) {}
+  location.replace(postHref(dir, post));
 }
 
-window.addEventListener('hashchange', router);
 setupThemeToggle();
 applyChrome();
-router();
+if (postEl) setupPost();
+else {
+  window.addEventListener('hashchange', router);
+  router();
+}

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary. · zosc blog</title>
+  <meta name="description" content="A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.">
+  <meta property="og:description" content="A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/cover.png">
+  <meta property="article:published_time" content="2026-03-26">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.","description":"A local-first, self-hosted trading analytics dashboard that reads positions, delayed market data, macro context, and a personal rule base. It computes deterministic context and LLM prompts, but never places orders or emits trade signals.","datePublished":"2026-03-26","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/cover.png","url":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-06-26-local-first-trading-dashboard/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-06-26-local-first-trading-dashboard"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-06-26-local-first-trading-dashboard/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-06-26-local-first-trading-dashboard/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>The First Feature in My Trading Dashboard Was Not a Chart. It Was a Read-Only Boundary.</h1>
+<p><img src="/posts/2026-06-26-local-first-trading-dashboard/cover.png" alt="A local-first, read-only trading analytics dashboard" loading="lazy"></p>
+<blockquote>
+<p><strong>Up front:</strong> this is a software engineering post, not investment advice. The project is read-only analytics. It does not place orders, does not emit buy/sell signals, and promises nothing about returns.</p>
+</blockquote>
+<h2>TL;DR</h2>
+<table>
+<thead>
+<tr>
+<th>Problem</th>
+<th>My approach</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Trading tools can overreach</td>
+<td>No broker connection by default; read-only when connected</td>
+</tr>
+<tr>
+<td>Bad data can look convincing</td>
+<td>Distorted quotes are labeled “do not use”</td>
+</tr>
+<tr>
+<td>Real-time data can cost money</td>
+<td>UI confirmation plus server-side throttle</td>
+</tr>
+<tr>
+<td>LLMs can hallucinate</td>
+<td>They receive facts and rules, not execution authority</td>
+</tr>
+<tr>
+<td>Slow gateways freeze pages</td>
+<td>Single-flight executor, hard timeout, cached snapshot</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>1. Why I wrote the boundary first</h2>
+<p><strong>Point:</strong> In trading software, “cannot do dangerous things” matters more than “looks advanced.”</p>
+<p>I wanted one screen that pulled together what I check before making a decision:</p>
+<ul>
+<li>Positions.</li>
+<li>Delayed quotes.</li>
+<li>Technical context.</li>
+<li>Macro background.</li>
+<li>News summaries.</li>
+<li>My own written rules.</li>
+<li>An LLM-ready context bundle.</li>
+</ul>
+<p>But the hard constraint came first: <strong>local-first, read-only by default.</strong></p>
+<p>The dashboard may help me organize information, frame risk, and spot conflicts with my own rules. It must not place orders. That boundary has to be architecture, not marketing copy.</p>
+<h2>2. Wrong frame / better frame</h2>
+<table>
+<thead>
+<tr>
+<th>Wrong frame</th>
+<th>Better frame</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The chart is the product</td>
+<td>The boundary and data quality are the product</td>
+</tr>
+<tr>
+<td>Let the LLM recommend trades</td>
+<td>Let the LLM read facts and rules only</td>
+</tr>
+<tr>
+<td>Read-only is a promise</td>
+<td>Read-only is enforced by code paths</td>
+</tr>
+<tr>
+<td>Missing data should be mocked</td>
+<td>Missing data should be labeled missing</td>
+</tr>
+<tr>
+<td>More real-time is always better</td>
+<td>Use paid real-time data only when explicitly needed</td>
+</tr>
+</tbody></table>
+<h2>3. Read-only by design</h2>
+<p><strong>Point:</strong> The safety property is enforced in several independent places.</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Constraint</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Default state</td>
+<td>Home view and polling use local snapshots plus delayed/free data</td>
+</tr>
+<tr>
+<td>Broker connection</td>
+<td>Only explicit user refresh connects</td>
+</tr>
+<tr>
+<td>Session config</td>
+<td>Broker session opens with <code>readonly=True</code></td>
+</tr>
+<tr>
+<td>Code path</td>
+<td>No order-placement call exists in the codebase</td>
+</tr>
+<tr>
+<td>Degraded mode</td>
+<td>Offline gateway re-marks old snapshots; it does not fake data</td>
+</tr>
+</tbody></table>
+<p>Read-only is not a sentence in the README. It is the shape of the code.</p>
+<h2>4. Data honesty</h2>
+<p><strong>Point:</strong> A dashboard you cannot trust at a glance is worse than no dashboard.</p>
+<p>The app adds several reliability gates:</p>
+<ul>
+<li>Wide bid/ask spread or bid &gt; ask: mark as distorted and tell the user not to use it.</li>
+<li>Implausible implied volatility: discard Greeks derived from it.</li>
+<li>Missing option Greeks: explain why, such as no real-time options subscription.</li>
+<li>Paid real-time snapshot: require UI confirmation and server-side throttling.</li>
+<li>Re-marked stale snapshot: label the valuation mode (<code>live</code>, <code>snapshot_external_mark</code>, <code>snapshot_stale</code>).</li>
+</ul>
+<blockquote>
+<p>I do not want a dashboard that pretends to know the market. I want one that knows when it should not be trusted.</p>
+</blockquote>
+<h2>5. Stack: restraint over spectacle</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Choice</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Frontend</td>
+<td>Vite + React + TypeScript</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>FastAPI + uvicorn</td>
+</tr>
+<tr>
+<td>Visualization</td>
+<td>Panels, tables, status bars; no heavy charting library</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Free/delayed by default; paid real-time only on demand</td>
+</tr>
+<tr>
+<td>LLM</td>
+<td>Context assembly only; no execution authority</td>
+</tr>
+</tbody></table>
+<p>The lack of a charting library is intentional. This tool is for reading context before a decision, not staring at candles.</p>
+<h2>6. “Real-time” without WebSockets</h2>
+<p><strong>Point:</strong> Not every dashboard needs socket plumbing.</p>
+<p>The frontend uses disciplined polling:</p>
+<ul>
+<li>Frequent checks for broker connectivity and portfolio state.</li>
+<li>Slower refresh for macro and calendar data.</li>
+<li>Per-source TTLs on the backend: quotes in seconds, options in minutes, fundamentals and daily bars in hours, calendar in days.</li>
+<li>Parallel cross-source fetches via a thread pool.</li>
+<li>A global semaphore to avoid provoking 429s from free APIs.</li>
+</ul>
+<p>It is not flashy. It is stable.</p>
+<h2>7. LLMs read facts. They do not press buttons.</h2>
+<p><strong>Point:</strong> Letting an LLM participate in analysis does not mean giving it authority.</p>
+<p>My personal rule base lives as notes. The app retrieves relevant rules and assembles them with holdings, quotes, macro context, and news.</p>
+<p>The retrieval pipeline degrades gracefully:</p>
+<pre><code class="language-text">lexical recall -&gt; semantic vectors -&gt; multi-query expansion -&gt; section expansion -&gt; LLM rerank -&gt; full pass
+</code></pre>
+<p>If an upper stage fails, it falls back to lexical search. Embeddings are cached with a content hash, so edited rules invalidate automatically.</p>
+<p>There is also a useful escape hatch: export all rules as plain text. The rule base is small enough to paste into a long-context web LLM when needed.</p>
+<h2>8. Pits and fixes</h2>
+<table>
+<thead>
+<tr>
+<th>Pit</th>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Half-open broker gateway froze the page</td>
+<td>Account/portfolio call hung ~54s while holding a lock</td>
+<td>Single-flight executor, hard timeout, cached snapshot</td>
+</tr>
+<tr>
+<td>Free data source died</td>
+<td>Page moved and gained JS anti-scraping</td>
+<td>Migrate source and handle cookie/token handshake</td>
+</tr>
+<tr>
+<td>“Stale options” was misdiagnosed</td>
+<td>Market-closed wide spreads looked like bad data</td>
+<td>Harden reliability checks</td>
+</tr>
+<tr>
+<td>Deploy was its own boss fight</td>
+<td>Cache, stdin, SSH command length, path conversion</td>
+<td>Split into a runbook</td>
+</tr>
+</tbody></table>
+<h2>9. Trade-offs</h2>
+<ul>
+<li>It is a single-user personal tool, not SaaS.</li>
+<li>CORS is pinned to localhost and it leans on a private network.</li>
+<li>Free data is delayed; truly real-time data costs money.</li>
+<li>Some third-party unofficial endpoints can change.</li>
+<li>There are MVP remnants in the tree.</li>
+<li>Again: this is read-only analytics, not an auto-trader and not advice.</li>
+</ul>
+<h2>10. Checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Define what the tool must never do.</li>
+<li><input disabled="" type="checkbox"> Do not connect to high-authority systems by default.</li>
+<li><input disabled="" type="checkbox"> Require explicit confirmation for costly or risky data.</li>
+<li><input disabled="" type="checkbox"> Label bad data instead of beautifying it.</li>
+<li><input disabled="" type="checkbox"> Let LLMs read context, not execute actions.</li>
+<li><input disabled="" type="checkbox"> Put timeouts and caches around slow external dependencies.</li>
+<li><input disabled="" type="checkbox"> Treat deployment as a runbook.</li>
+</ul>
+<h2>11. Final thought</h2>
+<p>The interesting work was never about predicting markets.</p>
+<p>It was about building a tool that is honest about data, restrained with permissions, and useful for thinking.</p>
+<p>Those three properties matter in any dashboard.</p>
+<p>→ <strong><a href="https://github.com/byzosc/trading-pannel" target="_blank" rel="noopener">github.com/byzosc/trading-pannel</a></strong></p>
+</div><nav class="post-nav"><a class="prev" href="/posts/2017-07-01-silence-is-an-eternal-theme/"><span class="post-nav-label">← Older</span><span class="post-nav-title">Silence Is an Eternal Theme</span></a><a class="next" href="/posts/2026-06-21-multi-model-ai-gateway/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">Multi-Model AI Gateway in a Day</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
