@@ -1,5 +1,72 @@
 [
   {
+    "dir": "2026-11-18-cubby",
+    "title": "Building Cubby: One Line Now, Find It Later",
+    "short_title": "Building Cubby",
+    "date": "2026-11-18",
+    "summary": "Why I built Cubby, a small offline app for remembering where you put things — the one rule that shaped it, the design trade-offs, and the bugs that only showed up on real phones.",
+    "tags": [
+      "cubby",
+      "flutter",
+      "ios",
+      "android",
+      "local-first"
+    ],
+    "cover": "cover.jpg",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "做知物（Cubby）：现在说一句，以后就能找到",
+        "short_title": "做知物 Cubby",
+        "summary": "我为什么做知物这个记东西放哪的小 App：一条决定了大半设计的原则、几处取舍，以及只有在真机上才暴露的坑。",
+        "tags": [
+          "知物",
+          "Cubby",
+          "Flutter",
+          "iOS",
+          "Android",
+          "本地优先"
+        ]
+      }
+    }
+  },
+  {
+    "dir": "2026-11-18-motionpilot-spec-tokens",
+    "title": "MotionPilot: An Easing Curve and a Duration Are One Token",
+    "short_title": "MotionPilot: Curve + Duration as One Token",
+    "date": "2026-11-18",
+    "summary": "Why my After Effects panel applies a motion spec's curve and duration in a single step, what Apply Spec actually does to your keyframes, and the AE pitfalls behind it.",
+    "tags": [
+      "motion-design",
+      "after-effects",
+      "motion-tokens",
+      "motionpilot",
+      "tools"
+    ],
+    "cover": "cover.jpg",
+    "lang": "en",
+    "translations": [
+      "zh"
+    ],
+    "localized": {
+      "zh": {
+        "title": "MotionPilot：缓动曲线和时长，是同一个 token",
+        "short_title": "MotionPilot：曲线 + 时长 = 一个 token",
+        "summary": "我的 After Effects 面板为什么把规范里的曲线和时长一步套上、Apply Spec 到底对关键帧做了什么，以及背后踩过的 AE 坑。",
+        "tags": [
+          "动效设计",
+          "After Effects",
+          "motion tokens",
+          "MotionPilot",
+          "工具"
+        ]
+      }
+    }
+  },
+  {
     "dir": "2026-07-20-zerb-hub-command-center",
     "title": "I Turned Homepage into My Personal Command Center",
     "short_title": "Homepage, Turned into a Command Center",

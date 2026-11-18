@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MotionPilot: An Easing Curve and a Duration Are One Token · zosc blog</title>
+  <meta name="description" content="Why my After Effects panel applies a motion spec's curve and duration in a single step, what Apply Spec actually does to your keyframes, and the AE pitfalls behind it.">
+  <link rel="canonical" href="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/">
+  <link rel="alternate" hreflang="en" href="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/">
+  <link rel="alternate" hreflang="zh-CN" href="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/zh/">
+  <link rel="alternate" hreflang="x-default" href="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="zosc blog">
+  <meta property="og:title" content="MotionPilot: An Easing Curve and a Duration Are One Token">
+  <meta property="og:description" content="Why my After Effects panel applies a motion spec's curve and duration in a single step, what Apply Spec actually does to your keyframes, and the AE pitfalls behind it.">
+  <meta property="og:url" content="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/">
+  <meta property="og:image" content="https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/cover.jpg">
+  <meta property="article:published_time" content="2026-11-18">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="author" href="https://zosc.com/">
+  <link rel="alternate" type="application/atom+xml" title="zosc blog" href="/feed.xml">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"MotionPilot: An Easing Curve and a Duration Are One Token","description":"Why my After Effects panel applies a motion spec's curve and duration in a single step, what Apply Spec actually does to your keyframes, and the AE pitfalls behind it.","datePublished":"2026-11-18","inLanguage":"en","image":"https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/cover.jpg","url":"https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.zosc.com/posts/2026-11-18-motionpilot-spec-tokens/"},"author":{"@type":"Person","@id":"https://zosc.com/#person","name":"zosc","url":"https://zosc.com/"},"publisher":{"@type":"Organization","@id":"https://zosc.com/#organization","name":"zosc","url":"https://zosc.com/"},"isPartOf":{"@id":"https://blog.zosc.com/#blog"}}</script>
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem('theme');
+        if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="zosc blog home">
+      <img class="brand-mark" src="/assets/brand/zosc-mark-32.png" alt="" width="24" height="24">
+      <span>zosc&nbsp;blog</span>
+    </a>
+    <nav class="site-nav">
+      <a href="https://zosc.com/" rel="author">zosc.com</a>
+      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode">Dark</button>
+    </nav>
+  </header>
+
+  <main id="app"><article class="post" data-giscus-term="2026-11-18-motionpilot-spec-tokens"><a class="back" href="/">← Back to posts</a><div class="lang-switch"><a data-lang="en" class="active" href="/posts/2026-11-18-motionpilot-spec-tokens/" hreflang="en">English</a><a data-lang="zh" class="" href="/posts/2026-11-18-motionpilot-spec-tokens/zh/" hreflang="zh-CN">中文</a></div><div class="post-body">
+<h1>MotionPilot: An Easing Curve and a Duration Are One Token</h1>
+<p><img src="/posts/2026-11-18-motionpilot-spec-tokens/cover.jpg" alt="MotionPilot in After Effects" loading="lazy"></p>
+<p>I&#39;m zosc, and MotionPilot is my After Effects panel for applying a motion spec where animation is actually made. It&#39;s free on Adobe Exchange.</p>
+<p>An <a href="/posts/2026-07-16-motionhub/">earlier post</a> covered the whole MotionRules toolset. This one stays on a single idea inside MotionPilot: <strong>an easing curve and a duration are one decision, so the panel applies them as one token.</strong></p>
+<h2>A curve without a duration is half a rule</h2>
+<p>Most easing tools give you curves. You pick &quot;ease out&quot;, the handles change, and the timing is still whatever you happened to drag. But a real motion spec doesn&#39;t say &quot;use this curve&quot;; it says &quot;this kind of movement uses this curve <em>for this long</em>.&quot; In a spec, <code>gentle</code> and <code>250ms</code> are one decision, not two.</p>
+<p>So the spec MotionPilot reads, <code>motion-tokens.json</code>, keeps it small. A motion is three things: which property moves, which curve it follows, and how long it takes. The file pins down the allowed values. Here&#39;s a trimmed example from the schema docs:</p>
+<pre><code class="language-json">{
+  &quot;curves&quot;: [
+    { &quot;name&quot;: &quot;easeStandard&quot;,   &quot;bezier&quot;: [0.40, 0.00, 0.20, 1.00] },
+    { &quot;name&quot;: &quot;easeEmphasized&quot;, &quot;bezier&quot;: [0.20, 0.00, 0.00, 1.00] },
+    { &quot;name&quot;: &quot;springSnappy&quot;,   &quot;bezier&quot;: [0.30, 1.30, 0.50, 1.00] }
+  ],
+  &quot;durations&quot;: { &quot;instant&quot;: 100, &quot;fast&quot;: 150, &quot;base&quot;: 250, &quot;slow&quot;: 400 }
+}
+</code></pre>
+<p>There is no separate &quot;overshoot&quot; field. A bounce lives in the curve itself: when the bezier&#39;s y goes above 1 (like <code>springSnappy</code>), it overshoots. Fewer fields means fewer ways for two people to describe the same motion differently.</p>
+<h2>What Apply Spec does</h2>
+<p>In the Spec tab you select two or more keyframes, pick a curve and a duration, and click Apply. It works offline, with no account, no API key and no network request. Under the hood it runs five steps, in this order.</p>
+<p><strong>1. Find every selected keyframe, on every layer.</strong> When you box-select keyframes across several layers, After Effects often reports only the current layer through <code>selectedLayers</code> and <code>selectedProperties</code>. So the panel walks every layer&#39;s property tree and collects every property with at least two selected keys. Each adjacent pair of selected keys is one segment.</p>
+<p><strong>2. Retime first, then ease.</strong> The handle speed depends on how long the segment is, so doing it the other way round gives the wrong speeds. The first key stays put, and each following key moves to the previous one plus the duration tier, snapped to a whole frame. 250 ms is 7.5 frames at 30 fps and 15 frames at 60 fps, so the panel rounds to whole frames and shows you the frame count next to the tier. With a curve-only tool, that&#39;s arithmetic you do in your head.</p>
+<p><strong>3. Move keyframes the hard way.</strong> After Effects has no &quot;move keyframe&quot; call in its scripting API. Moving one means reading everything about it, deleting it, recreating it at the new time and restoring it: value, incoming and outgoing ease, interpolation type, and for position the spatial tangents and roving flag too. If you forget the tangents, the motion path quietly changes shape.</p>
+<p><strong>4. Refuse half-edits.</strong> If retiming would push the last selected key into an unselected keyframe after it, that whole property is skipped and reported, not partly changed. I&#39;d rather do nothing than leave a project half-modified.</p>
+<p><strong>5. Write the handles.</strong> Handles only apply under Bezier interpolation, so linear or hold segments are converted first. The other side of each key is left as it was. The whole run is one undo group, so one Ctrl+Z puts everything back.</p>
+<h2>Turning a cubic-bezier into AE handles</h2>
+<p>After Effects doesn&#39;t take a cubic-bezier directly. Its ease handles are a speed and an influence per keyframe. The conversion at the heart of the panel is:</p>
+<ul>
+<li>outgoing handle of the first key: influence = x1 × 100%, speed = (y1 / x1) × the segment&#39;s average speed</li>
+<li>incoming handle of the second key: influence = (1 − x2) × 100%, speed = ((1 − y2) / (1 − x2)) × the average speed</li>
+</ul>
+<p>When y is outside 0–1 you get overshoot, and the handles express that too, still with just two keyframes.</p>
+<p>The firm rule is <strong>never bake frame by frame</strong>. An early version sampled curves into one keyframe per frame. One test produced 544 commands and took about 36 seconds to run in AE. Switching to bezier handles cut it to a few dozen. Motions with several bounces (elastic, bounce) become a few control keyframes, each segment with its own handles. That&#39;s still nothing like one key per frame.</p>
+<p>One pitfall cost me the overshoot for a while. Adding a keyframe resets the automatic handles of its neighbour, which wiped the outgoing handle I had just set on the first key. The springy curve came out flat. The fix is boring: create both keys with their handles, then set the first key&#39;s outgoing handle once more.</p>
+<h2>Where the AI part fits</h2>
+<p>MotionPilot can also build motion from a sentence, and that part is optional. You bring your own AI: a signed-in OpenAI Codex CLI, your own OpenAI or Google Gemini API key, or a local endpoint such as Ollama. There&#39;s no hosted AI service.</p>
+<p>The token idea is what keeps that half honest. <strong>The model never writes easing values.</strong> It names a curve from your spec, and the panel compiles that name into real handles. Even when the model writes ExtendScript directly, easing must go through the panel&#39;s own helper, with curves from the current spec; left to fill in speed and influence, a model invents its own handles.</p>
+<p>I&#39;m careful with the claim: I don&#39;t say every generated scene is fully spec-compliant. What I can say precisely is that the model doesn&#39;t compute easing; it picks from your list.</p>
+<h2>One spec file, shared with MotionRules</h2>
+<p>MotionPilot is the &quot;build&quot; step of MotionRules. MotionSpec is where you define the curves and duration tiers. MotionPilot applies them in After Effects. MotionSheet audits a Lottie export against the same <code>motion-tokens.json</code>. Because all three read the same file, the spec, the AE work and the developer handoff can&#39;t drift apart.</p>
+<p>The spec loads from a URL. By default that&#39;s <a href="https://motionrules.com/spec/" target="_blank" rel="noopener">motionrules.com/spec</a>, whose spec is published under CC BY 4.0. A studio publishes once and every artist&#39;s panel picks up the change. One index can list several targets — for example a phone UI profile and a head-mounted display profile with different timing budgets — and the panel refuses a spec whose target doesn&#39;t match the one you chose. A file you place locally always beats the URL.</p>
+<p>The pitfall here was silent. The panel ships an offline fallback copy of the spec. For a while that copy was still the first version: curve names that no longer existed, and a <code>slow</code> tier of 400 ms instead of 350. The prompt builder used it to tell the model which curve names were allowed, so offline, every generated motion was off-spec and nothing reported an error. The fallbacks are now generated from the spec, never copied by hand.</p>
+<h2>Two more After Effects surprises</h2>
+<ul>
+<li><strong>Non-English layer names produced empty files.</strong> The panel passes larger results through a file, and ExtendScript&#39;s <code>File.write</code> fails on non-ASCII text, leaving a 0-byte file. Comps with Chinese layer names broke every time with a vague &quot;unexpected end of JSON&quot;. The old panel had already fixed this by escaping text to <code>\uXXXX</code>; I left that fix behind when I moved to the new CEP panel. Lesson: when you port code, port its old patches too.</li>
+<li><strong>&quot;The AI is slow&quot; was the network.</strong> A prompt asking for a one-word reply took about 116 seconds at the default reasoning level and 115 at low. The same time at both levels meant the model wasn&#39;t the problem. The API host wasn&#39;t reachable directly, and the CLI kept retrying until it timed out. After Effects started from the Start menu doesn&#39;t inherit a user&#39;s proxy environment variables. With a proxy set explicitly, the same prompt took 5.5 seconds. The panel now manages the proxy itself, and never sends local endpoints like Ollama through it.</li>
+</ul>
+<h2>Requirements and links</h2>
+<p>MotionPilot needs After Effects 26.0–26.9. It&#39;s developed and tested on Windows; macOS is not verified yet.</p>
+<ul>
+<li><a href="https://zosc.com/project/motionpilot/" target="_blank" rel="noopener">MotionPilot on zosc.com</a></li>
+<li><a href="https://exchange.adobe.com/apps/cc/205857" target="_blank" rel="noopener">Adobe Exchange</a></li>
+<li><a href="https://motionrules.com/pilot" target="_blank" rel="noopener">Demo and guide on motionrules.com</a></li>
+</ul>
+</div><nav class="post-nav"><a class="prev" href="/posts/2026-07-20-zerb-hub-command-center/"><span class="post-nav-label">← Older</span><span class="post-nav-title">Homepage, Turned into a Command Center</span></a><a class="next" href="/posts/2026-11-18-cubby/"><span class="post-nav-label">Newer →</span><span class="post-nav-title">Building Cubby</span></a></nav></article></main>
+
+  <footer class="site-footer">
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">Plain Markdown · no build · push to publish.</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="/assets/app.js"></script>
+</body>
+</html>
