@@ -25,8 +25,10 @@ const postLang = postEl ? (document.documentElement.lang === 'zh-CN' ? 'zh' : 'e
 // 站点 UI 文案：文章页跟随页面语言，首页跟随当前阅读语言（localStorage 'lang'，默认英文）
 function currentLang() { return postLang || (localStorage.getItem('lang') === 'zh' ? 'zh' : 'en'); }
 const THEME_KEY = 'theme';
+// 2026-11-23: dark is the default whatever the system prefers — one look with zosc.com, which is
+// dark only. A reader who picks light keeps it (localStorage).
 function systemTheme() {
-  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return 'dark';
 }
 function savedTheme() {
   const theme = localStorage.getItem(THEME_KEY);

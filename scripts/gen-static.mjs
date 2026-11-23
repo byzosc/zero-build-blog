@@ -27,9 +27,9 @@ const HREFLANG = { en: 'en', zh: 'zh-CN' };
 const LANG_LABEL = { en: 'English', zh: '中文', 'zh-CN': '中文', ja: '日本語' };
 const STR = {
   en: { back: '← Back to posts', older: '← Older', newer: 'Newer →',
-        footer: 'Plain Markdown · no build · push to publish.', theme: 'Dark', themeLabel: 'Switch to dark mode' },
+        footer: 'Plain Markdown · no build · push to publish.', theme: 'Light', themeLabel: 'Switch to light mode' },
   zh: { back: '← 返回列表', older: '← 更早', newer: '更新 →',
-        footer: '纯 Markdown · 免构建 · push 即发布。', theme: '暗色', themeLabel: '切换到暗色模式' },
+        footer: '纯 Markdown · 免构建 · push 即发布。', theme: '亮色', themeLabel: '切换到亮色模式' },
 };
 const t = (k, lang) => (STR[lang] && STR[lang][k]) || STR.en[k];
 
@@ -201,8 +201,10 @@ ${alternates}
   <link rel="icon" href="/assets/brand/zosc-mark-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="/assets/brand/zosc-mark-192.png" sizes="192x192" type="image/png">
   <link rel="apple-touch-icon" href="/assets/brand/zosc-mark-180.png">
-  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="(prefers-color-scheme: light)">
-  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="(prefers-color-scheme: dark)">
+  <link id="hljs-light" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css" media="not all">
+  <link id="hljs-dark" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" media="all">
+  <link rel="preload" href="/assets/fonts/epilogue-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/mulish-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/assets/style.css">
 </head>
 <body>
@@ -212,8 +214,12 @@ ${alternates}
       <span>zosc&nbsp;blog</span>
     </a>
     <nav class="site-nav">
-      <a href="https://zosc.com/" rel="author">zosc.com</a>
-      <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">GitHub</a>
+      <a class="nav-site" href="https://zosc.com/#code">Code</a>
+      <a class="nav-site" href="https://zosc.com/#motion">Motion</a>
+      <a class="nav-site" href="https://zosc.com/#visual">Visual</a>
+      <a class="nav-site" href="https://zosc.com/about/">About</a>
+      <a class="nav-site" href="/" aria-current="page">Blog</a>
+      <a class="nav-home" href="https://zosc.com/" rel="author">zosc.com</a>
       <button class="theme-toggle" type="button" data-theme-toggle aria-label="${t('themeLabel', lang)}">${t('theme', lang)}</button>
     </nav>
   </header>
@@ -223,7 +229,7 @@ ${bodyHtml}
 </div>${nav}</article></main>
 
   <footer class="site-footer">
-    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">${t('footer', lang)}</span>
+    © <span id="year"></span> <a href="https://zosc.com/" rel="author">zosc</a> · <a href="https://x.com/byzosc" rel="me">X</a> · <a href="https://github.com/byzosc" rel="me">GitHub</a> · <span id="tagline">${t('footer', lang)}</span> · <a href="https://github.com/byzosc/zero-build-blog" target="_blank" rel="noopener">zero-build-blog</a>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
